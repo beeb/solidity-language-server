@@ -93,3 +93,6 @@ solidity-language-server
   - No ast nodes supported for yul
   - Struct defined types e.g. `Lib.Sturct` nameLocations are not identified as separate ast nodes
     - This makes renaming, and references for `Lib` not show up in `Lib.Struct` type usage
+- Solar's hir and inmemory ast replacement for our `ast_cache`
+  - Currently still in production
+  - You can try add `--use-solar` for lsp that uses solar for ast production
