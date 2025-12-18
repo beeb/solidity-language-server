@@ -119,11 +119,10 @@ pub fn cache_ids(
                         };
 
                         let mut final_name_location = name_location;
-                        if final_name_location.is_none() {
-                            if let Some(member_loc) = tree.get("memberLocation").and_then(|v| v.as_str()) {
+                        if final_name_location.is_none()
+                            && let Some(member_loc) = tree.get("memberLocation").and_then(|v| v.as_str()) {
                                 final_name_location = Some(member_loc.to_string());
                             }
-                        }
 
                         let node_info = NodeInfo {
                             src: src.to_string(),

@@ -83,7 +83,13 @@ pub fn id_to_location_with_index(
             return None;
         }
     } else {
-        return None;
+        // Fallback to src location for nodes without nameLocation
+        let parts: Vec<&str> = node.src.split(':').collect();
+        if parts.len() == 3 {
+            (parts[0], parts[1], parts[2])
+        } else {
+            return None;
+        }
     };
 
     let byte_offset: usize = byte_str.parse().ok()?;
