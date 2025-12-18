@@ -237,7 +237,7 @@ impl LanguageServer for ForgeLsp {
             Err(_) => {
                 self.client
                     .log_message(
-                        MessageType::ERROR, "Invalied file uri"
+                        MessageType::ERROR, "Invalid file uri"
                     ).await;
                 return Ok(None);
             }
