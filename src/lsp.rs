@@ -1,6 +1,8 @@
 use crate::runner::{ForgeRunner, Runner};
 use crate::references;
 use crate::goto;
+use crate::utils;
+use crate::rename;
 use std::sync::Arc;
 use std::collections::HashMap;
 use tokio::sync::RwLock;
@@ -98,6 +100,25 @@ impl ForgeLsp {
 
         self.client.publish_diagnostics(uri, all_diagnostics, Some(version)).await;
     }
+
+    async fn apply_workspace_edit(&self, workspace_edit: &WorkspaceEdit) -> Result<(), String> {
+        if let Some(changes) = &workspace_edit.changes {
+            for (uri, edits) in changes {
+                let path = uri.to_file_path().map_err(|_| "Invalid uri".to_string())?;
+                let mut content = std::fs::read_to_string(&path).map_err(|e| e.to_string())?;
+                let mut sorted_edits = edits.clone();
+                sorted_edits.sort_by(|a, b| b.range.start.cmp(&a.range.start));
+                for edit in sorted_edits {
+                    let start_byte = byte_offset(&content, edit.range.start)?;
+                    let end_byte = byte_offset(&content, edit.range.end)?;
+                    content.replace_range(start_byte..end_byte, &edit.new_text);
+                }
+                std::fs::write(&path, &content).map_err(|e| e.to_string())?;
+            }
+        }
+        Ok(())
+    }
+
 }
 
 #[tower_lsp::async_trait]
@@ -512,4 +533,193 @@ impl LanguageServer for ForgeLsp {
             Ok(Some(locations))
         }
     }
+    async fn rename(
+        &self,
+        params: RenameParams
+    ) -> tower_lsp::jsonrpc::Result<Option<WorkspaceEdit>> {
+        self.client
+            .log_message(
+                MessageType::INFO, "got textDocument/rename request"
+            ).await;
+
+        let uri = params.text_document_position.text_document.uri;
+        let position = params.text_document_position.position;
+        let new_name = params.new_name;
+        let file_path = match uri.to_file_path() {
+            Ok(p) => p,
+            Err(_) => {
+                self.client
+                    .log_message(
+                        MessageType::ERROR, "invalid file uri"
+                    ).await;
+                return Ok(None);
+            }
+        };
+        let source_bytes = match std::fs::read(&file_path) {
+            Ok(bytes) => bytes,
+            Err(e) => {
+                self.client
+                    .log_message(
+                        MessageType::ERROR, 
+                        format!("failed to read file: {e}")
+                    ).await;
+                return Ok(None);
+            }
+        };
+
+        let current_identifier = match rename::get_identifier_at_position(&source_bytes, position) {
+            Some(id) => id,
+            None => {
+                self.client
+                    .log_message(
+                        MessageType::ERROR, "No identifier found at position"
+                    ).await;
+                return Ok(None);
+            }
+        };
+
+        if !utils::is_valid_solidity_identifier(&new_name) {
+            return Err(tower_lsp::jsonrpc::Error::invalid_params(
+                "new name is not a valid solidity identifier"
+            ));
+        }
+
+        if new_name == current_identifier {
+            self.client
+                .log_message(
+                    MessageType::INFO, "new name is the same as current identifier"
+                ).await;
+            return Ok(None);
+        }
+
+        let ast_data = {
+            let cache = self.ast_cache.read().await;
+            if let Some(cached_ast) = cache.get(&uri.to_string()) {
+                self.client
+                    .log_message(
+                        MessageType::INFO, "using cached ast data"
+                    ).await;
+                cached_ast.clone()
+            } else {
+                drop(cache);
+                let path_str = match file_path.to_str() {
+                    Some(s) => s,
+                    None => {
+                        self.client
+                            .log_message(
+                                MessageType::ERROR, "invalid file path"
+                            ).await;
+                        return Ok(None);
+                    }
+                };
+                match self.compiler.ast(path_str).await {
+                    Ok(data) => {
+                        self.client
+                            .log_message(
+                                MessageType::INFO, "fetching and caching new ast data"
+                            ).await;
+                        let mut cache = self.ast_cache.write().await;
+                        cache.insert(uri.to_string(), data.clone());
+                        data
+                    }
+                    Err(e) => {
+                        self.client
+                            .log_message(
+                                MessageType::ERROR,
+                                format!("failed to get ast: {e}")
+                            ).await;
+                        return Ok(None);
+                    }
+                }
+            }
+        };
+        match rename::rename_symbol(&ast_data, &uri, position, &source_bytes, new_name) {
+            Some(workspace_edit) => {
+                self.client
+                    .log_message(
+                        MessageType::INFO,
+                        format!(
+                            "created rename edit with {} changes",
+                            workspace_edit
+                                .changes
+                                .as_ref()
+                                .map(|c| c.values().map(|v| v.len()).sum::<usize>())
+                                .unwrap_or(0)
+                        ),
+                    ).await;
+
+                let mut server_changes = HashMap::new();
+                let mut client_changes = HashMap::new();
+                if let Some(changes) = &workspace_edit.changes {
+                    for (file_uri, edits) in changes {
+                        if file_uri == &uri {
+                            client_changes.insert(file_uri.clone(), edits.clone());
+                        } else {
+                            server_changes.insert(file_uri.clone(), edits.clone());
+                        }
+                    }
+                }
+
+                if !server_changes.is_empty() {
+                    let server_edit = WorkspaceEdit {
+                        changes: Some(server_changes.clone()),
+                        ..Default::default()
+                    };
+                    if let Err(e) = self.apply_workspace_edit(&server_edit).await {
+                        self.client
+                            .log_message(
+                                MessageType::ERROR,
+                                format!("failed to apply server-side rename edit: {e}")
+                            ).await;
+                        return Ok(None);
+                    }
+                    self.client
+                        .log_message(
+                            MessageType::INFO,
+                            "applied server-side rename edits and saved other files"
+                        ).await;
+                    let mut cache = self.ast_cache.write().await;
+                    for uri in server_changes.keys() {
+                        cache.remove(uri.as_str());
+                    }
+
+                }
+
+                if client_changes.is_empty() {
+                    Ok(None)
+                } else {
+                    let client_edit = WorkspaceEdit {
+                        changes: Some(client_changes),
+                        ..Default::default()
+                    };
+                    Ok(Some(client_edit))
+                }
+            }
+
+            None => {
+                self.client
+                    .log_message(
+                        MessageType::INFO, "No locations found for renaming"
+                    ).await;
+                Ok(None)
+            }
+        }
+    }
+}
+
+
+fn byte_offset(content: &str, position: Position) -> Result<usize, String> {
+    let lines: Vec<&str> = content.lines().collect();
+    if position.line as usize >= lines.len() {
+        return Err("Line out of range".to_string());
+    }
+    let mut offset = 0;
+    (0..position.line as usize).for_each(|i| {
+        offset += lines[i].len() + 1; // +1 for \n
+    });
+    offset += position.character as usize;
+    if offset > content.len() {
+        return Err("Character out of range".to_string());
+    }
+    Ok(offset)
 }

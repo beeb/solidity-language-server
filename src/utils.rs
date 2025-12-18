@@ -52,7 +52,6 @@ pub fn position_to_byte_offset(source: &str, line: u32, character: u32) -> usize
     source.len()
 }
 
-/// Check if a string is a valid Solidity identifier
 pub fn is_valid_solidity_identifier(name: &str) -> bool {
     if name.is_empty() {
         return false;
