@@ -7,7 +7,7 @@ license = "MIT"
 readme = "README.md"
 homepage = "https://github.com/mmsaki/solidity-language-server"
 repository = "https://github.com/mmsaki/solidity-language-server"
-keywords = ["language server protocol", "solidity", "lsp"]
+keywords = ["language server", "solidity", "lsp"]
 
 [dependencies]
 clap = { version = "4.5.53", features = ["derive"] }
