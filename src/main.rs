@@ -8,6 +8,8 @@ use tracing::info;
 pub struct LspArgs {
     #[arg(long)]
     pub stdio: bool,
+    #[arg(long)]
+    pub use_solar: bool,
 }
 
 impl LspArgs {
@@ -23,7 +25,7 @@ impl LspArgs {
 
         let stdin = tokio::io::stdin();
         let stdout = tokio::io::stdout();
-        let (service, socket) = LspService::new(ForgeLsp::new);
+        let (service, socket) = LspService::new(|client| ForgeLsp::new(client, self.use_solar));
         Server::new(stdin, stdout, socket).serve(service).await;
 
         info!("Solidity LSP Server stopped.");

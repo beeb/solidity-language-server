@@ -1,13 +1,12 @@
-use crate::runner::{ForgeRunner, Runner};
-use crate::references;
 use crate::goto;
-use crate::utils;
+use crate::references;
 use crate::rename;
-use std::sync::Arc;
+use crate::runner::{ForgeRunner, Runner};
+use crate::utils;
 use std::collections::HashMap;
+use std::sync::Arc;
 use tokio::sync::RwLock;
 use tower_lsp::{Client, LanguageServer, lsp_types::*};
-
 
 pub struct ForgeLsp {
     client: Client,
@@ -16,10 +15,18 @@ pub struct ForgeLsp {
 }
 
 impl ForgeLsp {
-    pub fn new(client: Client) -> Self {
-        let compiler = Arc::new(ForgeRunner) as Arc<dyn Runner>;
+    pub fn new(client: Client, use_solar: bool) -> Self {
+        let compiler: Arc<dyn Runner> = if use_solar {
+            Arc::new(crate::solar_runner::SolarRunner)
+        } else {
+            Arc::new(ForgeRunner)
+        };
         let ast_cache = Arc::new(RwLock::new(HashMap::new()));
-        Self { client, compiler, ast_cache}
+        Self {
+            client,
+            compiler,
+            ast_cache,
+        }
     }
 
     async fn on_change(&self, params: TextDocumentItem) {
