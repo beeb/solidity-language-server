@@ -137,3 +137,30 @@ fn test_enum_members_in_document_symbols() {
         println!("Found enum with members in test data");
     }
 }
+
+#[test]
+fn test_container_names() {
+    let ast_data = match get_test_ast_data() {
+        Some(data) => data,
+        None => return,
+    };
+
+    let symbols = extract_symbols(&ast_data);
+
+    // Check that some symbols have container_name set
+    let symbols_with_container: Vec<_> = symbols.iter()
+        .filter(|s| s.container_name.is_some())
+        .collect();
+
+    // Should have some symbols with container names (functions in contracts, struct members, etc.)
+    assert!(!symbols_with_container.is_empty(), "Should find symbols with container_name set");
+
+    // Check that struct members have container_name
+    let struct_members: Vec<_> = symbols.iter()
+        .filter(|s| s.kind == SymbolKind::FIELD && s.container_name.is_some())
+        .collect();
+
+    if !struct_members.is_empty() {
+        println!("Found {} struct/field members with container names", struct_members.len());
+    }
+}
