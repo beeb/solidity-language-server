@@ -1,6 +1,6 @@
 use crate::{build::build_output_to_diagnostics, lint::lint_output_to_diagnostics};
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+use std::{io, path::PathBuf};
 use thiserror::Error;
 use tokio::process::Command;
 use tower_lsp::{
@@ -15,6 +15,7 @@ pub trait Runner: Send + Sync {
     async fn build(&self, file: &str) -> Result<serde_json::Value, RunnerError>;
     async fn lint(&self, file: &str) -> Result<serde_json::Value, RunnerError>;
     async fn ast(&self, file: &str) -> Result<serde_json::Value, RunnerError>;
+    async fn format(&self, file: &str) -> Result<String, RunnerError>;
     async fn get_build_diagnostics(&self, file: &Url) -> Result<Vec<Diagnostic>, RunnerError>;
     async fn get_lint_diagnostics(&self, file: &Url) -> Result<Vec<Diagnostic>, RunnerError>;
 }
@@ -86,6 +87,42 @@ impl Runner for ForgeRunner {
         Ok(parsed)
     }
 
+    async fn format(&self, file_path: &str) -> Result<String, RunnerError> {
+        let output = Command::new("forge")
+            .arg("fmt")
+            .arg(file_path)
+            .arg("--check")
+            .arg("--raw")
+            .env("FOUNDRY_DISABLE_NIGHTLY_WARNING", "1")
+            .output()
+            .await?;
+        let stdout = String::from_utf8_lossy(&output.stdout).to_string();
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        match output.status.code() {
+            Some(0) => {
+                // Already formatted, read the current file content
+                tokio::fs::read_to_string(file_path)
+                    .await
+                    .map_err(|_| RunnerError::ReadError)
+            }
+            Some(1) => {
+                // Needs formatting, stdout has the formatted content
+                if stdout.is_empty() {
+                    Err(RunnerError::CommandError(io::Error::other(format!(
+                        "forge fmt unexpected empty output on {}: exit code {}, stderr: {}",
+                        file_path, output.status, stderr
+                    ))))
+                } else {
+                    Ok(stdout)
+                }
+            }
+            _ => Err(RunnerError::CommandError(io::Error::other(format!(
+                "forge fmt failed on {}: exit code {}, stderr: {}",
+                file_path, output.status, stderr
+            )))),
+        }
+    }
+
     async fn get_lint_diagnostics(&self, file: &Url) -> Result<Vec<Diagnostic>, RunnerError> {
         let path: PathBuf = file.to_file_path().map_err(|_| RunnerError::InvalidUrl)?;
         let path_str = path.to_str().ok_or(RunnerError::InvalidUrl)?;
@@ -115,7 +152,7 @@ pub enum RunnerError {
     #[error("Invalid file URL")]
     InvalidUrl,
     #[error("Failed to run command: {0}")]
-    CommandError(#[from] std::io::Error),
+    CommandError(#[from] io::Error),
     #[error("JSON error: {0}")]
     JsonError(#[from] serde_json::Error),
     #[error("Empty output from compiler")]

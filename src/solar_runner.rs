@@ -85,6 +85,13 @@ impl Runner for SolarRunner {
         Ok(serde_json::Value::Array(Vec::new()))
     }
 
+    async fn format(&self, file: &str) -> Result<String, RunnerError> {
+        // Solar does not have formatting, return the original content
+        tokio::fs::read_to_string(file)
+            .await
+            .map_err(|_| RunnerError::ReadError)
+    }
+
     async fn ast(&self, file: &str) -> Result<serde_json::Value, RunnerError> {
         // For solar, we can return the AST as JSON
         // This is a simplified version; in practice, you might need to serialize the AST

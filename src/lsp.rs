@@ -2,8 +2,8 @@ use crate::goto;
 use crate::references;
 use crate::rename;
 use crate::runner::{ForgeRunner, Runner};
-use crate::utils;
 use crate::symbols;
+use crate::utils;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -13,6 +13,7 @@ pub struct ForgeLsp {
     client: Client,
     compiler: Arc<dyn Runner>,
     ast_cache: Arc<RwLock<HashMap<String, serde_json::Value>>>,
+    text_cache: Arc<RwLock<HashMap<String, String>>>,
 }
 
 impl ForgeLsp {
@@ -23,10 +24,12 @@ impl ForgeLsp {
             Arc::new(ForgeRunner)
         };
         let ast_cache = Arc::new(RwLock::new(HashMap::new()));
+        let text_cache = Arc::new(RwLock::new(HashMap::new()));
         Self {
             client,
             compiler,
             ast_cache,
+            text_cache,
         }
     }
 
@@ -72,6 +75,10 @@ impl ForgeLsp {
                 .log_message(MessageType::INFO, format!("Failed to cache ast data: {e}"))
                 .await;
         }
+
+        // cache text
+        let mut text_cache = self.text_cache.write().await;
+        text_cache.insert(uri.to_string(), params.text);
 
         let mut all_diagnostics = vec![];
 
@@ -156,18 +163,21 @@ impl LanguageServer for ForgeLsp {
                 references_provider: Some(OneOf::Left(true)),
                 rename_provider: Some(OneOf::Right(RenameOptions {
                     prepare_provider: Some(true),
-                    work_done_progress_options:  WorkDoneProgressOptions {
-                        work_done_progress: Some(true)
-                    }
+                    work_done_progress_options: WorkDoneProgressOptions {
+                        work_done_progress: Some(true),
+                    },
                 })),
                 workspace_symbol_provider: Some(OneOf::Left(true)),
                 document_symbol_provider: Some(OneOf::Left(true)),
+                document_formatting_provider: Some(OneOf::Left(true)),
                 text_document_sync: Some(TextDocumentSyncCapability::Options(
                     TextDocumentSyncOptions {
                         will_save: Some(true),
-                        will_save_wait_until: Some(true),
+                        will_save_wait_until: None,
                         open_close: Some(true),
-                        save: Some(TextDocumentSyncSaveOptions::Supported(true)),
+                        save: Some(TextDocumentSyncSaveOptions::SaveOptions(SaveOptions {
+                            include_text: Some(true),
+                        })),
                         change: Some(TextDocumentSyncKind::FULL),
                     },
                 )),
@@ -203,7 +213,7 @@ impl LanguageServer for ForgeLsp {
             .await;
 
         // invalidate cached ast
-        let uri = params.text_document.uri;
+        let uri = params.text_document.uri.clone();
         let mut cache = self.ast_cache.write().await;
         if cache.remove(&uri.to_string()).is_some() {
             self.client
@@ -212,6 +222,12 @@ impl LanguageServer for ForgeLsp {
                     format!("Invalidated cached ast data from file {uri}"),
                 )
                 .await;
+        }
+
+        // update text cache
+        if let Some(change) = params.content_changes.into_iter().next() {
+            let mut text_cache = self.text_cache.write().await;
+            text_cache.insert(uri.to_string(), change.text);
         }
     }
 
@@ -250,25 +266,101 @@ impl LanguageServer for ForgeLsp {
     async fn will_save(&self, params: WillSaveTextDocumentParams) {
         self.client
             .log_message(
-                MessageType::INFO, 
+                MessageType::INFO,
                 format!(
-                    "file will save reason:{:?} {}", 
-                    params.reason, 
-                    params.text_document.uri
-                )
+                    "file will save reason:{:?} {}",
+                    params.reason, params.text_document.uri
+                ),
             )
             .await;
     }
 
-    async fn will_save_wait_until(
+    async fn formatting(
         &self,
-        _params: WillSaveTextDocumentParams,
+        params: DocumentFormattingParams,
     ) -> tower_lsp::jsonrpc::Result<Option<Vec<TextEdit>>> {
         self.client
-            .log_message(MessageType::INFO, "will save wait until")
+            .log_message(MessageType::INFO, "formatting request")
             .await;
-        // TODO: Implement formatting or other pre-save edits
-        Ok(None)
+
+        let uri = params.text_document.uri;
+        let file_path = match uri.to_file_path() {
+            Ok(path) => path,
+            Err(_) => {
+                self.client
+                    .log_message(MessageType::ERROR, "Invalid file URI for formatting")
+                    .await;
+                return Ok(None);
+            }
+        };
+        let path_str = match file_path.to_str() {
+            Some(s) => s,
+            None => {
+                self.client
+                    .log_message(MessageType::ERROR, "Invalid file path for formatting")
+                    .await;
+                return Ok(None);
+            }
+        };
+
+        // Get original content
+        let original_content = {
+            let text_cache = self.text_cache.read().await;
+            if let Some(content) = text_cache.get(&uri.to_string()) {
+                content.clone()
+            } else {
+                // Fallback to reading file
+                match std::fs::read_to_string(&file_path) {
+                    Ok(content) => content,
+                    Err(_) => {
+                        self.client
+                            .log_message(MessageType::ERROR, "Failed to read file for formatting")
+                            .await;
+                        return Ok(None);
+                    }
+                }
+            }
+        };
+
+        // Get formatted content
+        let formatted_content = match self.compiler.format(path_str).await {
+            Ok(content) => content,
+            Err(e) => {
+                self.client
+                    .log_message(MessageType::WARNING, format!("Formatting failed: {e}"))
+                    .await;
+                return Ok(None);
+            }
+        };
+
+        // If changed, return edit to replace whole document
+        if original_content != formatted_content {
+            let lines: Vec<&str> = original_content.lines().collect();
+            let (end_line, end_character) = if original_content.ends_with('\n') {
+                (lines.len() as u32, 0)
+            } else {
+                (
+                    (lines.len().saturating_sub(1)) as u32,
+                    lines.last().map(|l| l.len() as u32).unwrap_or(0),
+                )
+            };
+            let edit = TextEdit {
+                range: Range {
+                    start: Position {
+                        line: 0,
+                        character: 0,
+                    },
+                    end: Position {
+                        line: end_line,
+                        character: end_character,
+                    },
+                },
+                new_text: formatted_content,
+            };
+            Ok(Some(vec![edit]))
+        } else {
+            Ok(None)
+        }
     }
 
     async fn did_close(&self, _: DidCloseTextDocumentParams) {
@@ -603,7 +695,10 @@ impl LanguageServer for ForgeLsp {
             self.client
                 .log_message(
                     MessageType::INFO,
-                    format!("prepare rename range: {}:{}", range.start.line, range.start.character),
+                    format!(
+                        "prepare rename range: {}:{}",
+                        range.start.line, range.start.character
+                    ),
                 )
                 .await;
             Ok(Some(PrepareRenameResponse::Range(range)))
@@ -783,13 +878,11 @@ impl LanguageServer for ForgeLsp {
 
     async fn symbol(
         &self,
-        params: WorkspaceSymbolParams
+        params: WorkspaceSymbolParams,
     ) -> tower_lsp::jsonrpc::Result<Option<Vec<SymbolInformation>>> {
         self.client
-            .log_message(
-                MessageType::INFO, "got workspace/symbol request"
-            )
-        .await;
+            .log_message(MessageType::INFO, "got workspace/symbol request")
+            .await;
 
         let current_dir = std::env::current_dir().ok();
         let ast_data = if let Some(dir) = current_dir {
@@ -798,20 +891,14 @@ impl LanguageServer for ForgeLsp {
                 Ok(data) => data,
                 Err(e) => {
                     self.client
-                        .log_message(
-                            MessageType::WARNING,
-                            format!("failed to get ast data: {e}")
-                        )
+                        .log_message(MessageType::WARNING, format!("failed to get ast data: {e}"))
                         .await;
                     return Ok(None);
-
                 }
             }
         } else {
             self.client
-                .log_message(
-                    MessageType::ERROR, "could not get current directory"
-                )
+                .log_message(MessageType::ERROR, "could not get current directory")
                 .await;
             return Ok(None);
         };
@@ -823,40 +910,33 @@ impl LanguageServer for ForgeLsp {
         }
         if all_symbols.is_empty() {
             self.client
-                .log_message(
-                    MessageType::INFO, "No symbols found"
-                )
+                .log_message(MessageType::INFO, "No symbols found")
                 .await;
             Ok(None)
         } else {
             self.client
                 .log_message(
-                    MessageType::INFO, 
-                    format!("found {} symbol", all_symbols.len())
+                    MessageType::INFO,
+                    format!("found {} symbol", all_symbols.len()),
                 )
                 .await;
             Ok(Some(all_symbols))
         }
-
     }
 
     async fn document_symbol(
         &self,
-        params: DocumentSymbolParams
+        params: DocumentSymbolParams,
     ) -> tower_lsp::jsonrpc::Result<Option<DocumentSymbolResponse>> {
         self.client
-            .log_message(
-                MessageType::INFO, "got textDocument/documentSymbol request"
-            )
+            .log_message(MessageType::INFO, "got textDocument/documentSymbol request")
             .await;
         let uri = params.text_document.uri;
         let file_path = match uri.to_file_path() {
             Ok(path) => path,
             Err(_) => {
                 self.client
-                    .log_message(
-                        MessageType::ERROR, "invalid file uri"
-                    )
+                    .log_message(MessageType::ERROR, "invalid file uri")
                     .await;
                 return Ok(None);
             }
@@ -866,22 +946,16 @@ impl LanguageServer for ForgeLsp {
             Some(s) => s,
             None => {
                 self.client
-                    .log_message(
-                        MessageType::ERROR, "invalid path"
-                    )
+                    .log_message(MessageType::ERROR, "invalid path")
                     .await;
                 return Ok(None);
             }
-
         };
         let ast_data = match self.compiler.ast(path_str).await {
             Ok(data) => data,
             Err(e) => {
                 self.client
-                    .log_message(
-                        MessageType::WARNING,
-                        format!("failed to get ast data: {e}")
-                    )
+                    .log_message(MessageType::WARNING, format!("failed to get ast data: {e}"))
                     .await;
                 return Ok(None);
             }
@@ -889,16 +963,14 @@ impl LanguageServer for ForgeLsp {
         let symbols = symbols::extract_document_symbols(&ast_data, path_str);
         if symbols.is_empty() {
             self.client
-                .log_message(
-                    MessageType::INFO, "no document symbols found"
-                )
+                .log_message(MessageType::INFO, "no document symbols found")
                 .await;
             Ok(None)
         } else {
             self.client
                 .log_message(
                     MessageType::INFO,
-                    format!("found {} document symbols", symbols.len())
+                    format!("found {} document symbols", symbols.len()),
                 )
                 .await;
             Ok(Some(DocumentSymbolResponse::Nested(symbols)))
