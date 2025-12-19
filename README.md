@@ -49,7 +49,7 @@ solidity-language-server
 - [x] `textDocument/prepareRename` - Prepare rename validation
 - [x] `textDocument/rename` - Rename symbols across files
 - [x] `textDocument/formatting` - Document formatting
-- [ ] `textDocument/completion` - Code completion
+- [x] `textDocument/completion` - Code completion
 - [ ] `textDocument/hover` - Hover information
 - [ ] `textDocument/signatureHelp` - Function signature help
 - [ ] `textDocument/typeDefinition` - Go to type definition
