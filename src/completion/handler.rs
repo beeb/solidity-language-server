@@ -12,12 +12,18 @@ pub fn get_completions(
     let mut completions = Vec::new();
 
     // Check if this is a dot completion
-    let is_dot_completion = params.context.as_ref()
+    let is_dot_completion = params
+        .context
+        .as_ref()
         .and_then(|ctx| ctx.trigger_character.as_ref())
         .map(|t| t == ".")
-        .unwrap_or(false) || {
-            let byte_offset = crate::utils::position_to_byte_offset(text, position.line, position.character);
-            text.get(..byte_offset).map(|s| s.ends_with('.')).unwrap_or(false)
+        .unwrap_or(false)
+        || {
+            let byte_offset =
+                crate::utils::position_to_byte_offset(text, position.line, position.character);
+            text.get(..byte_offset)
+                .map(|s| s.ends_with('.'))
+                .unwrap_or(false)
         };
 
     if is_dot_completion {
@@ -36,7 +42,11 @@ pub fn get_completions(
     completions
 }
 
-fn get_scoped_completions(ast_data: &Value, _text: &str, _position: Position) -> Vec<CompletionItem> {
+fn get_scoped_completions(
+    ast_data: &Value,
+    _text: &str,
+    _position: Position,
+) -> Vec<CompletionItem> {
     // Extract symbols from AST and provide completions for in-scope items
     // This is a simplified version - a full implementation would need proper scope analysis
     crate::symbols::extract_symbols(ast_data)
@@ -64,10 +74,5 @@ fn get_scoped_completions(ast_data: &Value, _text: &str, _position: Position) ->
 
 fn get_dot_completions(text: &str, ast_data: &Value, position: Position) -> Vec<CompletionItem> {
     // Use the member_access module for proper type detection
-    if let Some(completions) = member_access::get_dot_completions(text, ast_data, position) {
-        completions
-    } else {
-        // TODO: Implement proper type detection based on AST analysis for variables and other types
-        Vec::new()
-    }
+    member_access::get_dot_completions(text, ast_data, position).unwrap_or_default()
 }
