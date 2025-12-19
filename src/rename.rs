@@ -81,6 +81,50 @@ pub fn get_identifier_at_position(source_bytes: &[u8], position: Position) -> Op
     Some(line[start..end].to_string())
 }
 
+pub fn get_identifier_range(source_bytes: &[u8], position: Position) -> Option<Range> {
+    let text = String::from_utf8_lossy(source_bytes);
+    let lines: Vec<&str> = text.lines().collect();
+    if position.line as usize >= lines.len() {
+        return None;
+    }
+    let line = lines[position.line as usize];
+    if position.character as usize > line.len() {
+        return None;
+    }
+    let mut start = position.character as usize;
+    let mut end = position.character as usize;
+
+    while start > 0
+        && (line.as_bytes()[start - 1].is_ascii_alphanumeric()
+            || line.as_bytes()[start - 1] == b'_')
+    {
+        start -= 1;
+    }
+    while end < line.len()
+        && (line.as_bytes()[end].is_ascii_alphanumeric() || line.as_bytes()[end] == b'_')
+    {
+        end += 1;
+    }
+
+    if start == end {
+        return None;
+    }
+    if line.as_bytes()[start].is_ascii_digit() {
+        return None;
+    }
+
+    Some(Range {
+        start: Position {
+            line: position.line,
+            character: start as u32,
+        },
+        end: Position {
+            line: position.line,
+            character: end as u32,
+        },
+    })
+}
+
 type Type = HashMap<Url, HashMap<(u32, u32, u32, u32), TextEdit>>;
 
 pub fn rename_symbol(

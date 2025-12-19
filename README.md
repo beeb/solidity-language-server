@@ -61,7 +61,7 @@ solidity-language-server
 - [ ] `textDocument/formatting` - Document formatting
 - [ ] `textDocument/rangeFormatting` - Range formatting
 - [ ] `textDocument/onTypeFormatting` - On-type formatting
-- [ ] `textDocument/prepareRename` - Prepare rename validation
+- [x] `textDocument/prepareRename` - Prepare rename validation
 - [ ] `textDocument/foldingRange` - Folding ranges
 - [ ] `textDocument/selectionRange` - Selection ranges
 - [ ] `textDocument/semanticTokens` - Semantic tokens
