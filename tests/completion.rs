@@ -97,3 +97,120 @@ fn test_struct_member_completion_for_order() {
         "Completions should include date"
     );
 }
+
+#[test]
+fn test_mapping_access_struct_member_completion() {
+    let ast_data = match get_test_ast_data() {
+        Some(data) => {
+            println!("AST data obtained successfully");
+            data
+        }
+        None => {
+            println!("Failed to get AST data");
+            return;
+        }
+    };
+
+    let _symbols = extract_symbols(&ast_data);
+    println!("Extracted {} symbols", _symbols.len());
+
+    // Test dot completion for "orders[orderId]."
+    let text = "orders[orderId].";
+    let position = Position {
+        line: 59,
+        character: 16,
+    }; // After "orders[orderId]."
+
+    let result = member_access::get_dot_completions(text, &ast_data, position);
+
+    if let Some((ref comps, ref query)) = result {
+        println!(
+            "Got {} completions for query '{}': {:?}",
+            comps.len(),
+            query,
+            comps.iter().map(|c| &c.label).collect::<Vec<_>>()
+        );
+    } else {
+        println!("No completions returned");
+    }
+
+    assert!(
+        result.is_some(),
+        "Should return completions for 'orders[orderId].'"
+    );
+
+    let (completions, _query) = result.unwrap();
+    let completion_labels: Vec<&str> = completions.iter().map(|c| c.label.as_str()).collect();
+
+    assert!(
+        completion_labels.contains(&"buyer"),
+        "Completions should include buyer"
+    );
+    assert!(
+        completion_labels.contains(&"nonce"),
+        "Completions should include nonce"
+    );
+    assert!(
+        completion_labels.contains(&"amount"),
+        "Completions should include amount"
+    );
+    assert!(
+        completion_labels.contains(&"date"),
+        "Completions should include date"
+    );
+}
+
+#[test]
+fn test_library_function_completion_on_uint256() {
+    let ast_data = match get_test_ast_data() {
+        Some(data) => {
+            println!("AST data obtained successfully");
+            println!("AST keys: {:?}", data.as_object().map(|o| o.keys().collect::<Vec<_>>()));
+            data
+        }
+        None => {
+            println!("Failed to get AST data");
+            return;
+        }
+    };
+
+    let _symbols = extract_symbols(&ast_data);
+    println!("Extracted {} symbols", _symbols.len());
+
+    // Test dot completion for "orders[orderId].amount."
+    let text = "orders[orderId].amount.";
+    let position = Position {
+        line: 60,
+        character: 32,
+    }; // After "orders[orderId].amount."
+
+    let result = member_access::get_dot_completions(text, &ast_data, position);
+
+    if let Some((ref comps, ref query)) = result {
+        println!(
+            "Got {} completions for query '{}': {:?}",
+            comps.len(),
+            query,
+            comps.iter().map(|c| &c.label).collect::<Vec<_>>()
+        );
+    } else {
+        println!("No completions returned");
+    }
+
+    assert!(
+        result.is_some(),
+        "Should return completions for 'orders[orderId].amount.'"
+    );
+
+    let (completions, _query) = result.unwrap();
+    let completion_labels: Vec<&str> = completions.iter().map(|c| c.label.as_str()).collect();
+
+    assert!(
+        completion_labels.contains(&"addTax"),
+        "Completions should include addTax"
+    );
+    assert!(
+        completion_labels.contains(&"getRefund"),
+        "Completions should include getRefund"
+    );
+}
