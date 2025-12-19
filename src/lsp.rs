@@ -1025,14 +1025,73 @@ impl LanguageServer for ForgeLsp {
         let ast_data = {
             let cache = self.ast_cache.read().await;
             if let Some(cached_ast) = cache.get(&uri.to_string()) {
+                self.client
+                    .log_message(MessageType::INFO, "using cached AST data")
+                    .await;
                 cached_ast.clone()
             } else {
-                // For completion, we can proceed without AST if needed
-                serde_json::Value::Null
+                self.client
+                    .log_message(MessageType::INFO, "no cached AST data, fetching...")
+                    .await;
+                drop(cache);
+                if let Ok(file_path) = uri.to_file_path() {
+                    if let Some(path_str) = file_path.to_str() {
+                        match self.compiler.ast(path_str).await {
+                            Ok(data) => {
+                                self.client
+                                    .log_message(MessageType::INFO, "fetched AST data for completion")
+                                    .await;
+                                let mut cache = self.ast_cache.write().await;
+                                cache.insert(uri.to_string(), data.clone());
+                                data
+                            }
+                            Err(e) => {
+                                self.client
+                                    .log_message(
+                                        MessageType::ERROR,
+                                        format!("Failed to fetch AST for completion: {}", e),
+                                    )
+                                    .await;
+                                serde_json::Value::Null
+                            }
+                        }
+                    } else {
+                        self.client
+                            .log_message(MessageType::ERROR, "Invalid file path for AST fetch")
+                            .await;
+                        serde_json::Value::Null
+                    }
+                } else {
+                    self.client
+                        .log_message(MessageType::ERROR, "Invalid file URI for AST fetch")
+                        .await;
+                    serde_json::Value::Null
+                }
             }
         };
 
-        let completions = crate::completion::get_completions(&original_content, &ast_data, position, &params);
+        self.client
+            .log_message(
+                MessageType::INFO,
+                format!(
+                    "completion text length: {}, position: {}:{}",
+                    original_content.len(),
+                    position.line,
+                    position.character
+                ),
+            )
+            .await;
+
+        let (completions, query) =
+            crate::completion::get_completions(&original_content, &ast_data, position, &params);
+
+        let query_str = query.map(|q| format!(" for query '{}'", q)).unwrap_or_default();
+        self.client
+            .log_message(
+                MessageType::INFO,
+                format!("found {} completions{}", completions.len(), query_str),
+            )
+            .await;
 
         if completions.is_empty() {
             Ok(None)
