@@ -63,7 +63,7 @@ contract Shop {
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
     error ExcessAmount();
-    error InsuffientAmount();
+    error InsufficientAmount();
     error DuplicateRefundClaim();
     error RefundPolicyExpired();
     error InvalidRefundBenefiary();
@@ -110,7 +110,7 @@ contract Shop {
         if (shopClosed) revert ShopIsClosed();
         if (msg.value == PRICE) revert MissingTax();
         uint256 expectedTotal = PRICE.addTax(TAX, TAX_BASE);
-        if (msg.value < expectedTotal) revert InsuffientAmount();
+        if (msg.value < expectedTotal) revert InsufficientAmount();
         if (msg.value > expectedTotal) revert ExcessAmount();
         uint256 nonce = nonces[msg.sender];
         bytes32 orderId = keccak256(abi.encode(msg.sender, nonce));
