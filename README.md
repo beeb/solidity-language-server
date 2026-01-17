@@ -99,7 +99,7 @@ solidity-language-server
 
 ## Optional Flags
 
-> [!WARNING]
+> [!TIP]
 >
 > `--use-solar` flag (WIP)
 >
