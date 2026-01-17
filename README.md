@@ -18,21 +18,6 @@ Start the LSP server using:
 solidity-language-server
 ```
 
-## Optional Compilers Flags
-
-> [!INFO] Solar compiler (WIP)
->
-> [Solar](https://github.com/paradigmxyz/solar) is a solidity compiler, written in Rust.
->
-> My LSP implementation using solar is not complete, lsp will only give you build diagnostics.
->
-> - Use `--use-solar` flag for lsp implementation using solar compiler,
-> - Without this flag, default compilation uses forge build.
-
-```sh
-solidity-language-server --use-solar
-```
-
 ### LSP Features
 
 **General**
@@ -111,3 +96,21 @@ solidity-language-server --use-solar
 - Solar's hir and inmemory ast replacement for our `ast_cache`
   - Currently still in production
   - You can try add `--use-solar` for lsp that uses solar for ast production
+
+## Optional Flags
+
+> [!WARNING] `--use-solar` flag (WIP)
+>
+> [Solar](https://github.com/paradigmxyz/solar) is a solidity compiler, written in Rust.
+>
+>
+> - Use `--use-solar` flag for lsp implementation using solar compiler,
+> - Without this flag, default compilation uses forge build.
+>
+> My LSP implementation using solar is will not contain all the features, this LSP will only give you build diagnostics.
+
+Usage:
+
+```sh
+solidity-language-server --use-solar
+```
