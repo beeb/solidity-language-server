@@ -20,11 +20,14 @@ solidity-language-server
 
 ## Optional Compilers Flags
 
-> [!info] Solar compiler (WIP)
-> [Solar](https://github.com/paradigmxyz/solar) is a solidity compiler, written in Rust by paradigmxyz.
-> This implementation is not fully featured, only diagnostics for now it is still a work in progress.
+> [!INFO] Solar compiler (WIP)
 >
-> - Use `--use-solar` flag for lsp implementation using solar compiler, currently only diagnostics.
+> [Solar](https://github.com/paradigmxyz/solar) is a solidity compiler, written in Rust.
+>
+> My LSP implementation using solar is not complete, lsp will only give you build diagnostics.
+>
+> - Use `--use-solar` flag for lsp implementation using solar compiler,
+> - Without this flag, default compilation uses forge build.
 
 ```sh
 solidity-language-server --use-solar
