@@ -9,7 +9,7 @@ use solar::{
 use std::{io::Error, path::Path};
 use tokio::task;
 use tower_lsp::async_trait;
-use tower_lsp::lsp_types::{Diagnostic, DiagnosticSeverity, NumberOrString, Position, Range, Url};
+use tower_lsp::lsp_types::{Diagnostic, Position, Url};
 
 pub struct SolarRunner;
 
@@ -172,62 +172,9 @@ impl Runner for SolarRunner {
         .map_err(|_| RunnerError::CommandError(Error::other("Task panicked")))?
     }
 
-    async fn get_lint_diagnostics(&self, file: &Url) -> Result<Vec<Diagnostic>, RunnerError> {
-        let mut diagnostics = self.get_build_diagnostics(file).await?;
-
-        // Add custom lint checks
-        let path = file.to_file_path().map_err(|_| RunnerError::InvalidUrl)?;
-        let content = tokio::fs::read_to_string(&path)
-            .await
-            .map_err(|_| RunnerError::ReadError)?;
-
-        // Check for SPDX license
-        if !content.contains("SPDX-License-Identifier") {
-            diagnostics.push(Diagnostic {
-                range: Range {
-                    start: Position {
-                        line: 0,
-                        character: 0,
-                    },
-                    end: Position {
-                        line: 0,
-                        character: 0,
-                    },
-                },
-                severity: Some(DiagnosticSeverity::WARNING),
-                code: Some(NumberOrString::String("missing-license".to_string())),
-                code_description: None,
-                source: Some("solar-lint".to_string()),
-                message: "Missing SPDX license identifier".to_string(),
-                related_information: None,
-                tags: None,
-                data: None,
-            });
-        }
-
-        // Check for pragma solidity
-        if !content.contains("pragma solidity") {
-            diagnostics.push(Diagnostic {
-                range: Range {
-                    start: Position {
-                        line: 0,
-                        character: 0,
-                    },
-                    end: Position {
-                        line: 0,
-                        character: 0,
-                    },
-                },
-                severity: Some(DiagnosticSeverity::WARNING),
-                code: Some(NumberOrString::String("missing-pragma".to_string())),
-                code_description: None,
-                source: Some("solar-lint".to_string()),
-                message: "Missing pragma solidity version".to_string(),
-                related_information: None,
-                tags: None,
-                data: None,
-            });
-        }
+    async fn get_lint_diagnostics(&self, _file: &Url) -> Result<Vec<Diagnostic>, RunnerError> {
+        let diagnostics = Vec::new();
+        // TODO:
 
         Ok(diagnostics)
     }
