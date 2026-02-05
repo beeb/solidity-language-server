@@ -11,6 +11,7 @@ pub struct NodeInfo {
     pub referenced_declaration: Option<u64>,
     pub node_type: Option<String>,
     pub member_location: Option<String>,
+    pub absolute_path: Option<String>,
 }
 
 fn push_if_node_or_array<'a>(tree: &'a Value, key: &str, stack: &mut Vec<&'a Value>) {
@@ -60,20 +61,24 @@ pub fn cache_ids(
                 if let Some(id) = ast.get("id").and_then(|v| v.as_u64())
                     && let Some(src) = ast.get("src").and_then(|v| v.as_str())
                 {
-                     nodes.get_mut(&abs_path).unwrap().insert(
-                         id,
-                         NodeInfo {
-                             src: src.to_string(),
-                             name_location: None,
-                             name_locations: vec![],
-                             referenced_declaration: None,
-                             node_type: ast
-                                 .get("nodeType")
-                                 .and_then(|v| v.as_str())
-                                 .map(|s| s.to_string()),
-                             member_location: None,
-                         },
-                     );
+                      nodes.get_mut(&abs_path).unwrap().insert(
+                          id,
+                          NodeInfo {
+                              src: src.to_string(),
+                              name_location: None,
+                              name_locations: vec![],
+                              referenced_declaration: None,
+                              node_type: ast
+                                  .get("nodeType")
+                                  .and_then(|v| v.as_str())
+                                  .map(|s| s.to_string()),
+                              member_location: None,
+                              absolute_path: ast
+                                  .get("absolutePath")
+                                  .and_then(|v| v.as_str())
+                                  .map(|s| s.to_string()),
+                          },
+                      );
                 }
 
                 let mut stack = vec![ast];
@@ -137,6 +142,10 @@ pub fn cache_ids(
                                 .map(|s| s.to_string()),
                             member_location: tree
                                 .get("memberLocation")
+                                .and_then(|v| v.as_str())
+                                .map(|s| s.to_string()),
+                            absolute_path: tree
+                                .get("absolutePath")
                                 .and_then(|v| v.as_str())
                                 .map(|s| s.to_string()),
                         };
