@@ -1,4 +1,4 @@
-use solidity_language_server::build::{build_output_to_diagnostics, ignored_code_for_tests};
+use solidity_language_server::build::{build_output_to_diagnostics, ignored_error_code_warning};
 use solidity_language_server::runner::{ForgeRunner, Runner};
 use solidity_language_server::utils::byte_offset_to_position;
 use std::fs;
@@ -139,7 +139,7 @@ async fn test_ignored_code_for_tests() {
             "file": "test/ERC6909Claims.t.sol"
         }
     });
-    assert!(ignored_code_for_tests(&error_json));
+    assert!(ignored_error_code_warning(&error_json));
 
     let error_json_non_test = serde_json::json!({
         "errorCode": "5574",
@@ -147,7 +147,7 @@ async fn test_ignored_code_for_tests() {
             "file": "contracts/ERC6909Claims.sol"
         }
     });
-    assert!(!ignored_code_for_tests(&error_json_non_test));
+    assert!(!ignored_error_code_warning(&error_json_non_test));
 
     let error_json_other_code = serde_json::json!({
         "errorCode": "1234",
@@ -155,5 +155,5 @@ async fn test_ignored_code_for_tests() {
             "file": "test/ERC6909Claims.t.sol"
         }
     });
-    assert!(!ignored_code_for_tests(&error_json_other_code));
+    assert!(!ignored_error_code_warning(&error_json_other_code));
 }
