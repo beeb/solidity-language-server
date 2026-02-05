@@ -303,6 +303,26 @@ pub fn goto_bytes(
     }
 
     if refs.is_empty() {
+        // Check if we're on the string part of an import statement
+        // ImportDirective nodes have absolutePath pointing to the imported file
+        for (_id, content) in current_file_nodes {
+            if content.node_type == Some("ImportDirective".to_string()) {
+                let src_parts: Vec<&str> = content.src.split(':').collect();
+                if src_parts.len() != 3 {
+                    continue;
+                }
+
+                let start_b: usize = src_parts[0].parse().ok()?;
+                let length: usize = src_parts[1].parse().ok()?;
+                let end_b = start_b + length;
+
+                if start_b <= position && position < end_b {
+                    if let Some(import_path) = &content.absolute_path {
+                        return Some((import_path.clone(), 0));
+                    }
+                }
+            }
+        }
         return None;
     }
 
