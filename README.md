@@ -18,43 +18,6 @@ Start the LSP server using:
 solidity-language-server
 ```
 
-### Neovim
-
-Add to your Neovim config (e.g. `~/.config/nvim/init.lua` or `after/ftplugin/solidity.lua`):
-
-```lua
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "solidity",
-  callback = function()
-    vim.lsp.start({
-      name = "solidity-language-server",
-      cmd = { "solidity-language-server" },
-      root_dir = vim.fs.root(0, { "foundry.toml", ".git" }),
-      settings = {},
-    })
-  end,
-})
-```
-
-Or with [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig):
-
-```lua
-local lspconfig = require("lspconfig")
-local configs = require("lspconfig.configs")
-
-if not configs.solidity_ls then
-  configs.solidity_ls = {
-    default_config = {
-      cmd = { "solidity-language-server" },
-      filetypes = { "solidity" },
-      root_dir = lspconfig.util.root_pattern("foundry.toml", ".git"),
-    },
-  }
-end
-
-lspconfig.solidity_ls.setup({})
-```
-
 ## Benchmarks
 
 Benchmarked against **solc --lsp** (C++) and **Hardhat/Nomic** (Node.js) on Uniswap V4-core (`Pool.sol`, 618 lines). 10 iterations + 2 warmup. See [./bench](./bench)
