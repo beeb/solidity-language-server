@@ -1,3 +1,4 @@
+use crate::completion;
 use crate::goto;
 use crate::references;
 use crate::rename;
@@ -12,12 +13,14 @@ use tower_lsp::{Client, LanguageServer, lsp_types::*};
 pub struct ForgeLsp {
     client: Client,
     compiler: Arc<dyn Runner>,
-    ast_cache: Arc<RwLock<HashMap<String, serde_json::Value>>>,
+    ast_cache: Arc<RwLock<HashMap<String, Arc<serde_json::Value>>>>,
     text_cache: Arc<RwLock<HashMap<String, String>>>,
+    completion_cache: Arc<RwLock<HashMap<String, Arc<completion::CompletionCache>>>>,
+    fast_completions: bool,
 }
 
 impl ForgeLsp {
-    pub fn new(client: Client, use_solar: bool) -> Self {
+    pub fn new(client: Client, use_solar: bool, fast_completions: bool) -> Self {
         let compiler: Arc<dyn Runner> = if use_solar {
             Arc::new(crate::solar_runner::SolarRunner)
         } else {
@@ -25,11 +28,14 @@ impl ForgeLsp {
         };
         let ast_cache = Arc::new(RwLock::new(HashMap::new()));
         let text_cache = Arc::new(RwLock::new(HashMap::new()));
+        let completion_cache = Arc::new(RwLock::new(HashMap::new()));
         Self {
             client,
             compiler,
             ast_cache,
             text_cache,
+            completion_cache,
+            fast_completions,
         }
     }
 
@@ -68,8 +74,21 @@ impl ForgeLsp {
         
         if build_succeeded {
             if let Ok(ast_data) = ast_result {
+                let ast_data = Arc::new(ast_data);
                 let mut cache = self.ast_cache.write().await;
-                cache.insert(uri.to_string(), ast_data);
+                cache.insert(uri.to_string(), ast_data.clone());
+                drop(cache);
+
+                // Rebuild completion cache in the background; old cache stays usable until replaced
+                let completion_cache = self.completion_cache.clone();
+                let uri_string = uri.to_string();
+                tokio::spawn(async move {
+                    if let Some(sources) = ast_data.get("sources") {
+                        let contracts = ast_data.get("contracts");
+                        let cc = completion::build_completion_cache(sources, contracts);
+                        completion_cache.write().await.insert(uri_string, Arc::new(cc));
+                    }
+                });
                 self.client
                     .log_message(MessageType::INFO, "Build successful, AST cache updated")
                     .await;
@@ -167,6 +186,11 @@ impl LanguageServer for ForgeLsp {
                 version: Some("0.0.1".to_string()),
             }),
             capabilities: ServerCapabilities {
+                completion_provider: Some(CompletionOptions {
+                    trigger_characters: Some(vec![".".to_string()]),
+                    resolve_provider: Some(false),
+                    ..Default::default()
+                }),
                 definition_provider: Some(OneOf::Left(true)),
                 declaration_provider: Some(DeclarationCapability::Simple(true)),
                 references_provider: Some(OneOf::Left(true)),
@@ -391,6 +415,63 @@ impl LanguageServer for ForgeLsp {
             .await;
     }
 
+    async fn completion(
+        &self,
+        params: CompletionParams,
+    ) -> tower_lsp::jsonrpc::Result<Option<CompletionResponse>> {
+        let uri = params.text_document_position.text_document.uri;
+        let position = params.text_document_position.position;
+
+        let trigger_char = params
+            .context
+            .as_ref()
+            .and_then(|ctx| ctx.trigger_character.as_deref());
+
+        // Get source text — only needed for dot completions (to parse the line)
+        let source_text = {
+            let text_cache = self.text_cache.read().await;
+            if let Some(text) = text_cache.get(&uri.to_string()) {
+                text.clone()
+            } else {
+                match uri.to_file_path() {
+                    Ok(path) => std::fs::read_to_string(&path).unwrap_or_default(),
+                    Err(_) => return Ok(None),
+                }
+            }
+        };
+
+        // Clone the Arc (pointer copy, instant) and drop the lock immediately.
+        let cached: Option<Arc<completion::CompletionCache>> = {
+            let comp_cache = self.completion_cache.read().await;
+            comp_cache.get(&uri.to_string()).cloned()
+        };
+
+        if cached.is_none() {
+            // Spawn background cache build so the next request will have full completions
+            let ast_cache = self.ast_cache.clone();
+            let completion_cache = self.completion_cache.clone();
+            let uri_string = uri.to_string();
+            tokio::spawn(async move {
+                let ast_data = {
+                    let cache = ast_cache.read().await;
+                    match cache.get(&uri_string) {
+                        Some(v) => v.clone(),
+                        None => return,
+                    }
+                };
+                if let Some(sources) = ast_data.get("sources") {
+                    let contracts = ast_data.get("contracts");
+                    let cc = completion::build_completion_cache(sources, contracts);
+                    completion_cache.write().await.insert(uri_string, Arc::new(cc));
+                }
+            });
+        }
+
+        let cache_ref = cached.as_deref();
+        let result = completion::handle_completion(cache_ref, &source_text, position, trigger_char, self.fast_completions);
+        Ok(result)
+    }
+
     async fn goto_definition(
         &self,
         params: GotoDefinitionParams,
@@ -422,12 +503,9 @@ impl LanguageServer for ForgeLsp {
             }
         };
 
-        let ast_data = {
+        let ast_data: Arc<serde_json::Value> = {
             let cache = self.ast_cache.read().await;
             if let Some(cached_ast) = cache.get(&uri.to_string()) {
-                self.client
-                    .log_message(MessageType::INFO, "Using cached ast data")
-                    .await;
                 cached_ast.clone()
             } else {
                 drop(cache);
@@ -435,19 +513,13 @@ impl LanguageServer for ForgeLsp {
                     Some(s) => s,
                     None => {
                         self.client
-                            .log_message(MessageType::ERROR, "Invalied file path")
+                            .log_message(MessageType::ERROR, "Invalid file path")
                             .await;
                         return Ok(None);
                     }
                 };
-                // Fetch fresh AST but don't cache it - caching only happens in did_save
                 match self.compiler.ast(path_str).await {
-                    Ok(data) => {
-                        self.client
-                            .log_message(MessageType::INFO, "fetched fresh ast data (not caching)")
-                            .await;
-                        data
-                    }
+                    Ok(data) => Arc::new(data),
                     Err(e) => {
                         self.client
                             .log_message(MessageType::ERROR, format!("failed to get ast: {e}"))
@@ -508,12 +580,9 @@ impl LanguageServer for ForgeLsp {
             }
         };
 
-        let ast_data = {
+        let ast_data: Arc<serde_json::Value> = {
             let cache = self.ast_cache.read().await;
             if let Some(cached_ast) = cache.get(&uri.to_string()) {
-                self.client
-                    .log_message(MessageType::INFO, "using cached ast data")
-                    .await;
                 cached_ast.clone()
             } else {
                 drop(cache);
@@ -526,15 +595,8 @@ impl LanguageServer for ForgeLsp {
                         return Ok(None);
                     }
                 };
-
-                // Fetch fresh AST but don't cache it - caching only happens in did_save
                 match self.compiler.ast(path_str).await {
-                    Ok(data) => {
-                        self.client
-                            .log_message(MessageType::INFO, "fetched fresh ast data (not caching)")
-                            .await;
-                        data
-                    }
+                    Ok(data) => Arc::new(data),
                     Err(e) => {
                         self.client
                             .log_message(MessageType::ERROR, format!("failed to get ast: {e}"))
@@ -592,12 +654,9 @@ impl LanguageServer for ForgeLsp {
                 return Ok(None);
             }
         };
-        let ast_data = {
+        let ast_data: Arc<serde_json::Value> = {
             let cache = self.ast_cache.read().await;
             if let Some(cached_ast) = cache.get(&uri.to_string()) {
-                self.client
-                    .log_message(MessageType::INFO, "Using cached AST data")
-                    .await;
                 cached_ast.clone()
             } else {
                 drop(cache);
@@ -610,14 +669,8 @@ impl LanguageServer for ForgeLsp {
                         return Ok(None);
                     }
                 };
-                // Fetch fresh AST but don't cache it - caching only happens in did_save
                 match self.compiler.ast(path_str).await {
-                    Ok(data) => {
-                        self.client
-                            .log_message(MessageType::INFO, "fetched fresh ast data (not caching)")
-                            .await;
-                        data
-                    }
+                    Ok(data) => Arc::new(data),
                     Err(e) => {
                         self.client
                             .log_message(MessageType::ERROR, format!("Failed to get AST: {e}"))
@@ -751,12 +804,9 @@ impl LanguageServer for ForgeLsp {
             return Ok(None);
         }
 
-        let ast_data = {
+        let ast_data: Arc<serde_json::Value> = {
             let cache = self.ast_cache.read().await;
             if let Some(cached_ast) = cache.get(&uri.to_string()) {
-                self.client
-                    .log_message(MessageType::INFO, "using cached ast data")
-                    .await;
                 cached_ast.clone()
             } else {
                 drop(cache);
@@ -769,14 +819,8 @@ impl LanguageServer for ForgeLsp {
                         return Ok(None);
                     }
                 };
-                // Fetch fresh AST but don't cache it - caching only happens in did_save
                 match self.compiler.ast(path_str).await {
-                    Ok(data) => {
-                        self.client
-                            .log_message(MessageType::INFO, "fetched fresh ast data (not caching)")
-                            .await;
-                        data
-                    }
+                    Ok(data) => Arc::new(data),
                     Err(e) => {
                         self.client
                             .log_message(MessageType::ERROR, format!("failed to get ast: {e}"))
@@ -935,13 +979,25 @@ impl LanguageServer for ForgeLsp {
                 return Ok(None);
             }
         };
-        let ast_data = match self.compiler.ast(path_str).await {
-            Ok(data) => data,
-            Err(e) => {
-                self.client
-                    .log_message(MessageType::WARNING, format!("failed to get ast data: {e}"))
-                    .await;
-                return Ok(None);
+        // Use cached AST if available, otherwise fetch fresh
+        let ast_data: Arc<serde_json::Value> = {
+            let cache = self.ast_cache.read().await;
+            if let Some(cached_ast) = cache.get(&uri.to_string()) {
+                cached_ast.clone()
+            } else {
+                drop(cache);
+                match self.compiler.ast(path_str).await {
+                    Ok(data) => Arc::new(data),
+                    Err(e) => {
+                        self.client
+                            .log_message(
+                                MessageType::WARNING,
+                                format!("failed to get ast data: {e}"),
+                            )
+                            .await;
+                        return Ok(None);
+                    }
+                }
             }
         };
         let symbols = symbols::extract_document_symbols(&ast_data, path_str);
