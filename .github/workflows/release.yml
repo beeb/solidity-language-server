@@ -77,7 +77,7 @@ jobs:
         run: |
           output=$(cargo test 2>&1)
           echo "$output"
-          passed=$(echo "$output" | grep -oP '\d+ passed' | tail -1 | grep -oP '\d+')
+          passed=$(echo "$output" | grep -oP '\d+ passed' | awk '{sum += $1} END {print sum}')
           echo "passed=$passed" >> "$GITHUB_OUTPUT"
 
       - name: Download all artifacts
