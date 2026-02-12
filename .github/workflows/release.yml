@@ -71,18 +71,17 @@ jobs:
         with:
           path: artifacts
 
-      - name: Generate checksums
+      - name: Collect binaries and generate checksums
         run: |
-          cd artifacts
-          find . -type f \( -name "*.tar.gz" -o -name "*.zip" \) -exec mv {} . \;
-          sha256sum solidity-language-server-* > checksums-sha256.txt
+          mkdir -p dist
+          find artifacts -type f \( -name "*.tar.gz" -o -name "*.zip" \) -exec mv {} dist/ \;
+          cd dist
+          ls -la
+          sha256sum * > checksums-sha256.txt
           cat checksums-sha256.txt
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
-          files: |
-            artifacts/solidity-language-server-*.tar.gz
-            artifacts/solidity-language-server-*.zip
-            artifacts/checksums-sha256.txt
+          files: dist/*
