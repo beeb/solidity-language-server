@@ -30,7 +30,7 @@
 - [x] `textDocument/rename` - Rename symbols across files
 - [x] `textDocument/formatting` - Document formatting
 - [x] `textDocument/completion` - Code completion
-- [ ] `textDocument/hover` - Hover information
+- [x] `textDocument/hover` - Hover information
 - [ ] `textDocument/signatureHelp` - Function signature help
 - [ ] `textDocument/typeDefinition` - Go to type definition
 - [ ] `textDocument/implementation` - Go to implementation

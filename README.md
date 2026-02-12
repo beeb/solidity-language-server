@@ -1,14 +1,32 @@
 # Solidity Language Server
 
-Solidity lsp server using foundry's build process only.
+[![Crates.io](https://img.shields.io/crates/v/solidity-language-server)](https://crates.io/crates/solidity-language-server)
+[![Tests](https://github.com/mmsaki/solidity-language-server/actions/workflows/test.yml/badge.svg)](https://github.com/mmsaki/solidity-language-server/actions/workflows/test.yml)
+[![Release](https://github.com/mmsaki/solidity-language-server/actions/workflows/release.yml/badge.svg)](https://github.com/mmsaki/solidity-language-server/actions/workflows/release.yml)
+[![GitHub Release](https://img.shields.io/github/v/release/mmsaki/solidity-language-server)](https://github.com/mmsaki/solidity-language-server/releases/latest)
+
+The fastest Solidity language server — go-to-definition, references, rename, completions, hover, and more, powered by Foundry's AST. See [benchmarks](https://github.com/mmsaki/solidity-lsp-benchmarks).
+
+## Features
+
+- **Go to Definition** / **Go to Declaration** — jump to any symbol across files
+- **Find References** — all usages of a symbol across the project
+- **Rename** — project-wide symbol rename with prepare support
+- **Hover** — signatures, NatSpec docs, function/error/event selectors, `@inheritdoc` resolution
+- **Completions** — scope-aware with two modes (fast cache vs full recomputation)
+- **Document Symbols** / **Workspace Symbols** — outline and search
+- **Formatting** — via `forge fmt`
+- **Diagnostics** — from `forge build` or `solar`
+
+See [FEATURES.md](FEATURES.md) for the full LSP feature set and roadmap.
 
 ## Install
-
-Install binary from crates.io
 
 ```sh
 cargo install solidity-language-server
 ```
+
+Or download a pre-built binary from the [latest release](https://github.com/mmsaki/solidity-language-server/releases/latest).
 
 ## Usage
 
@@ -18,6 +36,20 @@ solidity-language-server --version                # show version + commit + plat
 solidity-language-server --completion-mode full   # full scope-aware completions
 solidity-language-server --help                   # show all options
 ```
+
+### Flags
+
+| Flag | Values | Default | Description |
+|------|--------|---------|-------------|
+| `--version`, `-V` | | | Show version, commit hash, OS, and architecture |
+| `--completion-mode` | `fast`, `full` | `fast` | Controls completion computation strategy |
+| `--use-solar` | | | Use solar compiler instead of forge |
+| `--stdio` | | | Use stdio transport |
+
+**Completion modes:**
+
+- **fast** — Pre-built completions served from cache. Zero per-request computation. Best for large projects like Uniswap v4.
+- **full** — Per-request scope filtering with full completion recomputation. For power users who want scope-aware results.
 
 ### Neovim
 
@@ -41,6 +73,16 @@ return {
 }
 ```
 
+### Verify Release Binaries
+
+Release binaries are GPG-signed. To verify, download `checksums-sha256.txt`, `checksums-sha256.txt.asc`, and [`public-key.asc`](public-key.asc) from the release:
+
+```sh
+gpg --import public-key.asc
+gpg --verify checksums-sha256.txt.asc checksums-sha256.txt
+sha256sum -c checksums-sha256.txt
+```
+
 ## Demos
 
 <https://github.com/user-attachments/assets/c5cbdc5a-f123-4f85-b27a-165a4854cd83>
@@ -56,45 +98,3 @@ return {
 <https://github.com/user-attachments/assets/ab4eb55c-b354-4e20-8e95-0a635d72f29b>
 
 <https://github.com/user-attachments/assets/fef1b79f-7a05-4063-8ef6-cc41b7dc3c0a>
-
-### Flags
-
-| Flag | Values | Default | Description |
-|------|--------|---------|-------------|
-| `--version`, `-V` | | | Show version, commit hash, OS, and architecture |
-| `--completion-mode` | `fast`, `full` | `fast` | Controls completion computation strategy |
-| `--use-solar` | | | Use solar compiler instead of forge |
-| `--stdio` | | | Use stdio transport |
-
-**Completion modes:**
-
-- **fast** — Pre-built completions served from cache. Zero per-request computation. Best for large projects like Uniswap v4.
-- **full** — Per-request scope filtering with full completion recomputation. For power users who want scope-aware results.
-
-### Verify Release Binaries
-
-Release binaries are GPG-signed. To verify a download:
-
-```sh
-gpg --import public-key.asc
-gpg --verify checksums-sha256.txt.asc checksums-sha256.txt
-sha256sum -c checksums-sha256.txt
-```
-
-## Benchmarks
-
-Benchmarked against **solc --lsp** (C++) and **Hardhat/Nomic** (Node.js) on Uniswap V4-core (`Pool.sol`, 618 lines). 10 iterations + 2 warmup. See [solidity-lsp-benchmarks](https://github.com/mmsaki/solidity-lsp-benchmarks)
-
-| Benchmark | Our LSP | solc --lsp | Hardhat/Nomic |
-|-----------|---------|------------|---------------|
-| Spawn + Init | 3ms ⚡ | 123ms | 867ms |
-| Diagnostics | 435ms | 133ms ⚡ | 911ms |
-| Go to Definition | 8.8ms ⚡ | - | timeout |
-| Go to Declaration | 8.9ms ⚡ | unsupported | timeout |
-| Find References | 10.2ms ⚡ | unsupported | timeout |
-| Document Symbols | 9.0ms ⚡ | unsupported | timeout |
-
-> Run benchmarks: `cd bench && cargo build --release && ./target/release/bench <subcommand>`
->
-> Subcommands: `spawn`, `diagnostics`, `definition`, `declaration`, `hover`, `references`, `documentSymbol`
->
