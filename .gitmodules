@@ -1,3 +1,0 @@
-[submodule "bench/v4-core"]
-	path = bench/v4-core
-	url = https://github.com/Uniswap/v4-core.git

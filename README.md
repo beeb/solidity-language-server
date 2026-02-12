@@ -71,7 +71,7 @@ solidity-language-server --completion-mode full
 
 ## Benchmarks
 
-Benchmarked against **solc --lsp** (C++) and **Hardhat/Nomic** (Node.js) on Uniswap V4-core (`Pool.sol`, 618 lines). 10 iterations + 2 warmup. See [./bench](./bench)
+Benchmarked against **solc --lsp** (C++) and **Hardhat/Nomic** (Node.js) on Uniswap V4-core (`Pool.sol`, 618 lines). 10 iterations + 2 warmup. See [solidity-lsp-benchmarks](https://github.com/mmsaki/solidity-lsp-benchmarks)
 
 | Benchmark | Our LSP | solc --lsp | Hardhat/Nomic |
 |-----------|---------|------------|---------------|
