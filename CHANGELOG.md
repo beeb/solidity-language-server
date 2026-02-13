@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.1.14
+
+### Fixes
+
+- `textDocument/definition` and `textDocument/declaration` now return proper range width instead of zero-width ranges (#30)
+  - `goto_bytes()` returns `(file_path, byte_offset, length)` — extracts the length field from `nameLocation` or `src`
+  - `goto_declaration()` computes `end` from `byte_offset + length`, so editors correctly highlight the target symbol
+  - Previously `start == end` in the returned `Location`, making it impossible for the editor to highlight the target
+
+### Tests
+
+- 4 new goto range-length tests: `Hooks` (len 5), `Pool` (len 4), `SafeCast` (len 8), Yul external reference (nonzero)
+- 168 total tests, 0 warnings
+
 ## v0.1.13
 
 ### Features

@@ -268,7 +268,7 @@ def collect_yul_keys(obj, keys=set()):
 | `src/goto.rs` | `CHILD_KEYS` const, `ExternalRefs` type, `cache_ids` 3-tuple, `src_to_location`, `goto_bytes` Yul handling with file-id filter |
 | `src/references.rs` | `byte_to_decl_via_external_refs`, `goto_references_with_index` Yul cursor + use-site collection |
 | `src/rename.rs` | Destructure 3-tuple (`_external_refs`) |
-| `tests/yul_external_references.rs` | 6 tests against `pool-manager-ast.json` |
+| `tests/yul_external_references.rs` | Yul goto + reference tests against `pool-manager-ast.json` |
 
 ## Pitfalls (Yul)
 
@@ -377,7 +377,7 @@ The per-cache approach avoids both: each `CachedBuild` uses its own `id_to_path_
 | `src/references.rs` | `resolve_target_location()` accepts `&CachedBuild`, `goto_references_for_target()` accepts `&CachedBuild` |
 | `src/rename.rs` | `rename_symbol()` accepts `&CachedBuild` + `&[&CachedBuild]` |
 | `src/lsp.rs` | `ast_cache` type changed to `HashMap<String, Arc<CachedBuild>>`, `get_or_fetch_build()` helper, all handlers updated |
-| `tests/cross_file_references.rs` | 12 tests: CachedBuild construction, byte_to_id bridging, cross-file reference scanning |
+| `tests/cross_file_references.rs` | CachedBuild construction, byte_to_id bridging, cross-file reference scanning |
 
 ## Test Case: `library Hooks` Cross-File References
 

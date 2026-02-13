@@ -380,7 +380,7 @@ completion_provider: Some(CompletionOptions {
 | `src/completion.rs` | CompletionCache, build logic, dot/general completion, type resolution, magic types, keywords |
 | `src/lsp.rs` | LSP handler, server capabilities, trigger character registration |
 | `src/lib.rs` | `pub mod completion` |
-| `tests/completion.rs` | 86 tests against `pool-manager-ast.json` |
+| `tests/completion.rs` | Completion tests against `pool-manager-ast.json` |
 
 ## Exploration Tools
 
