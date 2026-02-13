@@ -9,6 +9,10 @@
 - All nodes with `referencedDeclaration` link to their definition via `id_to_location`
 - Uses pre-indexed `CachedBuild.nodes` — no extra AST traversal at request time
 
+### Fixes
+
+- `--version` now shows commit hash when installed from crates.io (reads `.cargo_vcs_info.json` as fallback)
+
 ### Tests
 
 - 11 document link tests (CI-safe, real fixture data from `pool-manager-ast.json`)
