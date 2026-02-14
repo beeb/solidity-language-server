@@ -1,4 +1,4 @@
-use crate::utils::byte_offset_to_position;
+use crate::utils::{byte_offset_to_position, find_project_root};
 use serde_json::Value;
 use std::path::Path;
 use tower_lsp::lsp_types::{Diagnostic, DiagnosticSeverity, NumberOrString, Position, Range};
@@ -21,24 +21,44 @@ pub fn build_output_to_diagnostics(
         return Vec::new();
     };
     let path = path.as_ref();
+    let project_root = find_project_root(path);
     errors
         .iter()
-        .filter_map(|err| parse_diagnostic(err, path, content))
+        .filter_map(|err| parse_diagnostic(err, path, project_root.as_deref(), content))
         .collect()
 }
 
-fn parse_diagnostic(err: &Value, path: &Path, content: &str) -> Option<Diagnostic> {
+fn parse_diagnostic(
+    err: &Value,
+    path: &Path,
+    project_root: Option<&Path>,
+    content: &str,
+) -> Option<Diagnostic> {
     if ignored_error_code_warning(err) {
         return None;
     }
     let source_file = err
         .get("sourceLocation")
         .and_then(|loc| loc.get("file"))
-        .and_then(|f| f.as_str())
-        .and_then(|full_path| Path::new(full_path).file_name())
-        .and_then(|os_str| os_str.to_str())?;
+        .and_then(|f| f.as_str())?;
 
-    if source_file != path.file_name().and_then(|os_str| os_str.to_str())? {
+    let source_path = Path::new(source_file);
+
+    // source_file can be absolute or relative to the project root.
+    // path is the absolute path from the LSP client.
+    let matches = if source_path.is_absolute() {
+        source_path == path
+    } else if let Some(root) = project_root {
+        // Make path relative to the project root and compare with forge's relative path
+        path.strip_prefix(root)
+            .map(|rel| rel == source_path)
+            .unwrap_or(false)
+    } else {
+        // Fallback: compare filenames only
+        source_path.file_name() == path.file_name()
+    };
+
+    if !matches {
         return None;
     }
 
