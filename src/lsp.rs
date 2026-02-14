@@ -705,8 +705,13 @@ impl LanguageServer for ForgeLsp {
         };
 
         // Get references from the current file's AST
-        let mut locations =
-            references::goto_references(&cached_build.ast, &uri, position, &source_bytes);
+        let mut locations = references::goto_references(
+            &cached_build.ast,
+            &uri,
+            position,
+            &source_bytes,
+            params.context.include_declaration,
+        );
 
         // Cross-file: resolve target definition location, then scan other cached ASTs
         if let Some((def_abs_path, def_byte_offset)) =
@@ -722,6 +727,7 @@ impl LanguageServer for ForgeLsp {
                     &def_abs_path,
                     def_byte_offset,
                     None,
+                    params.context.include_declaration,
                 );
                 locations.extend(other_locations);
             }
