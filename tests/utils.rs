@@ -92,14 +92,67 @@ fn test_is_valid_solidity_identifier() {
 #[test]
 fn test_rejects_active_keywords() {
     let keywords = [
-        "abstract", "address", "anonymous", "as", "assembly", "bool", "break", "bytes",
-        "calldata", "catch", "constant", "constructor", "continue", "contract", "delete", "do",
-        "else", "emit", "enum", "event", "external", "fallback", "false", "fixed", "for",
-        "function", "hex", "if", "immutable", "import", "indexed", "interface", "internal", "is",
-        "library", "mapping", "memory", "modifier", "new", "override", "payable", "pragma",
-        "private", "public", "pure", "receive", "return", "returns", "storage", "string",
-        "struct", "true", "try", "type", "ufixed", "unchecked", "unicode", "using", "view",
-        "virtual", "while",
+        "abstract",
+        "address",
+        "anonymous",
+        "as",
+        "assembly",
+        "bool",
+        "break",
+        "bytes",
+        "calldata",
+        "catch",
+        "constant",
+        "constructor",
+        "continue",
+        "contract",
+        "delete",
+        "do",
+        "else",
+        "emit",
+        "enum",
+        "event",
+        "external",
+        "fallback",
+        "false",
+        "fixed",
+        "for",
+        "function",
+        "hex",
+        "if",
+        "immutable",
+        "import",
+        "indexed",
+        "interface",
+        "internal",
+        "is",
+        "library",
+        "mapping",
+        "memory",
+        "modifier",
+        "new",
+        "override",
+        "payable",
+        "pragma",
+        "private",
+        "public",
+        "pure",
+        "receive",
+        "return",
+        "returns",
+        "storage",
+        "string",
+        "struct",
+        "true",
+        "try",
+        "type",
+        "ufixed",
+        "unchecked",
+        "unicode",
+        "using",
+        "view",
+        "virtual",
+        "while",
     ];
     for kw in keywords {
         assert!(
@@ -112,10 +165,37 @@ fn test_rejects_active_keywords() {
 #[test]
 fn test_rejects_reserved_keywords() {
     let reserved = [
-        "after", "alias", "apply", "auto", "byte", "case", "copyof", "default", "define",
-        "final", "implements", "in", "inline", "let", "macro", "match", "mutable", "null", "of",
-        "partial", "promise", "reference", "relocatable", "sealed", "sizeof", "static",
-        "supports", "switch", "typedef", "typeof", "var",
+        "after",
+        "alias",
+        "apply",
+        "auto",
+        "byte",
+        "case",
+        "copyof",
+        "default",
+        "define",
+        "final",
+        "implements",
+        "in",
+        "inline",
+        "let",
+        "macro",
+        "match",
+        "mutable",
+        "null",
+        "of",
+        "partial",
+        "promise",
+        "reference",
+        "relocatable",
+        "sealed",
+        "sizeof",
+        "static",
+        "supports",
+        "switch",
+        "typedef",
+        "typeof",
+        "var",
     ];
     for kw in reserved {
         assert!(
@@ -158,7 +238,15 @@ fn test_rejects_numeric_type_keywords() {
 #[test]
 fn test_allows_identifier_keywords() {
     // These 7 keywords are explicitly allowed as identifiers per SolidityParser.g4
-    let allowed = ["from", "error", "revert", "global", "transient", "layout", "at"];
+    let allowed = [
+        "from",
+        "error",
+        "revert",
+        "global",
+        "transient",
+        "layout",
+        "at",
+    ];
     for kw in allowed {
         assert!(
             is_valid_solidity_identifier(kw),
@@ -289,14 +377,12 @@ fn test_roundtrip_utf16_byte_to_pos_to_byte() {
     let source = "ab😀é█cd\nef";
     let char_boundaries: Vec<usize> = source.char_indices().map(|(i, _)| i).collect();
     for &byte_off in &char_boundaries {
-        let Position {
-            line,
-            character: col,
-        } = byte_offset_to_position(source, byte_off);
-        let recovered = position_to_byte_offset(source, Position::new(line, col));
+        let pos = byte_offset_to_position(source, byte_off);
+        let recovered = position_to_byte_offset(source, pos);
         assert_eq!(
             recovered, byte_off,
-            "roundtrip failed for byte_off={byte_off}: pos=({line},{col}) -> {recovered}"
+            "roundtrip failed for byte_off={byte_off}: pos=({},{}) -> {recovered}",
+            pos.line, pos.character
         );
     }
 }
