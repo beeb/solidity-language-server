@@ -456,18 +456,14 @@ impl LanguageServer for ForgeLsp {
 
         // If changed, return edit to replace whole document
         if original_content != formatted_content {
-            let (end_line, end_character) =
-                utils::byte_offset_to_position(&original_content, original_content.len());
+            let end = utils::byte_offset_to_position(&original_content, original_content.len());
             let edit = TextEdit {
                 range: Range {
                     start: Position {
                         line: 0,
                         character: 0,
                     },
-                    end: Position {
-                        line: end_line,
-                        character: end_character,
-                    },
+                    end,
                 },
                 new_text: formatted_content,
             };

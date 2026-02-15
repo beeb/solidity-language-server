@@ -32,22 +32,12 @@ fn find_identifier_on_line(source_bytes: &[u8], line: u32, identifier: &str) -> 
                 .take(line as usize)
                 .map(|l| l.len() + 1) // +1 for newline
                 .sum();
-            let (_, start_col) =
-                crate::utils::byte_offset_to_position(&text, line_start_byte + col);
-            let (_, end_col) = crate::utils::byte_offset_to_position(
+            let start = crate::utils::byte_offset_to_position(&text, line_start_byte + col);
+            let end = crate::utils::byte_offset_to_position(
                 &text,
                 line_start_byte + col + ident_bytes.len(),
             );
-            return Some(Range {
-                start: Position {
-                    line,
-                    character: start_col,
-                },
-                end: Position {
-                    line,
-                    character: end_col,
-                },
-            });
+            return Some(Range { start, end });
         }
         search_start = col + 1;
     }
@@ -184,19 +174,10 @@ pub fn get_identifier_range(source_bytes: &[u8], position: Position) -> Option<R
     }
 
     // Convert byte offsets back to encoding-aware positions
-    let (_, start_col) = crate::utils::byte_offset_to_position(&text, line_start + start);
-    let (_, end_col) = crate::utils::byte_offset_to_position(&text, line_start + end);
+    let start = crate::utils::byte_offset_to_position(&text, line_start + start);
+    let end = crate::utils::byte_offset_to_position(&text, line_start + end);
 
-    Some(Range {
-        start: Position {
-            line: position.line,
-            character: start_col,
-        },
-        end: Position {
-            line: position.line,
-            character: end_col,
-        },
-    })
+    Some(Range { start, end })
 }
 
 type Type = HashMap<Url, HashMap<(u32, u32, u32, u32), TextEdit>>;

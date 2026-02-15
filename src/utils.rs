@@ -1,5 +1,5 @@
 use std::sync::OnceLock;
-use tower_lsp::lsp_types::PositionEncodingKind;
+use tower_lsp::lsp_types::{Position, PositionEncodingKind};
 
 /// How the LSP client counts column offsets within a line.
 ///
@@ -63,9 +63,9 @@ pub fn encoding() -> PositionEncoding {
 // Byte-offset ↔ LSP-position conversion
 // ---------------------------------------------------------------------------
 
-/// Convert a byte offset in `source` to an `(line, column)` pair whose column
-/// unit depends on the negotiated [`PositionEncoding`].
-pub fn byte_offset_to_position(source: &str, byte_offset: usize) -> (u32, u32) {
+/// Convert a byte offset in `source` to a [`Position`] whose column unit depends
+/// on the negotiated [`PositionEncoding`].
+pub fn byte_offset_to_position(source: &str, byte_offset: usize) -> Position {
     let enc = encoding();
     let mut line: u32 = 0;
     let mut col: u32 = 0;
@@ -102,8 +102,10 @@ pub fn byte_offset_to_position(source: &str, byte_offset: usize) -> (u32, u32) {
             }
         }
     }
-
-    (line, col)
+    Position {
+        line,
+        character: col,
+    }
 }
 
 /// Convert an LSP `(line, character)` position back to a byte offset, where
