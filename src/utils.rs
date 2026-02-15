@@ -6,25 +6,23 @@ use tower_lsp::lsp_types::{Position, PositionEncodingKind};
 /// Set once during `initialize()` via [`set_encoding`] and read implicitly by
 /// [`byte_offset_to_position`] and [`position_to_byte_offset`].  All other
 /// modules are encoding-agnostic — they never need to know or pass this value.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum PositionEncoding {
     /// Column = number of bytes from the start of the line (UTF-8 code units).
     Utf8,
     /// Column = number of UTF-16 code units from the start of the line.
     /// This is the **mandatory default** per the LSP specification.
+    #[default]
     Utf16,
 }
 
 impl PositionEncoding {
-    /// The mandatory LSP fallback encoding.
-    pub const DEFAULT: Self = PositionEncoding::Utf16;
-
     /// Pick the best encoding from the set the client advertises.
     ///
     /// Preference: UTF-8 if supported, otherwise UTF-16 (the mandatory fallback).
     pub fn negotiate(client_encodings: Option<&[PositionEncodingKind]>) -> Self {
         let Some(encodings) = client_encodings else {
-            return Self::DEFAULT;
+            return Self::default();
         };
         if encodings.contains(&PositionEncodingKind::UTF8) {
             PositionEncoding::Utf8
@@ -56,7 +54,10 @@ pub fn set_encoding(enc: PositionEncoding) {
 
 /// Read the negotiated encoding (falls back to UTF-16 if never set).
 pub fn encoding() -> PositionEncoding {
-    ENCODING.get().copied().unwrap_or(PositionEncoding::DEFAULT)
+    ENCODING
+        .get()
+        .copied()
+        .unwrap_or(PositionEncoding::default())
 }
 
 // ---------------------------------------------------------------------------
