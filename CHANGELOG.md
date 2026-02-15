@@ -1,5 +1,35 @@
 # Changelog
 
+## v0.1.16
+
+### Features
+
+- Scope-aware completion with inheritance resolution (#57)
+  - Completions are now filtered by the current scope (contract, function, block)
+  - Inherited members from parent contracts are resolved and included
+  - Replaces the previous `fast`/`full` completion mode split with a single unified engine
+
+### Fixes
+
+- Use relative path to filter out diagnostics (#55)
+  - Build diagnostic filtering now correctly matches files using relative paths
+  - Fixes cases where diagnostics from dependency files were incorrectly included
+
+### Deprecations
+
+- `--completion-mode` flag is deprecated (#59)
+  - The `fast`/`full` split is no longer needed — scope-aware completions are always active
+
+### New Contributors
+
+- [@libkakashi](https://github.com/libkakashi) — chore: add Zed editor setup section in docs (#60)
+
+### Other
+
+- Refactor build module: simplify diagnostic filtering, extract path comparison helper
+- Add Zed editor setup section in docs (#60)
+- 272 total tests, 0 warnings
+
 ## v0.1.15
 
 ### Fixes
