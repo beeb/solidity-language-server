@@ -48,23 +48,26 @@ fn test_byte_offset_to_position_empty_source() {
 #[test]
 fn test_position_to_byte_offset_basic() {
     let source = "line1\nline2\nline3\n";
-    assert_eq!(position_to_byte_offset(source, 0, 0), 0); // 'l'
-    assert_eq!(position_to_byte_offset(source, 0, 5), 5); // '\n'
-    assert_eq!(position_to_byte_offset(source, 1, 0), 6); // 'l' in line2
-    assert_eq!(position_to_byte_offset(source, 1, 3), 9); // 'e' in line2
-    assert_eq!(position_to_byte_offset(source, 2, 0), 12); // 'l' in line3
+    assert_eq!(position_to_byte_offset(source, Position::new(0, 0)), 0); // 'l'
+    assert_eq!(position_to_byte_offset(source, Position::new(0, 5)), 5); // '\n'
+    assert_eq!(position_to_byte_offset(source, Position::new(1, 0)), 6); // 'l' in line2
+    assert_eq!(position_to_byte_offset(source, Position::new(1, 3)), 9); // 'e' in line2
+    assert_eq!(position_to_byte_offset(source, Position::new(2, 0)), 12); // 'l' in line3
 }
 
 #[test]
 fn test_position_to_byte_offset_out_of_bounds() {
     let source = "line1\nline2\n";
-    assert_eq!(position_to_byte_offset(source, 10, 10), source.len());
+    assert_eq!(
+        position_to_byte_offset(source, Position::new(10, 10)),
+        source.len()
+    );
 }
 
 #[test]
 fn test_position_to_byte_offset_empty() {
     let source = "";
-    assert_eq!(position_to_byte_offset(source, 0, 0), 0);
+    assert_eq!(position_to_byte_offset(source, Position::new(0, 0)), 0);
 }
 
 #[test]
@@ -158,32 +161,32 @@ fn test_byte_offset_to_position_utf16_multiline() {
 #[test]
 fn test_position_to_byte_offset_utf16_bmp_chars() {
     let source = "a█b";
-    assert_eq!(position_to_byte_offset(source, 0, 0), 0); // 'a'
-    assert_eq!(position_to_byte_offset(source, 0, 1), 1); // '█' starts at byte 1
-    assert_eq!(position_to_byte_offset(source, 0, 2), 4); // 'b' starts at byte 4
+    assert_eq!(position_to_byte_offset(source, Position::new(0, 0)), 0); // 'a'
+    assert_eq!(position_to_byte_offset(source, Position::new(0, 1)), 1); // '█' starts at byte 1
+    assert_eq!(position_to_byte_offset(source, Position::new(0, 2)), 4); // 'b' starts at byte 4
 }
 
 #[test]
 fn test_position_to_byte_offset_utf16_surrogate_pair() {
     // "a😀b" — UTF-16 cols: a=0, 😀=1(2 units), b=3
     let source = "a😀b";
-    assert_eq!(position_to_byte_offset(source, 0, 0), 0); // 'a'
-    assert_eq!(position_to_byte_offset(source, 0, 1), 1); // '😀' at byte 1
-    assert_eq!(position_to_byte_offset(source, 0, 3), 5); // 'b' at byte 5
+    assert_eq!(position_to_byte_offset(source, Position::new(0, 0)), 0); // 'a'
+    assert_eq!(position_to_byte_offset(source, Position::new(0, 1)), 1); // '😀' at byte 1
+    assert_eq!(position_to_byte_offset(source, Position::new(0, 3)), 5); // 'b' at byte 5
 }
 
 #[test]
 fn test_position_to_byte_offset_utf16_multiline() {
     let source = "█░\na😀\nz";
     // Line 0: █=col0, ░=col1
-    assert_eq!(position_to_byte_offset(source, 0, 0), 0);
-    assert_eq!(position_to_byte_offset(source, 0, 1), 3);
+    assert_eq!(position_to_byte_offset(source, Position::new(0, 0)), 0);
+    assert_eq!(position_to_byte_offset(source, Position::new(0, 1)), 3);
     // Line 1: a=col0, 😀=col1, end=col3
-    assert_eq!(position_to_byte_offset(source, 1, 0), 7);
-    assert_eq!(position_to_byte_offset(source, 1, 1), 8);
-    assert_eq!(position_to_byte_offset(source, 1, 3), 12);
+    assert_eq!(position_to_byte_offset(source, Position::new(1, 0)), 7);
+    assert_eq!(position_to_byte_offset(source, Position::new(1, 1)), 8);
+    assert_eq!(position_to_byte_offset(source, Position::new(1, 3)), 12);
     // Line 2: z=col0
-    assert_eq!(position_to_byte_offset(source, 2, 0), 13);
+    assert_eq!(position_to_byte_offset(source, Position::new(2, 0)), 13);
 }
 
 #[test]
@@ -196,7 +199,7 @@ fn test_roundtrip_utf16_byte_to_pos_to_byte() {
             line,
             character: col,
         } = byte_offset_to_position(source, byte_off);
-        let recovered = position_to_byte_offset(source, line, col);
+        let recovered = position_to_byte_offset(source, Position::new(line, col));
         assert_eq!(
             recovered, byte_off,
             "roundtrip failed for byte_off={byte_off}: pos=({line},{col}) -> {recovered}"

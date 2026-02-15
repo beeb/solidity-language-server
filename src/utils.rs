@@ -108,21 +108,21 @@ pub fn byte_offset_to_position(source: &str, byte_offset: usize) -> Position {
     }
 }
 
-/// Convert an LSP `(line, character)` position back to a byte offset, where
+/// Convert an LSP [`Position`] position back to a byte offset, where
 /// `character` is interpreted according to the negotiated [`PositionEncoding`].
-pub fn position_to_byte_offset(source: &str, line: u32, character: u32) -> usize {
+pub fn position_to_byte_offset(source: &str, pos: Position) -> usize {
     let enc = encoding();
     let mut current_line: u32 = 0;
     let mut current_col: u32 = 0;
 
     for (i, ch) in source.char_indices() {
-        if current_line == line && current_col == character {
+        if current_line == pos.line && current_col == pos.character {
             return i;
         }
 
         match ch {
             '\n' => {
-                if current_line == line {
+                if current_line == pos.line {
                     return i; // clamp to end of line
                 }
                 current_line += 1;

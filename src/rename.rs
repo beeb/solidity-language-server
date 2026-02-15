@@ -88,8 +88,7 @@ fn get_name_location_index(
 
 pub fn get_identifier_at_position(source_bytes: &[u8], position: Position) -> Option<String> {
     let text = String::from_utf8_lossy(source_bytes);
-    let abs_offset =
-        crate::utils::position_to_byte_offset(&text, position.line, position.character);
+    let abs_offset = crate::utils::position_to_byte_offset(&text, position);
     let lines: Vec<&str> = text.lines().collect();
     let line = lines.get(position.line as usize)?;
     // Compute byte offset within this line
@@ -133,8 +132,7 @@ pub fn get_identifier_at_position(source_bytes: &[u8], position: Position) -> Op
 
 pub fn get_identifier_range(source_bytes: &[u8], position: Position) -> Option<Range> {
     let text = String::from_utf8_lossy(source_bytes);
-    let abs_offset =
-        crate::utils::position_to_byte_offset(&text, position.line, position.character);
+    let abs_offset = crate::utils::position_to_byte_offset(&text, position);
     let lines: Vec<&str> = text.lines().collect();
     let line = lines.get(position.line as usize)?;
     // Compute byte offset of line start and cursor column within line
