@@ -1,47 +1,48 @@
 use solidity_language_server::utils::{
     byte_offset_to_position, is_valid_solidity_identifier, position_to_byte_offset,
 };
+use tower_lsp::lsp_types::Position;
 
 #[test]
 fn test_byte_offset_to_position_unix_newlines() {
     let source = "line1\nline2\nline3\n";
-    assert_eq!(byte_offset_to_position(source, 0), (0, 0)); // 'l' in line1
-    assert_eq!(byte_offset_to_position(source, 5), (0, 5)); // '\n'
-    assert_eq!(byte_offset_to_position(source, 6), (1, 0)); // 'l' in line2
-    assert_eq!(byte_offset_to_position(source, 11), (1, 5)); // '\n'
-    assert_eq!(byte_offset_to_position(source, 12), (2, 0)); // 'l' in line3
+    assert_eq!(byte_offset_to_position(source, 0), Position::new(0, 0)); // 'l' in line1
+    assert_eq!(byte_offset_to_position(source, 5), Position::new(0, 5)); // '\n'
+    assert_eq!(byte_offset_to_position(source, 6), Position::new(1, 0)); // 'l' in line2
+    assert_eq!(byte_offset_to_position(source, 11), Position::new(1, 5)); // '\n'
+    assert_eq!(byte_offset_to_position(source, 12), Position::new(2, 0)); // 'l' in line3
 }
 
 #[test]
 fn test_byte_offset_to_position_windows_newlines() {
     let source = "line1\r\nline2\r\nline3\r\n";
-    assert_eq!(byte_offset_to_position(source, 0), (0, 0));
-    assert_eq!(byte_offset_to_position(source, 5), (0, 5));
-    assert_eq!(byte_offset_to_position(source, 7), (1, 0)); // skips \r\n
-    assert_eq!(byte_offset_to_position(source, 12), (1, 5));
-    assert_eq!(byte_offset_to_position(source, 14), (2, 0));
+    assert_eq!(byte_offset_to_position(source, 0), Position::new(0, 0));
+    assert_eq!(byte_offset_to_position(source, 5), Position::new(0, 5));
+    assert_eq!(byte_offset_to_position(source, 7), Position::new(1, 0)); // skips \r\n
+    assert_eq!(byte_offset_to_position(source, 12), Position::new(1, 5));
+    assert_eq!(byte_offset_to_position(source, 14), Position::new(2, 0));
 }
 
 #[test]
 fn test_byte_offset_to_position_no_newlines() {
     let source = "justoneline";
-    assert_eq!(byte_offset_to_position(source, 0), (0, 0));
-    assert_eq!(byte_offset_to_position(source, 5), (0, 5));
-    assert_eq!(byte_offset_to_position(source, 11), (0, 11));
+    assert_eq!(byte_offset_to_position(source, 0), Position::new(0, 0));
+    assert_eq!(byte_offset_to_position(source, 5), Position::new(0, 5));
+    assert_eq!(byte_offset_to_position(source, 11), Position::new(0, 11));
 }
 
 #[test]
 fn test_byte_offset_to_position_offset_out_of_bounds() {
     let source = "short\nfile";
     let offset = source.len() + 10;
-    assert_eq!(byte_offset_to_position(source, offset), (1, 4));
+    assert_eq!(byte_offset_to_position(source, offset), Position::new(1, 4));
 }
 
 #[test]
 fn test_byte_offset_to_position_empty_source() {
     let source = "";
-    assert_eq!(byte_offset_to_position(source, 0), (0, 0));
-    assert_eq!(byte_offset_to_position(source, 10), (0, 0));
+    assert_eq!(byte_offset_to_position(source, 0), Position::new(0, 0));
+    assert_eq!(byte_offset_to_position(source, 10), Position::new(0, 0));
 }
 
 #[test]
@@ -100,10 +101,10 @@ fn test_byte_offset_to_position_utf16_bmp_chars() {
     let source = "a█b";
     assert_eq!(source.len(), 5);
 
-    assert_eq!(byte_offset_to_position(source, 0), (0, 0)); // before 'a'
-    assert_eq!(byte_offset_to_position(source, 1), (0, 1)); // before '█' (byte 1)
-    assert_eq!(byte_offset_to_position(source, 4), (0, 2)); // before 'b' (byte 4)
-    assert_eq!(byte_offset_to_position(source, 5), (0, 3)); // end
+    assert_eq!(byte_offset_to_position(source, 0), Position::new(0, 0)); // before 'a'
+    assert_eq!(byte_offset_to_position(source, 1), Position::new(0, 1)); // before '█' (byte 1)
+    assert_eq!(byte_offset_to_position(source, 4), Position::new(0, 2)); // before 'b' (byte 4)
+    assert_eq!(byte_offset_to_position(source, 5), Position::new(0, 3)); // end
 }
 
 #[test]
@@ -114,10 +115,10 @@ fn test_byte_offset_to_position_utf16_surrogate_pair() {
     let source = "a😀b";
     assert_eq!(source.len(), 6);
 
-    assert_eq!(byte_offset_to_position(source, 0), (0, 0)); // before 'a'
-    assert_eq!(byte_offset_to_position(source, 1), (0, 1)); // before '😀'
-    assert_eq!(byte_offset_to_position(source, 5), (0, 3)); // before 'b' (col 1+2=3)
-    assert_eq!(byte_offset_to_position(source, 6), (0, 4)); // end
+    assert_eq!(byte_offset_to_position(source, 0), Position::new(0, 0)); // before 'a'
+    assert_eq!(byte_offset_to_position(source, 1), Position::new(0, 1)); // before '😀'
+    assert_eq!(byte_offset_to_position(source, 5), Position::new(0, 3)); // before 'b' (col 1+2=3)
+    assert_eq!(byte_offset_to_position(source, 6), Position::new(0, 4)); // end
 }
 
 #[test]
@@ -127,11 +128,11 @@ fn test_byte_offset_to_position_utf16_mixed_multibyte() {
     let source = "é█😀x";
     assert_eq!(source.len(), 10);
 
-    assert_eq!(byte_offset_to_position(source, 0), (0, 0)); // before 'é'
-    assert_eq!(byte_offset_to_position(source, 2), (0, 1)); // before '█'
-    assert_eq!(byte_offset_to_position(source, 5), (0, 2)); // before '😀'
-    assert_eq!(byte_offset_to_position(source, 9), (0, 4)); // before 'x'
-    assert_eq!(byte_offset_to_position(source, 10), (0, 5)); // end
+    assert_eq!(byte_offset_to_position(source, 0), Position::new(0, 0)); // before 'é'
+    assert_eq!(byte_offset_to_position(source, 2), Position::new(0, 1)); // before '█'
+    assert_eq!(byte_offset_to_position(source, 5), Position::new(0, 2)); // before '😀'
+    assert_eq!(byte_offset_to_position(source, 9), Position::new(0, 4)); // before 'x'
+    assert_eq!(byte_offset_to_position(source, 10), Position::new(0, 5)); // end
 }
 
 #[test]
@@ -143,15 +144,15 @@ fn test_byte_offset_to_position_utf16_multiline() {
     assert_eq!(source.len(), 14);
 
     // Line 0
-    assert_eq!(byte_offset_to_position(source, 0), (0, 0)); // '█'
-    assert_eq!(byte_offset_to_position(source, 3), (0, 1)); // '░'
-    assert_eq!(byte_offset_to_position(source, 6), (0, 2)); // '\n'
+    assert_eq!(byte_offset_to_position(source, 0), Position::new(0, 0)); // '█'
+    assert_eq!(byte_offset_to_position(source, 3), Position::new(0, 1)); // '░'
+    assert_eq!(byte_offset_to_position(source, 6), Position::new(0, 2)); // '\n'
     // Line 1
-    assert_eq!(byte_offset_to_position(source, 7), (1, 0)); // 'a'
-    assert_eq!(byte_offset_to_position(source, 8), (1, 1)); // '😀'
-    assert_eq!(byte_offset_to_position(source, 12), (1, 3)); // '\n'
+    assert_eq!(byte_offset_to_position(source, 7), Position::new(1, 0)); // 'a'
+    assert_eq!(byte_offset_to_position(source, 8), Position::new(1, 1)); // '😀'
+    assert_eq!(byte_offset_to_position(source, 12), Position::new(1, 3)); // '\n'
     // Line 2
-    assert_eq!(byte_offset_to_position(source, 13), (2, 0)); // 'z'
+    assert_eq!(byte_offset_to_position(source, 13), Position::new(2, 0)); // 'z'
 }
 
 #[test]
@@ -191,7 +192,10 @@ fn test_roundtrip_utf16_byte_to_pos_to_byte() {
     let source = "ab😀é█cd\nef";
     let char_boundaries: Vec<usize> = source.char_indices().map(|(i, _)| i).collect();
     for &byte_off in &char_boundaries {
-        let (line, col) = byte_offset_to_position(source, byte_off);
+        let Position {
+            line,
+            character: col,
+        } = byte_offset_to_position(source, byte_off);
         let recovered = position_to_byte_offset(source, line, col);
         assert_eq!(
             recovered, byte_off,
