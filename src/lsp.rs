@@ -459,10 +459,7 @@ impl LanguageServer for ForgeLsp {
             let end = utils::byte_offset_to_position(&original_content, original_content.len());
             let edit = TextEdit {
                 range: Range {
-                    start: Position {
-                        line: 0,
-                        character: 0,
-                    },
+                    start: Position::default(),
                     end,
                 },
                 new_text: formatted_content,
