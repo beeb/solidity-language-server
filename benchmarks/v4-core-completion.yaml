@@ -13,7 +13,7 @@
 # v0.1.15: Block parent inference fixed — scope walk correctly traverses
 #          Block → FunctionDefinition → ContractDefinition → SourceUnit.
 
-project: /Users/meek/developer/uniswap/v4-core
+project: v4-core
 file: src/libraries/Pool.sol
 # Line 206 (0-based) = `Slot0 _slot0 = self.slot0;`
 # Col 32 = right after the dot in `self.`
