@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.1.19
+
+### Refactor
+
+- Rewrite `textDocument/documentSymbol` and `workspace/symbol` to use tree-sitter instead of Forge AST (#77, #78)
+  - Symbols no longer depend on `forge build` — works on any Solidity file immediately
+  - `documentSymbol` reads from text_cache with disk fallback
+  - `workspace/symbol` scans open files only
+- Clean up semantic tokens to avoid overriding tree-sitter highlights (#78)
+  - Remove modifiers, builtin types, pragmas, variables, and member expressions from LSP tokens
+  - Prevents `@lsp.typemod.*` priority 126-127 from overriding tree-sitter colors
+
+### Performance
+
+- `textDocument/documentSymbol` 3.2x faster (3.24ms → 1.02ms)
+- `workspace/symbol` 6.4x faster (6.08ms → 0.95ms)
+
+### Features
+
+- Add `textDocument/semanticTokens/full` via tree-sitter (#75, #76)
+
 ## v0.1.18
 
 ### Features
