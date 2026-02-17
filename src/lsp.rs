@@ -645,6 +645,9 @@ impl LanguageServer for ForgeLsp {
 
         let source_text = String::from_utf8_lossy(&source_bytes).to_string();
 
+        // Extract the identifier name under the cursor for tree-sitter validation.
+        let cursor_name = goto::cursor_context(&source_text, position).map(|ctx| ctx.name);
+
         // Determine if the file is dirty (unsaved edits since last build).
         // When dirty, AST byte offsets are stale so we prefer tree-sitter.
         // When clean, AST has proper semantic resolution (scoping, types).
@@ -661,12 +664,35 @@ impl LanguageServer for ForgeLsp {
             (text_version > build_version, cb)
         };
 
+        // Validate a tree-sitter result: read the target source and check that
+        // the text at the location matches the cursor identifier. Tree-sitter
+        // resolves by name so a mismatch means it landed on the wrong node.
+        // AST results are NOT validated — the AST can legitimately resolve to a
+        // different name (e.g. `.selector` → error declaration).
+        let validate_ts = |loc: &Location| -> bool {
+            let Some(ref name) = cursor_name else {
+                return true; // can't validate, trust it
+            };
+            let target_src = if loc.uri == uri {
+                Some(source_text.clone())
+            } else {
+                loc.uri
+                    .to_file_path()
+                    .ok()
+                    .and_then(|p| std::fs::read_to_string(&p).ok())
+            };
+            match target_src {
+                Some(src) => goto::validate_goto_target(&src, loc, name),
+                None => true, // can't read target, trust it
+            }
+        };
+
         if is_dirty {
             self.client
                 .log_message(MessageType::INFO, "file is dirty, trying tree-sitter first")
                 .await;
 
-            // DIRTY: tree-sitter first → AST fallback
+            // DIRTY: tree-sitter first (validated) → AST fallback
             let ts_result = {
                 let comp_cache = self.completion_cache.read().await;
                 let text_cache = self.text_cache.read().await;
@@ -678,37 +704,48 @@ impl LanguageServer for ForgeLsp {
             };
 
             if let Some(location) = ts_result {
-                self.client
-                    .log_message(
-                        MessageType::INFO,
-                        format!(
-                            "found definition (tree-sitter) at {}:{}",
-                            location.uri, location.range.start.line
-                        ),
-                    )
-                    .await;
-                return Ok(Some(GotoDefinitionResponse::from(location)));
-            }
-
-            // Tree-sitter couldn't resolve — try AST as best-effort fallback
-            if let Some(ref cb) = cached_build {
-                if let Some(location) =
-                    goto::goto_declaration(&cb.ast, &uri, position, &source_bytes)
-                {
+                if validate_ts(&location) {
                     self.client
                         .log_message(
                             MessageType::INFO,
                             format!(
-                                "found definition (AST fallback) at {}:{}",
+                                "found definition (tree-sitter) at {}:{}",
                                 location.uri, location.range.start.line
                             ),
                         )
                         .await;
                     return Ok(Some(GotoDefinitionResponse::from(location)));
                 }
+                self.client
+                    .log_message(
+                        MessageType::INFO,
+                        "tree-sitter result failed validation, trying AST fallback",
+                    )
+                    .await;
+            }
+
+            // Tree-sitter failed or didn't validate — try name-based AST lookup.
+            // Instead of matching by byte offset (which is stale on dirty files),
+            // search cached AST nodes whose source text matches the cursor name
+            // and follow their referencedDeclaration.
+            if let Some(ref cb) = cached_build {
+                if let Some(ref name) = cursor_name {
+                    if let Some(location) = goto::goto_declaration_by_name(cb, &uri, name) {
+                        self.client
+                            .log_message(
+                                MessageType::INFO,
+                                format!(
+                                    "found definition (AST by name) at {}:{}",
+                                    location.uri, location.range.start.line
+                                ),
+                            )
+                            .await;
+                        return Ok(Some(GotoDefinitionResponse::from(location)));
+                    }
+                }
             }
         } else {
-            // CLEAN: AST first → tree-sitter fallback
+            // CLEAN: AST first → tree-sitter fallback (validated)
             if let Some(ref cb) = cached_build {
                 if let Some(location) =
                     goto::goto_declaration(&cb.ast, &uri, position, &source_bytes)
@@ -726,7 +763,7 @@ impl LanguageServer for ForgeLsp {
                 }
             }
 
-            // AST couldn't resolve — try tree-sitter fallback
+            // AST couldn't resolve — try tree-sitter fallback (validated)
             let ts_result = {
                 let comp_cache = self.completion_cache.read().await;
                 let text_cache = self.text_cache.read().await;
@@ -738,16 +775,21 @@ impl LanguageServer for ForgeLsp {
             };
 
             if let Some(location) = ts_result {
+                if validate_ts(&location) {
+                    self.client
+                        .log_message(
+                            MessageType::INFO,
+                            format!(
+                                "found definition (tree-sitter fallback) at {}:{}",
+                                location.uri, location.range.start.line
+                            ),
+                        )
+                        .await;
+                    return Ok(Some(GotoDefinitionResponse::from(location)));
+                }
                 self.client
-                    .log_message(
-                        MessageType::INFO,
-                        format!(
-                            "found definition (tree-sitter fallback) at {}:{}",
-                            location.uri, location.range.start.line
-                        ),
-                    )
+                    .log_message(MessageType::INFO, "tree-sitter fallback failed validation")
                     .await;
-                return Ok(Some(GotoDefinitionResponse::from(location)));
             }
         }
 

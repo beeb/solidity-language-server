@@ -565,6 +565,120 @@ pub fn goto_declaration(
     None
 }
 
+/// Name-based AST goto — resolves by searching cached AST nodes for identifiers
+/// matching `name` in the current file, then following `referencedDeclaration`.
+///
+/// Unlike `goto_declaration` which matches by byte offset (breaks on dirty files),
+/// this reads the identifier text from the **built source** (on disk) at each node's
+/// `src` range and compares it to the cursor name. Works on dirty files because the
+/// AST node relationships (referencedDeclaration) are still valid — only the byte
+/// offsets in the current buffer are stale.
+pub fn goto_declaration_by_name(
+    cached_build: &CachedBuild,
+    file_uri: &Url,
+    name: &str,
+) -> Option<Location> {
+    let path = match file_uri.as_ref().starts_with("file://") {
+        true => &file_uri.as_ref()[7..],
+        false => file_uri.as_ref(),
+    };
+    let abs_path = cached_build.path_to_abs.get(path)?;
+    let current_file_nodes = cached_build.nodes.get(abs_path)?;
+
+    // Read the built source from disk to extract identifier text at src ranges
+    let built_source = std::fs::read_to_string(abs_path).ok()?;
+
+    // Collect all nodes in this file whose source text matches `name` and have
+    // a referencedDeclaration. Pick the narrowest (most specific) match.
+    let mut best: Option<(usize, u64)> = None; // (span_size, ref_id)
+
+    for (_id, node) in current_file_nodes {
+        let ref_id = match node.referenced_declaration {
+            Some(id) => id,
+            None => continue,
+        };
+
+        // Parse the node's src to get the byte range in the built source
+        let src_parts: Vec<&str> = node.src.split(':').collect();
+        if src_parts.len() != 3 {
+            continue;
+        }
+        let start: usize = match src_parts[0].parse() {
+            Ok(v) => v,
+            Err(_) => continue,
+        };
+        let length: usize = match src_parts[1].parse() {
+            Ok(v) => v,
+            Err(_) => continue,
+        };
+
+        if start + length > built_source.len() {
+            continue;
+        }
+
+        let node_text = &built_source[start..start + length];
+
+        // Check if this node's text matches the name we're looking for.
+        // For simple identifiers, the text equals the name directly.
+        // For member access (e.g. `x.toInt128()`), check if the text contains
+        // `.name(` or ends with `.name`.
+        let matches = node_text == name
+            || node_text.contains(&format!(".{name}("))
+            || node_text.ends_with(&format!(".{name}"));
+
+        if matches {
+            if best.is_none() || length < best.unwrap().0 {
+                best = Some((length, ref_id));
+            }
+        }
+    }
+
+    let (_span, ref_id) = best?;
+
+    // Find the declaration node across all files
+    let mut target_node: Option<&NodeInfo> = None;
+    for file_nodes in cached_build.nodes.values() {
+        if let Some(node) = file_nodes.get(&ref_id) {
+            target_node = Some(node);
+            break;
+        }
+    }
+
+    let node = target_node?;
+
+    // Parse the target's nameLocation or src
+    let loc_str = node.name_location.as_deref().unwrap_or(&node.src);
+    let parts: Vec<&str> = loc_str.split(':').collect();
+    if parts.len() != 3 {
+        return None;
+    }
+    let location_bytes: usize = parts[0].parse().ok()?;
+    let length: usize = parts[1].parse().ok()?;
+    let file_id = parts[2];
+
+    let file_path = cached_build.id_to_path_map.get(file_id)?;
+
+    let target_file_path = std::path::Path::new(file_path);
+    let absolute_path = if target_file_path.is_absolute() {
+        target_file_path.to_path_buf()
+    } else {
+        std::env::current_dir().ok()?.join(target_file_path)
+    };
+
+    let target_source_bytes = std::fs::read(&absolute_path).ok()?;
+    let start_pos = bytes_to_pos(&target_source_bytes, location_bytes)?;
+    let end_pos = bytes_to_pos(&target_source_bytes, location_bytes + length)?;
+    let target_uri = Url::from_file_path(&absolute_path).ok()?;
+
+    Some(Location {
+        uri: target_uri,
+        range: Range {
+            start: start_pos,
+            end: end_pos,
+        },
+    })
+}
+
 // ── Tree-sitter enhanced goto ──────────────────────────────────────────────
 
 /// Context extracted from the cursor position via tree-sitter.
@@ -595,6 +709,25 @@ fn ts_parse(source: &str) -> Option<tree_sitter::Tree> {
         .set_language(&tree_sitter_solidity::LANGUAGE.into())
         .expect("failed to load Solidity grammar");
     parser.parse(source, None)
+}
+
+/// Validate that the text at a goto target location matches the expected name.
+///
+/// Used to reject tree-sitter results that land on the wrong identifier.
+/// AST results are NOT validated because the AST can legitimately resolve
+/// to a different name (e.g. `.selector` → error declaration).
+pub fn validate_goto_target(target_source: &str, location: &Location, expected_name: &str) -> bool {
+    let line = location.range.start.line as usize;
+    let start_col = location.range.start.character as usize;
+    let end_col = location.range.end.character as usize;
+
+    if let Some(line_text) = target_source.lines().nth(line) {
+        if end_col <= line_text.len() {
+            return &line_text[start_col..end_col] == expected_name;
+        }
+    }
+    // Can't read target — assume valid
+    true
 }
 
 /// Find the deepest named node at the given byte offset.
