@@ -1,6 +1,7 @@
 use crate::completion;
 use crate::goto;
 use crate::hover;
+use crate::inlay_hints;
 use crate::links;
 use crate::references;
 use crate::rename;
@@ -173,6 +174,14 @@ impl ForgeLsp {
         self.client
             .publish_diagnostics(uri, all_diagnostics, None)
             .await;
+
+        // Refresh inlay hints after everything is updated
+        if build_succeeded {
+            let client = self.client.clone();
+            tokio::spawn(async move {
+                let _ = client.inlay_hint_refresh().await;
+            });
+        }
     }
 
     /// Get a CachedBuild from the cache, or fetch and build one on demand.
@@ -287,6 +296,14 @@ impl LanguageServer for ForgeLsp {
                     },
                 }),
                 document_formatting_provider: Some(OneOf::Left(true)),
+                inlay_hint_provider: Some(OneOf::Right(InlayHintServerCapabilities::Options(
+                    InlayHintOptions {
+                        resolve_provider: Some(false),
+                        work_done_progress_options: WorkDoneProgressOptions {
+                            work_done_progress: None,
+                        },
+                    },
+                ))),
                 semantic_tokens_provider: Some(
                     SemanticTokensServerCapabilities::SemanticTokensOptions(
                         SemanticTokensOptions {
@@ -624,31 +641,6 @@ impl LanguageServer for ForgeLsp {
             None => return Ok(None),
         };
 
-        let source = String::from_utf8_lossy(&source_bytes).into_owned();
-
-        // Try tree-sitter enhanced goto first (works with stale AST)
-        {
-            let cc_cache = self.completion_cache.read().await;
-            let tc_cache = self.text_cache.read().await;
-            if let Some(cc) = cc_cache.values().next() {
-                if let Some(location) =
-                    goto::goto_definition_ts(&source, position, &uri, cc, &tc_cache)
-                {
-                    self.client
-                        .log_message(
-                            MessageType::INFO,
-                            format!(
-                                "found definition (tree-sitter) at {}:{}",
-                                location.uri, location.range.start.line
-                            ),
-                        )
-                        .await;
-                    return Ok(Some(GotoDefinitionResponse::from(location)));
-                }
-            }
-        }
-
-        // Fallback: existing AST-based goto
         let cached_build = self.get_or_fetch_build(&uri, &file_path, false).await;
         let cached_build = match cached_build {
             Some(cb) => cb,
@@ -1200,5 +1192,55 @@ impl LanguageServer for ForgeLsp {
         let tokens = semantic_tokens::semantic_tokens_full(&source);
 
         Ok(Some(SemanticTokensResult::Tokens(tokens)))
+    }
+
+    async fn inlay_hint(
+        &self,
+        params: InlayHintParams,
+    ) -> tower_lsp::jsonrpc::Result<Option<Vec<InlayHint>>> {
+        self.client
+            .log_message(MessageType::INFO, "got textDocument/inlayHint request")
+            .await;
+
+        let uri = params.text_document.uri;
+        let range = params.range;
+
+        let file_path = match uri.to_file_path() {
+            Ok(path) => path,
+            Err(_) => {
+                self.client
+                    .log_message(MessageType::ERROR, "invalid file uri")
+                    .await;
+                return Ok(None);
+            }
+        };
+
+        let source_bytes = match self.get_source_bytes(&uri, &file_path).await {
+            Some(bytes) => bytes,
+            None => return Ok(None),
+        };
+
+        let cached_build = self.get_or_fetch_build(&uri, &file_path, false).await;
+        let cached_build = match cached_build {
+            Some(cb) => cb,
+            None => return Ok(None),
+        };
+
+        let hints = inlay_hints::inlay_hints(&cached_build, &uri, range, &source_bytes);
+
+        if hints.is_empty() {
+            self.client
+                .log_message(MessageType::INFO, "no inlay hints found")
+                .await;
+            Ok(None)
+        } else {
+            self.client
+                .log_message(
+                    MessageType::INFO,
+                    format!("found {} inlay hints", hints.len()),
+                )
+                .await;
+            Ok(Some(hints))
+        }
     }
 }
