@@ -11,7 +11,7 @@ const PM_KEY: &str = "/Users/meek/developer/uniswap/v4-core/src/PoolManager.sol"
 fn load_build() -> CachedBuild {
     let ast: Value =
         serde_json::from_str(&fs::read_to_string("pool-manager-ast.json").unwrap()).unwrap();
-    CachedBuild::new(ast)
+    CachedBuild::new(ast, 0)
 }
 
 /// Extract ImportDirective nodes from the raw fixture AST.
@@ -293,7 +293,7 @@ fn test_reference_links_have_no_tooltip() {
 
 #[test]
 fn test_empty_sources() {
-    let build = CachedBuild::new(serde_json::json!({}));
+    let build = CachedBuild::new(serde_json::json!({}), 0);
     let source_bytes = b"";
     let uri = Url::from_file_path("/tmp/Empty.sol").unwrap();
 

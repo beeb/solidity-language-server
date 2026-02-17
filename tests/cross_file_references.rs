@@ -8,7 +8,7 @@ use std::fs;
 fn load_cached_build() -> CachedBuild {
     let ast_data: Value =
         serde_json::from_str(&fs::read_to_string("pool-manager-ast.json").unwrap()).unwrap();
-    CachedBuild::new(ast_data)
+    CachedBuild::new(ast_data, 0)
 }
 
 // =============================================================================
