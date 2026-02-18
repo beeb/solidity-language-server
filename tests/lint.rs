@@ -42,10 +42,7 @@ fn test_lint_to_lsp_diagnostics() {
 
     let first_diag = &diagnostics[0];
     assert_eq!(first_diag.source, Some("forge-lint".to_string()));
-    assert_eq!(
-        first_diag.message,
-        "[forge lint] function names should use mixedCase"
-    );
+    assert_eq!(first_diag.message, "function names should use mixedCase");
     assert_eq!(
         first_diag.severity,
         Some(tower_lsp::lsp_types::DiagnosticSeverity::INFORMATION)

@@ -98,7 +98,7 @@ fn parse_diagnostic(err: &Value, path: &Path, content: &str) -> Option<Diagnosti
         code,
         code_description: None,
         source: Some("forge-build".to_string()),
-        message: format!("[forge build] {message}"),
+        message: message.to_string(),
         related_information: None,
         tags: None,
         data: None,

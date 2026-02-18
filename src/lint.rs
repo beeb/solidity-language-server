@@ -43,7 +43,7 @@ pub fn lint_output_to_diagnostics(
                             }),
                             code_description: None,
                             source: Some("forge-lint".to_string()),
-                            message: format!("[forge lint] {}", forge_diag.message),
+                            message: forge_diag.message.clone(),
                             related_information: None,
                             tags: None,
                             data: None,
