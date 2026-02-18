@@ -14,7 +14,7 @@
 - Gas estimates in hover, inlay hints, and code lens (#91, #94)
   - `GasIndex` built from solc contract output (creation + external/internal costs)
   - Hover shows gas cost for functions and deploy cost for contracts
-  - Gas icon (`⛽`) with formatted numbers (e.g. `125,432`)
+  - Fire icon (🔥) with formatted numbers (e.g. `125,432`)
 - Use solc directly for AST + diagnostics, 11x faster on large projects (#90)
 
 ### Refactor
