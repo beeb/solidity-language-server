@@ -12,6 +12,7 @@ use crate::symbols;
 use crate::utils;
 use std::collections::HashMap;
 use std::sync::Arc;
+use std::sync::atomic::{AtomicU64, Ordering};
 use tokio::sync::RwLock;
 use tower_lsp::{Client, LanguageServer, lsp_types::*};
 
@@ -34,6 +35,11 @@ pub struct ForgeLsp {
     settings: Arc<RwLock<Settings>>,
     /// Whether to use solc directly for AST generation (with forge fallback).
     use_solc: bool,
+    /// Cache of semantic tokens per document for delta support.
+    /// Key: URI string, Value: (result_id, tokens).
+    semantic_token_cache: Arc<RwLock<HashMap<String, (String, Vec<SemanticToken>)>>>,
+    /// Monotonic counter for generating unique result_ids.
+    semantic_token_id: Arc<AtomicU64>,
 }
 
 impl ForgeLsp {
@@ -61,6 +67,8 @@ impl ForgeLsp {
             client_capabilities,
             settings,
             use_solc,
+            semantic_token_cache: Arc::new(RwLock::new(HashMap::new())),
+            semantic_token_id: Arc::new(AtomicU64::new(0)),
         }
     }
 
@@ -539,8 +547,8 @@ impl LanguageServer for ForgeLsp {
                     SemanticTokensServerCapabilities::SemanticTokensOptions(
                         SemanticTokensOptions {
                             legend: semantic_tokens::legend(),
-                            full: Some(SemanticTokensFullOptions::Bool(true)),
-                            range: None,
+                            full: Some(SemanticTokensFullOptions::Delta { delta: Some(true) }),
+                            range: Some(true),
                             work_done_progress_options: WorkDoneProgressOptions {
                                 work_done_progress: None,
                             },
@@ -1713,9 +1721,132 @@ impl LanguageServer for ForgeLsp {
             }
         };
 
-        let tokens = semantic_tokens::semantic_tokens_full(&source);
+        let mut tokens = semantic_tokens::semantic_tokens_full(&source);
+
+        // Generate a unique result_id and cache the tokens for delta requests
+        let id = self.semantic_token_id.fetch_add(1, Ordering::Relaxed);
+        let result_id = id.to_string();
+        tokens.result_id = Some(result_id.clone());
+
+        {
+            let mut cache = self.semantic_token_cache.write().await;
+            cache.insert(uri.to_string(), (result_id, tokens.data.clone()));
+        }
 
         Ok(Some(SemanticTokensResult::Tokens(tokens)))
+    }
+
+    async fn semantic_tokens_range(
+        &self,
+        params: SemanticTokensRangeParams,
+    ) -> tower_lsp::jsonrpc::Result<Option<SemanticTokensRangeResult>> {
+        self.client
+            .log_message(
+                MessageType::INFO,
+                "got textDocument/semanticTokens/range request",
+            )
+            .await;
+
+        let uri = params.text_document.uri;
+        let range = params.range;
+        let source = {
+            let cache = self.text_cache.read().await;
+            cache.get(&uri.to_string()).map(|(_, s)| s.clone())
+        };
+
+        let source = match source {
+            Some(s) => s,
+            None => {
+                let file_path = match uri.to_file_path() {
+                    Ok(p) => p,
+                    Err(_) => return Ok(None),
+                };
+                match std::fs::read_to_string(&file_path) {
+                    Ok(s) => s,
+                    Err(_) => return Ok(None),
+                }
+            }
+        };
+
+        let tokens =
+            semantic_tokens::semantic_tokens_range(&source, range.start.line, range.end.line);
+
+        Ok(Some(SemanticTokensRangeResult::Tokens(tokens)))
+    }
+
+    async fn semantic_tokens_full_delta(
+        &self,
+        params: SemanticTokensDeltaParams,
+    ) -> tower_lsp::jsonrpc::Result<Option<SemanticTokensFullDeltaResult>> {
+        self.client
+            .log_message(
+                MessageType::INFO,
+                "got textDocument/semanticTokens/full/delta request",
+            )
+            .await;
+
+        let uri = params.text_document.uri;
+        let previous_result_id = params.previous_result_id;
+
+        let source = {
+            let cache = self.text_cache.read().await;
+            cache.get(&uri.to_string()).map(|(_, s)| s.clone())
+        };
+
+        let source = match source {
+            Some(s) => s,
+            None => {
+                let file_path = match uri.to_file_path() {
+                    Ok(p) => p,
+                    Err(_) => return Ok(None),
+                };
+                match std::fs::read_to_string(&file_path) {
+                    Ok(s) => s,
+                    Err(_) => return Ok(None),
+                }
+            }
+        };
+
+        let mut new_tokens = semantic_tokens::semantic_tokens_full(&source);
+
+        // Generate a new result_id
+        let id = self.semantic_token_id.fetch_add(1, Ordering::Relaxed);
+        let new_result_id = id.to_string();
+        new_tokens.result_id = Some(new_result_id.clone());
+
+        let uri_str = uri.to_string();
+
+        // Look up the previous tokens by result_id
+        let old_tokens = {
+            let cache = self.semantic_token_cache.read().await;
+            cache
+                .get(&uri_str)
+                .filter(|(rid, _)| *rid == previous_result_id)
+                .map(|(_, tokens)| tokens.clone())
+        };
+
+        // Update the cache with the new tokens
+        {
+            let mut cache = self.semantic_token_cache.write().await;
+            cache.insert(uri_str, (new_result_id.clone(), new_tokens.data.clone()));
+        }
+
+        match old_tokens {
+            Some(old) => {
+                // Compute delta
+                let edits = semantic_tokens::compute_delta(&old, &new_tokens.data);
+                Ok(Some(SemanticTokensFullDeltaResult::TokensDelta(
+                    SemanticTokensDelta {
+                        result_id: Some(new_result_id),
+                        edits,
+                    },
+                )))
+            }
+            None => {
+                // No cached previous — fall back to full response
+                Ok(Some(SemanticTokensFullDeltaResult::Tokens(new_tokens)))
+            }
+        }
     }
 
     async fn inlay_hint(

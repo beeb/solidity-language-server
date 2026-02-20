@@ -1,7 +1,15 @@
 use tower_lsp::lsp_types::{
-    SemanticToken, SemanticTokenModifier, SemanticTokenType, SemanticTokens, SemanticTokensLegend,
+    SemanticToken, SemanticTokenModifier, SemanticTokenType, SemanticTokens, SemanticTokensEdit,
+    SemanticTokensLegend,
 };
 use tree_sitter::{Node, Parser};
+
+/// Inclusive line range for filtering (0-based).
+#[derive(Clone, Copy, Debug)]
+struct LineRange {
+    start: u32,
+    end: u32,
+}
 
 // ── Token type indices ─────────────────────────────────────────────────────
 
@@ -63,10 +71,28 @@ pub fn legend() -> SemanticTokensLegend {
     }
 }
 
-// ── Public entry point ─────────────────────────────────────────────────────
+// ── Public entry points ────────────────────────────────────────────────────
 
-/// Parse `source` with tree-sitter and return semantic tokens.
+/// Parse `source` with tree-sitter and return semantic tokens for the entire file.
 pub fn semantic_tokens_full(source: &str) -> SemanticTokens {
+    semantic_tokens_impl(source, None)
+}
+
+/// Parse `source` with tree-sitter and return semantic tokens only for
+/// lines `start_line..=end_line` (0-based). Nodes outside the range are
+/// pruned during the tree walk so we avoid visiting most of the AST on
+/// large files.
+pub fn semantic_tokens_range(source: &str, start_line: u32, end_line: u32) -> SemanticTokens {
+    semantic_tokens_impl(
+        source,
+        Some(LineRange {
+            start: start_line,
+            end: end_line,
+        }),
+    )
+}
+
+fn semantic_tokens_impl(source: &str, range: Option<LineRange>) -> SemanticTokens {
     let mut parser = Parser::new();
     parser
         .set_language(&tree_sitter_solidity::LANGUAGE.into())
@@ -83,7 +109,7 @@ pub fn semantic_tokens_full(source: &str) -> SemanticTokens {
     };
 
     let mut tokens: Vec<RawToken> = Vec::new();
-    collect(tree.root_node(), source, &mut tokens);
+    collect(tree.root_node(), source, range, &mut tokens);
     tokens.sort_by(|a, b| a.line.cmp(&b.line).then(a.col.cmp(&b.col)));
 
     // Delta-encode
@@ -112,6 +138,63 @@ pub fn semantic_tokens_full(source: &str) -> SemanticTokens {
     }
 }
 
+// ── Delta support ──────────────────────────────────────────────────────────
+
+/// Compare two delta-encoded token arrays and return the minimal set of edits
+/// to transform `old` into `new`. Each `SemanticToken` is 5 × u32, so one
+/// token = 5 data elements in the flat array the LSP client sees.
+///
+/// The algorithm finds the longest common prefix and suffix, then emits a
+/// single edit that replaces the changed middle section.
+pub fn compute_delta(old: &[SemanticToken], new: &[SemanticToken]) -> Vec<SemanticTokensEdit> {
+    let old_len = old.len();
+    let new_len = new.len();
+
+    // Find longest common prefix
+    let prefix = old
+        .iter()
+        .zip(new.iter())
+        .take_while(|(a, b)| tok_eq(a, b))
+        .count();
+
+    // If everything matches, no edits needed
+    if prefix == old_len && prefix == new_len {
+        return vec![];
+    }
+
+    // Find longest common suffix (not overlapping with prefix)
+    let max_suffix = old_len.min(new_len) - prefix;
+    let suffix = (0..max_suffix)
+        .take_while(|&i| tok_eq(&old[old_len - 1 - i], &new[new_len - 1 - i]))
+        .count();
+
+    // The changed region in old: [prefix .. old_len - suffix]
+    // The replacement from new:  [prefix .. new_len - suffix]
+    let delete_count = old_len - prefix - suffix;
+    let insert = &new[prefix..new_len - suffix];
+
+    // Each token is 5 u32s in the flat data array
+    let start = (prefix * 5) as u32;
+    let delete_data = (delete_count * 5) as u32;
+
+    let data: Vec<SemanticToken> = insert.to_vec();
+
+    vec![SemanticTokensEdit {
+        start,
+        delete_count: delete_data,
+        data: if data.is_empty() { None } else { Some(data) },
+    }]
+}
+
+/// Compare two `SemanticToken`s field-by-field.
+fn tok_eq(a: &SemanticToken, b: &SemanticToken) -> bool {
+    a.delta_line == b.delta_line
+        && a.delta_start == b.delta_start
+        && a.length == b.length
+        && a.token_type == b.token_type
+        && a.token_modifiers_bitset == b.token_modifiers_bitset
+}
+
 #[derive(Debug)]
 struct RawToken {
     line: u32,
@@ -122,7 +205,22 @@ struct RawToken {
 
 // ── Tree walker ────────────────────────────────────────────────────────────
 
-fn collect(node: Node, source: &str, tokens: &mut Vec<RawToken>) {
+/// Returns `true` if the node overlaps with the requested line range.
+/// When no range is set (`None`), every node is in range.
+fn in_range(node: Node, range: Option<LineRange>) -> bool {
+    let Some(r) = range else { return true };
+    let node_start = node.start_position().row as u32;
+    let node_end = node.end_position().row as u32;
+    // Overlap check: node ends at-or-after range start AND starts at-or-before range end
+    node_end >= r.start && node_start <= r.end
+}
+
+fn collect(node: Node, source: &str, range: Option<LineRange>, tokens: &mut Vec<RawToken>) {
+    // Prune subtrees entirely outside the requested range
+    if !in_range(node, range) {
+        return;
+    }
+
     if !node.is_named() {
         if let Some(tt) = classify_anon(node, source) {
             push(node, tt, tokens);
@@ -142,56 +240,56 @@ fn collect(node: Node, source: &str, tokens: &mut Vec<RawToken>) {
         // Declarations — tag the identifier, walk body
         "contract_declaration" => {
             push_child_id(node, ty::CLASS, tokens);
-            walk(node, source, tokens);
+            walk(node, source, range, tokens);
         }
         "interface_declaration" => {
             push_child_id(node, ty::INTERFACE, tokens);
-            walk(node, source, tokens);
+            walk(node, source, range, tokens);
         }
         "library_declaration" => {
             push_child_id(node, ty::NAMESPACE, tokens);
-            walk(node, source, tokens);
+            walk(node, source, range, tokens);
         }
         "struct_definition" | "struct_declaration" => {
             push_child_id(node, ty::STRUCT, tokens);
-            walk(node, source, tokens);
+            walk(node, source, range, tokens);
         }
         "enum_definition" | "enum_declaration" => {
             push_child_id(node, ty::ENUM, tokens);
-            walk(node, source, tokens);
+            walk(node, source, range, tokens);
         }
         "enum_value" => push(node, ty::ENUM_MEMBER, tokens),
         "type_alias" => {
             push_child_id(node, ty::TYPE, tokens);
-            walk(node, source, tokens);
+            walk(node, source, range, tokens);
         }
         "event_definition" => {
             push_child_id(node, ty::EVENT, tokens);
-            walk(node, source, tokens);
+            walk(node, source, range, tokens);
         }
         "error_declaration" => {
             push_child_id(node, ty::TYPE, tokens);
-            walk(node, source, tokens);
+            walk(node, source, range, tokens);
         }
         "function_definition" => {
             push_child_id(node, ty::FUNCTION, tokens);
-            walk(node, source, tokens);
+            walk(node, source, range, tokens);
         }
         "state_variable_declaration" => {
             push_child_id(node, ty::PROPERTY, tokens);
-            walk(node, source, tokens);
+            walk(node, source, range, tokens);
         }
 
         // Parameters
         "parameter" | "event_parameter" | "error_parameter" => {
             push_child_id(node, ty::PARAMETER, tokens);
-            walk(node, source, tokens);
+            walk(node, source, range, tokens);
         }
 
         // Inheritance
         "inheritance_specifier" => {
             push_child_id(node, ty::INTERFACE, tokens);
-            walk(node, source, tokens);
+            walk(node, source, range, tokens);
         }
 
         // Type references
@@ -210,10 +308,10 @@ fn collect(node: Node, source: &str, tokens: &mut Vec<RawToken>) {
         // Let tree-sitter handle: pragmas, builtins, modifiers, members, variables
         "pragma_directive" | "solidity_pragma_token" | "solidity_version" => {}
         "type_name" | "primitive_type" if node.child_count() == 0 => {}
-        "type_name" | "primitive_type" => walk(node, source, tokens),
+        "type_name" | "primitive_type" => walk(node, source, range, tokens),
 
         // Everything else
-        _ => walk(node, source, tokens),
+        _ => walk(node, source, range, tokens),
     }
 }
 
@@ -282,10 +380,10 @@ fn is_sized_type(text: &str) -> bool {
 
 // ── Token emitters ─────────────────────────────────────────────────────────
 
-fn walk(node: Node, source: &str, tokens: &mut Vec<RawToken>) {
+fn walk(node: Node, source: &str, range: Option<LineRange>, tokens: &mut Vec<RawToken>) {
     let mut cursor = node.walk();
     for child in node.children(&mut cursor) {
-        collect(child, source, tokens);
+        collect(child, source, range, tokens);
     }
 }
 
@@ -413,5 +511,168 @@ mod tests {
             result.data.len() > 20,
             "Counter.sol should produce many tokens"
         );
+    }
+
+    // ── Range tests ────────────────────────────────────────────────────
+
+    #[test]
+    fn test_range_returns_subset() {
+        // Three contracts on separate lines — requesting only line 1
+        // should return fewer tokens than the full file.
+        let source = "contract A {}\ncontract B {}\ncontract C {}";
+        let full = semantic_tokens_full(source);
+        let range = semantic_tokens_range(source, 1, 1);
+        assert!(
+            range.data.len() < full.data.len(),
+            "range (line 1 only) should return fewer tokens than full: range={} full={}",
+            range.data.len(),
+            full.data.len(),
+        );
+    }
+
+    #[test]
+    fn test_range_delta_encoding_starts_fresh() {
+        // When range starts at line 2, the first delta_line should still
+        // be relative to position (0,0) per the LSP spec — the editor
+        // adjusts based on the range start.
+        let source = "contract A {}\ncontract B {}\ncontract C {}";
+        let range = semantic_tokens_range(source, 2, 2);
+        assert!(!range.data.is_empty(), "should have tokens on line 2");
+        // First token on line 2 has delta_line == 2 (relative to 0,0)
+        assert_eq!(range.data[0].delta_line, 2);
+    }
+
+    #[test]
+    fn test_range_covers_multiline_node() {
+        // A function spanning lines 1-3; requesting lines 1-3 should
+        // include all tokens from the function body.
+        let source = "\
+contract Foo {
+    function bar(uint256 x) public pure returns (uint256) {
+        return x + 1;
+    }
+}";
+        let full = semantic_tokens_full(source);
+        let range = semantic_tokens_range(source, 0, 4);
+        assert_eq!(
+            range.data.len(),
+            full.data.len(),
+            "range covering entire file should match full"
+        );
+    }
+
+    #[test]
+    fn test_range_empty_when_outside() {
+        let source = "contract Foo {}";
+        // Line 0 has the contract; line 5 has nothing
+        let range = semantic_tokens_range(source, 5, 10);
+        assert!(
+            range.data.is_empty(),
+            "range beyond EOF should return no tokens"
+        );
+    }
+
+    #[test]
+    fn test_range_only_second_contract() {
+        // Two contracts on separate lines; request only the second one
+        let source = "contract A {}\ncontract B {}";
+        let range = semantic_tokens_range(source, 1, 1);
+        // Should get "contract" keyword + "B" class identifier = 2 tokens
+        assert_eq!(
+            range.data.len(),
+            2,
+            "expected keyword + class on line 1, got {}",
+            range.data.len(),
+        );
+        // Both tokens should be on line 1
+        assert_eq!(range.data[0].delta_line, 1);
+    }
+
+    // ── Delta tests ────────────────────────────────────────────────────
+
+    fn mk_tok(dl: u32, ds: u32, len: u32, tt: u32) -> SemanticToken {
+        SemanticToken {
+            delta_line: dl,
+            delta_start: ds,
+            length: len,
+            token_type: tt,
+            token_modifiers_bitset: 0,
+        }
+    }
+
+    #[test]
+    fn test_delta_identical_returns_empty() {
+        let tokens = vec![mk_tok(0, 0, 8, ty::KEYWORD), mk_tok(0, 9, 3, ty::CLASS)];
+        let edits = compute_delta(&tokens, &tokens);
+        assert!(edits.is_empty(), "identical tokens should produce no edits");
+    }
+
+    #[test]
+    fn test_delta_append_token() {
+        let old = vec![mk_tok(0, 0, 8, ty::KEYWORD)];
+        let new = vec![mk_tok(0, 0, 8, ty::KEYWORD), mk_tok(0, 9, 3, ty::CLASS)];
+        let edits = compute_delta(&old, &new);
+        assert_eq!(edits.len(), 1);
+        // start = 5 (after 1 token × 5 u32s), delete 0, insert the new token
+        assert_eq!(edits[0].start, 5);
+        assert_eq!(edits[0].delete_count, 0);
+        assert_eq!(edits[0].data.as_ref().unwrap().len(), 1);
+    }
+
+    #[test]
+    fn test_delta_remove_token() {
+        let old = vec![mk_tok(0, 0, 8, ty::KEYWORD), mk_tok(0, 9, 3, ty::CLASS)];
+        let new = vec![mk_tok(0, 0, 8, ty::KEYWORD)];
+        let edits = compute_delta(&old, &new);
+        assert_eq!(edits.len(), 1);
+        assert_eq!(edits[0].start, 5);
+        assert_eq!(edits[0].delete_count, 5); // 1 token × 5 u32s
+        assert!(edits[0].data.is_none());
+    }
+
+    #[test]
+    fn test_delta_change_middle_token() {
+        let old = vec![
+            mk_tok(0, 0, 8, ty::KEYWORD),
+            mk_tok(0, 9, 3, ty::CLASS),
+            mk_tok(1, 0, 8, ty::KEYWORD),
+        ];
+        let new = vec![
+            mk_tok(0, 0, 8, ty::KEYWORD),
+            mk_tok(0, 9, 5, ty::FUNCTION), // changed
+            mk_tok(1, 0, 8, ty::KEYWORD),
+        ];
+        let edits = compute_delta(&old, &new);
+        assert_eq!(edits.len(), 1);
+        assert_eq!(edits[0].start, 5); // skip prefix (1 token)
+        assert_eq!(edits[0].delete_count, 5); // replace 1 token
+        let inserted = edits[0].data.as_ref().unwrap();
+        assert_eq!(inserted.len(), 1);
+        assert_eq!(inserted[0].length, 5);
+        assert_eq!(inserted[0].token_type, ty::FUNCTION);
+    }
+
+    #[test]
+    fn test_delta_full_file_edit() {
+        // Original and modified source
+        let old = semantic_tokens_full("contract A {}");
+        let new = semantic_tokens_full("contract B {}");
+        let edits = compute_delta(&old.data, &new.data);
+        // Only the class name token differs (A → B same length, but the delta
+        // encoding is identical since both are 1-char identifiers at same position).
+        // If token arrays are identical, edits should be empty.
+        // If they differ, we get exactly one edit.
+        assert!(edits.len() <= 1);
+    }
+
+    #[test]
+    fn test_delta_completely_different() {
+        let old = vec![mk_tok(0, 0, 8, ty::KEYWORD)];
+        let new = vec![mk_tok(0, 0, 5, ty::FUNCTION), mk_tok(0, 6, 3, ty::TYPE)];
+        let edits = compute_delta(&old, &new);
+        assert_eq!(edits.len(), 1);
+        assert_eq!(edits[0].start, 0); // no common prefix
+        assert_eq!(edits[0].delete_count, 5); // delete all old (1 × 5)
+        assert_eq!(edits[0].data.as_ref().unwrap().len(), 2); // insert all new
     }
 }

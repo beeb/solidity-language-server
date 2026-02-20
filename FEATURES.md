@@ -45,10 +45,10 @@
 - [ ] `textDocument/foldingRange` - Folding ranges
 - [ ] `textDocument/selectionRange` - Selection ranges
 - [x] `textDocument/inlayHint` - Inlay hints (parameter names, gas estimates)
-- [ ] `textDocument/semanticTokens` - Semantic tokens
+- [x] `textDocument/semanticTokens` - Semantic tokens
 - [x] `textDocument/semanticTokens/full` - Full semantic tokens
-- [ ] `textDocument/semanticTokens/range` - Range semantic tokens
-- [ ] `textDocument/semanticTokens/delta` - Delta semantic tokens
+- [x] `textDocument/semanticTokens/range` - Range semantic tokens
+- [x] `textDocument/semanticTokens/delta` - Delta semantic tokens
 
 **Workspace Features**
 
