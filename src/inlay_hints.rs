@@ -1015,7 +1015,7 @@ fn ts_gas_hint_for_function(
     Some(InlayHint {
         position: Position::new(brace_pos.line, brace_pos.character + offset),
         kind: Some(InlayHintKind::TYPE),
-        label: InlayHintLabel::String(format!("gas: {}", gas::format_gas(cost))),
+        label: InlayHintLabel::String(format!("🔥 gas: {}", gas::format_gas(cost))),
         text_edits: None,
         tooltip: Some(InlayHintTooltip::String("Estimated gas cost".to_string())),
         padding_left: Some(true),
@@ -1058,7 +1058,7 @@ fn ts_gas_hint_for_contract(
     Some(InlayHint {
         position: Position::new(brace_pos.line, brace_pos.character + 1),
         kind: Some(InlayHintKind::TYPE),
-        label: InlayHintLabel::String(format!("deploy: {} ", gas::format_gas(display_cost))),
+        label: InlayHintLabel::String(format!("🔥 deploy: {} ", gas::format_gas(display_cost))),
         text_edits: None,
         tooltip: Some(InlayHintTooltip::String(format!(
             "Deploy cost — code deposit: {}, execution: {}",
