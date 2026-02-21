@@ -1,0 +1,106 @@
+# Shop.sol — small contract (~272 lines, no viaIR)
+#   lsp-bench -c benchmarks/shop.yaml
+#
+# Snapshots (didChange):
+#   Shop.v2.snapshot — getPrice() added after constructor (+5 lines, shifts code below)
+#   Shop.v3.snapshot — cancelOrder() + event + error added at bottom (new usages of orderId, orders, owner)
+#   Shop.v4.snapshot — both edits combined (top + bottom)
+
+project: example
+file: Shop.sol
+line: 136
+col: 32
+output: benchmarks/shop
+report: README.md
+
+methods:
+  textDocument/definition:
+    line: 136
+    col: 32
+    # PRICE — immutable declared at line 68, resolved through `using Transaction for uint256`
+    didChange:
+      - file: Shop.v2.snapshot
+        line: 142
+        col: 32
+        # PRICE shifted (getPrice added above)
+      - file: Shop.v3.snapshot
+        line: 138
+        col: 32
+        # PRICE same offset (cancelOrder added below, +2 for new event/error)
+      - file: Shop.v4.snapshot
+        line: 144
+        col: 32
+        # PRICE shifted (both edits)
+
+  textDocument/references:
+    line: 69
+    col: 27
+    # owner — 14+ usages across the contract
+    didChange:
+      - file: Shop.v2.snapshot
+        line: 69
+        col: 27
+        # owner — same position (getPrice doesn't reference owner)
+      - file: Shop.v3.snapshot
+        line: 69
+        col: 27
+        # owner — cancelOrder uses onlyOwner modifier (new indirect usage)
+      - file: Shop.v4.snapshot
+        line: 69
+        col: 27
+        # owner — both edits applied
+
+  textDocument/completion:
+    line: 159
+    col: 18
+    trigger: "."
+    # order. — member completion on Transaction.Order (buyer, nonce, amount, date, confirmed)
+    didChange:
+      - file: Shop.v2.snapshot
+        line: 162
+        col: 18
+        # order. shifted (getPrice added above)
+      - file: Shop.v3.snapshot
+        line: 160
+        col: 18
+        # order. shifted +1 (new event/error above)
+      - file: Shop.v4.snapshot
+        line: 166
+        col: 18
+        # order. shifted (both edits)
+
+  textDocument/hover:
+    line: 41
+    col: 13
+    # addTax — function with full NatSpec (@notice, @param, @return)
+    didChange:
+      - file: Shop.v2.snapshot
+        line: 41
+        col: 13
+        # addTax — in Transaction library, above all changes
+      - file: Shop.v3.snapshot
+        line: 41
+        col: 13
+        # addTax — same position
+      - file: Shop.v4.snapshot
+        line: 41
+        col: 13
+        # addTax — same position
+
+  textDocument/rename:
+    line: 69
+    col: 27
+    # owner — 14+ occurrences across contract
+    didChange:
+      - file: Shop.v2.snapshot
+        line: 69
+        col: 27
+        # owner — same count (getPrice doesn't reference owner)
+      - file: Shop.v3.snapshot
+        line: 69
+        col: 27
+        # owner — cancelOrder uses onlyOwner, may add to rename scope
+      - file: Shop.v4.snapshot
+        line: 69
+        col: 27
+        # owner — both edits applied

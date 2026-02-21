@@ -1,0 +1,24 @@
+# Run all file benchmarks:
+#   lsp-bench -c benchmarks/config.yaml
+#
+# Shop.sol      (~272 lines, simple contract, no viaIR)
+# Pool.sol      (~613 lines, library, no viaIR)
+# PoolManager.t.sol (~1262 lines, test file, viaIR)
+
+project: v4-core
+iterations: 5
+warmup: 2
+timeout: 10
+index_timeout: 15
+response: full
+
+servers:
+  - mmsaki
+
+benchmarks:
+  - all
+
+include:
+  - shop.yaml
+  - pool.yaml
+  - poolmanager-t.yaml

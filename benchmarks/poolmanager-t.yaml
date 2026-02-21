@@ -1,0 +1,35 @@
+# PoolManager.t.sol — large test file (~1262 lines, viaIR)
+#   lsp-bench -c benchmarks/poolmanager-t.yaml
+
+file: test/PoolManager.t.sol
+line: 116
+col: 51
+output: benchmarks/poolmanager-t
+report: README.md
+
+methods:
+  textDocument/definition:
+    line: 116
+    col: 51
+    # TickMath — cross-directory jump to src/libraries/TickMath.sol
+
+  textDocument/references:
+    line: 102
+    col: 32
+    # key — 150+ usages, inherited PoolKey, stress test for reference gathering
+
+  textDocument/completion:
+    line: 815
+    col: 35
+    trigger: "."
+    # delta. — completion on BalanceDelta user-defined value type
+
+  textDocument/hover:
+    line: 96
+    col: 29
+    # PoolNotInitialized — error with NatSpec from imported Pool library
+
+  textDocument/rename:
+    line: 254
+    col: 18
+    # mockHooks — ~6 usages within test function scope

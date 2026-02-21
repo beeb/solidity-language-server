@@ -1,0 +1,37 @@
+# Server registry — define once, reference by name in configs.
+# Usage in configs:
+#   servers:
+#     - mmsaki           # default version
+#     - mmsaki@v0.1.20   # specific version
+#     - solc
+
+mmsaki:
+  cmd: solidity-language-server
+  link: https://github.com/mmsaki/solidity-language-server
+  versions:
+    v0.1.24:
+      cmd: solidity-language-server
+    v0.1.20:
+      cmd: solidity-language-server
+    local:
+      cmd: ./target/release/solidity-language-server
+
+solc:
+  cmd: solc
+  args: ["--lsp"]
+  link: https://docs.soliditylang.org
+
+nomicfoundation:
+  cmd: nomicfoundation-solidity-language-server
+  args: ["--stdio"]
+  link: https://github.com/NomicFoundation/hardhat-vscode
+
+juanfranblanco:
+  cmd: vscode-solidity-server
+  args: ["--stdio"]
+  link: https://github.com/juanfranblanco/vscode-solidity
+
+qiuxiang:
+  cmd: solidity-ls
+  args: ["--stdio"]
+  link: https://github.com/qiuxiang/solidity-ls

@@ -1,0 +1,35 @@
+# Pool.sol — medium library (~613 lines, no viaIR)
+#   lsp-bench -c benchmarks/pool.yaml
+
+file: src/libraries/Pool.sol
+line: 102
+col: 15
+output: benchmarks/pool
+report: README.md
+
+methods:
+  textDocument/definition:
+    line: 102
+    col: 15
+    # TickMath — imported from ./TickMath.sol, cross-file jump
+
+  textDocument/references:
+    line: 8
+    col: 8
+    # TickMath — ~18 references throughout the file
+
+  textDocument/completion:
+    line: 105
+    col: 44
+    trigger: "."
+    # Slot0.wrap(bytes32(0)). — completion on Slot0 user-defined type
+
+  textDocument/hover:
+    line: 145
+    col: 13
+    # modifyLiquidity — fully documented function with NatSpec
+
+  textDocument/rename:
+    line: 149
+    col: 15
+    # liquidityDelta — ~13 usages within modifyLiquidity
