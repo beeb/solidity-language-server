@@ -1,11 +1,20 @@
 # PoolManager.t.sol — large test file (~1262 lines, viaIR)
 #   lsp-bench -c benchmarks/poolmanager-t.yaml
 
+project: v4-core
 file: test/PoolManager.t.sol
 line: 116
 col: 51
 output: benchmarks/poolmanager-t
 report: README.md
+
+exclude:
+  - textDocument/typeDefinition
+  - textDocument/implementation
+  - textDocument/foldingRange
+  - textDocument/selectionRange
+  - textDocument/codeLens
+  - textDocument/documentColor
 
 methods:
   textDocument/definition:
@@ -40,6 +49,13 @@ methods:
     line: 300
     col: 0
     # First 300 lines — imports through early test functions
+
+  textDocument/formatting:
+    didChange:
+      - file: ../example/PoolManager.t.unformatted.snapshot
+        line: 0
+        col: 0
+        # 10 extra blank lines at end — formatter should strip them
 
   textDocument/signatureHelp:
     line: 116
