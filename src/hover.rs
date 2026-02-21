@@ -1608,16 +1608,16 @@ mod tests {
     use super::*;
 
     fn load_test_ast() -> Value {
-        let data = std::fs::read_to_string("pool-manager-ast.json").expect("test fixture");
+        let data = std::fs::read_to_string("poolmanager.json").expect("test fixture");
         let raw: Value = serde_json::from_str(&data).expect("valid json");
-        crate::solc::normalize_forge_output(raw)
+        crate::solc::normalize_solc_output(raw, None)
     }
 
     #[test]
     fn test_find_node_by_id_pool_manager() {
         let ast = load_test_ast();
         let sources = ast.get("sources").unwrap();
-        let node = find_node_by_id(sources, NodeId(1767)).unwrap();
+        let node = find_node_by_id(sources, NodeId(1216)).unwrap();
         assert_eq!(
             node.get("name").and_then(|v| v.as_str()),
             Some("PoolManager")
@@ -1633,7 +1633,7 @@ mod tests {
         let ast = load_test_ast();
         let sources = ast.get("sources").unwrap();
         // IPoolManager.initialize has the full docs
-        let node = find_node_by_id(sources, NodeId(2411)).unwrap();
+        let node = find_node_by_id(sources, NodeId(2003)).unwrap();
         assert_eq!(
             node.get("name").and_then(|v| v.as_str()),
             Some("initialize")
@@ -1644,8 +1644,8 @@ mod tests {
     fn test_extract_documentation_object() {
         let ast = load_test_ast();
         let sources = ast.get("sources").unwrap();
-        // IPoolManager.initialize (id=2411) has full NatSpec
-        let node = find_node_by_id(sources, NodeId(2411)).unwrap();
+        // IPoolManager.initialize (id=2003) has full NatSpec
+        let node = find_node_by_id(sources, NodeId(2003)).unwrap();
         let doc = extract_documentation(node).unwrap();
         assert!(doc.contains("@notice"));
         assert!(doc.contains("@param key"));
@@ -1655,8 +1655,8 @@ mod tests {
     fn test_extract_documentation_none() {
         let ast = load_test_ast();
         let sources = ast.get("sources").unwrap();
-        // PoolKey struct (id=8887) — check if it has docs
-        let node = find_node_by_id(sources, NodeId(8887)).unwrap();
+        // PoolKey struct (id=6871) — check if it has docs
+        let node = find_node_by_id(sources, NodeId(6871)).unwrap();
         // PoolKey may or may not have docs, just verify no crash
         let _ = extract_documentation(node);
     }
@@ -1701,7 +1701,7 @@ mod tests {
     fn test_build_function_signature_initialize() {
         let ast = load_test_ast();
         let sources = ast.get("sources").unwrap();
-        let node = find_node_by_id(sources, NodeId(2411)).unwrap();
+        let node = find_node_by_id(sources, NodeId(2003)).unwrap();
         let sig = build_function_signature(node).unwrap();
         assert!(sig.starts_with("function initialize("));
         assert!(sig.contains("returns"));
@@ -1711,7 +1711,7 @@ mod tests {
     fn test_build_signature_contract() {
         let ast = load_test_ast();
         let sources = ast.get("sources").unwrap();
-        let node = find_node_by_id(sources, NodeId(1767)).unwrap();
+        let node = find_node_by_id(sources, NodeId(1216)).unwrap();
         let sig = build_function_signature(node).unwrap();
         assert!(sig.contains("contract PoolManager"));
         assert!(sig.contains(" is "));
@@ -1721,7 +1721,7 @@ mod tests {
     fn test_build_signature_struct() {
         let ast = load_test_ast();
         let sources = ast.get("sources").unwrap();
-        let node = find_node_by_id(sources, NodeId(8887)).unwrap();
+        let node = find_node_by_id(sources, NodeId(6871)).unwrap();
         let sig = build_function_signature(node).unwrap();
         assert!(sig.starts_with("struct PoolKey"));
         assert!(sig.contains('{'));
@@ -1732,7 +1732,7 @@ mod tests {
         let ast = load_test_ast();
         let sources = ast.get("sources").unwrap();
         // Find an ErrorDefinition
-        let node = find_node_by_id(sources, NodeId(508)).unwrap();
+        let node = find_node_by_id(sources, NodeId(1372)).unwrap();
         assert_eq!(
             node.get("nodeType").and_then(|v| v.as_str()),
             Some("ErrorDefinition")
@@ -1746,7 +1746,7 @@ mod tests {
         let ast = load_test_ast();
         let sources = ast.get("sources").unwrap();
         // Find an EventDefinition
-        let node = find_node_by_id(sources, NodeId(8)).unwrap();
+        let node = find_node_by_id(sources, NodeId(7404)).unwrap();
         assert_eq!(
             node.get("nodeType").and_then(|v| v.as_str()),
             Some("EventDefinition")
@@ -1761,7 +1761,7 @@ mod tests {
         let sources = ast.get("sources").unwrap();
         // Find a VariableDeclaration with documentation — check a state var
         // PoolManager has state variables, find one
-        let pm = find_node_by_id(sources, NodeId(1767)).unwrap();
+        let pm = find_node_by_id(sources, NodeId(1216)).unwrap();
         if let Some(nodes) = pm.get("nodes").and_then(|v| v.as_array()) {
             for node in nodes {
                 if node.get("nodeType").and_then(|v| v.as_str()) == Some("VariableDeclaration") {
@@ -1777,8 +1777,8 @@ mod tests {
     fn test_pool_manager_has_documentation() {
         let ast = load_test_ast();
         let sources = ast.get("sources").unwrap();
-        // Owned contract (id=59) has NatSpec
-        let node = find_node_by_id(sources, NodeId(59)).unwrap();
+        // Owned contract (id=7455) has NatSpec
+        let node = find_node_by_id(sources, NodeId(7455)).unwrap();
         let doc = extract_documentation(node).unwrap();
         assert!(doc.contains("@notice"));
     }
@@ -1816,8 +1816,8 @@ mod tests {
     fn test_extract_selector_function() {
         let ast = load_test_ast();
         let sources = ast.get("sources").unwrap();
-        // PoolManager.swap (id=1167) has functionSelector "f3cd914c"
-        let node = find_node_by_id(sources, NodeId(1167)).unwrap();
+        // PoolManager.swap (id=616) has functionSelector "f3cd914c"
+        let node = find_node_by_id(sources, NodeId(616)).unwrap();
         let selector = extract_selector(node).unwrap();
         assert_eq!(selector, Selector::Func(FuncSelector::new("f3cd914c")));
         assert_eq!(selector.as_hex(), "f3cd914c");
@@ -1827,8 +1827,8 @@ mod tests {
     fn test_extract_selector_error() {
         let ast = load_test_ast();
         let sources = ast.get("sources").unwrap();
-        // DelegateCallNotAllowed (id=508) has errorSelector
-        let node = find_node_by_id(sources, NodeId(508)).unwrap();
+        // DelegateCallNotAllowed (id=1372) has errorSelector
+        let node = find_node_by_id(sources, NodeId(1372)).unwrap();
         let selector = extract_selector(node).unwrap();
         assert_eq!(selector, Selector::Func(FuncSelector::new("0d89438e")));
         assert_eq!(selector.as_hex(), "0d89438e");
@@ -1838,8 +1838,8 @@ mod tests {
     fn test_extract_selector_event() {
         let ast = load_test_ast();
         let sources = ast.get("sources").unwrap();
-        // OwnershipTransferred (id=8) has eventSelector
-        let node = find_node_by_id(sources, NodeId(8)).unwrap();
+        // OwnershipTransferred (id=7404) has eventSelector
+        let node = find_node_by_id(sources, NodeId(7404)).unwrap();
         let selector = extract_selector(node).unwrap();
         assert!(matches!(selector, Selector::Event(_)));
         assert_eq!(selector.as_hex().len(), 64); // 32-byte keccak hash
@@ -1849,8 +1849,8 @@ mod tests {
     fn test_extract_selector_public_variable() {
         let ast = load_test_ast();
         let sources = ast.get("sources").unwrap();
-        // owner (id=10) is public, has functionSelector
-        let node = find_node_by_id(sources, NodeId(10)).unwrap();
+        // owner (id=7406) is public, has functionSelector
+        let node = find_node_by_id(sources, NodeId(7406)).unwrap();
         let selector = extract_selector(node).unwrap();
         assert_eq!(selector, Selector::Func(FuncSelector::new("8da5cb5b")));
     }
@@ -1859,8 +1859,8 @@ mod tests {
     fn test_extract_selector_internal_function_none() {
         let ast = load_test_ast();
         let sources = ast.get("sources").unwrap();
-        // Pool.swap (id=5960) is internal, no selector
-        let node = find_node_by_id(sources, NodeId(5960)).unwrap();
+        // Pool.swap (id=5021) is internal, no selector
+        let node = find_node_by_id(sources, NodeId(5021)).unwrap();
         assert!(extract_selector(node).is_none());
     }
 
@@ -1870,8 +1870,8 @@ mod tests {
     fn test_resolve_inheritdoc_swap() {
         let ast = load_test_ast();
         let sources = ast.get("sources").unwrap();
-        // PoolManager.swap (id=1167) has "@inheritdoc IPoolManager"
-        let decl = find_node_by_id(sources, NodeId(1167)).unwrap();
+        // PoolManager.swap (id=616) has "@inheritdoc IPoolManager"
+        let decl = find_node_by_id(sources, NodeId(616)).unwrap();
         let doc_text = extract_documentation(decl).unwrap();
         assert!(doc_text.contains("@inheritdoc"));
 
@@ -1884,8 +1884,8 @@ mod tests {
     fn test_resolve_inheritdoc_initialize() {
         let ast = load_test_ast();
         let sources = ast.get("sources").unwrap();
-        // PoolManager.initialize (id=881) has "@inheritdoc IPoolManager"
-        let decl = find_node_by_id(sources, NodeId(881)).unwrap();
+        // PoolManager.initialize (id=330) has "@inheritdoc IPoolManager"
+        let decl = find_node_by_id(sources, NodeId(330)).unwrap();
         let doc_text = extract_documentation(decl).unwrap();
 
         let resolved = resolve_inheritdoc(sources, decl, &doc_text).unwrap();
@@ -1898,22 +1898,22 @@ mod tests {
         let ast = load_test_ast();
         let sources = ast.get("sources").unwrap();
 
-        // extsload(bytes32) — id=442, selector "1e2eaeaf"
-        let decl = find_node_by_id(sources, NodeId(442)).unwrap();
+        // extsload(bytes32) — id=1306, selector "1e2eaeaf"
+        let decl = find_node_by_id(sources, NodeId(1306)).unwrap();
         let doc_text = extract_documentation(decl).unwrap();
         let resolved = resolve_inheritdoc(sources, decl, &doc_text).unwrap();
         assert!(resolved.contains("granular pool state"));
         // Should match the single-slot overload doc
         assert!(resolved.contains("@param slot"));
 
-        // extsload(bytes32, uint256) — id=455, selector "35fd631a"
-        let decl2 = find_node_by_id(sources, NodeId(455)).unwrap();
+        // extsload(bytes32, uint256) — id=1319, selector "35fd631a"
+        let decl2 = find_node_by_id(sources, NodeId(1319)).unwrap();
         let doc_text2 = extract_documentation(decl2).unwrap();
         let resolved2 = resolve_inheritdoc(sources, decl2, &doc_text2).unwrap();
         assert!(resolved2.contains("@param startSlot"));
 
-        // extsload(bytes32[]) — id=467, selector "dbd035ff"
-        let decl3 = find_node_by_id(sources, NodeId(467)).unwrap();
+        // extsload(bytes32[]) — id=1331, selector "dbd035ff"
+        let decl3 = find_node_by_id(sources, NodeId(1331)).unwrap();
         let doc_text3 = extract_documentation(decl3).unwrap();
         let resolved3 = resolve_inheritdoc(sources, decl3, &doc_text3).unwrap();
         assert!(resolved3.contains("sparse pool state"));
@@ -1924,7 +1924,7 @@ mod tests {
         let ast = load_test_ast();
         let sources = ast.get("sources").unwrap();
         // PoolManager.swap with @inheritdoc — verify format_natspec resolves it
-        let decl = find_node_by_id(sources, NodeId(1167)).unwrap();
+        let decl = find_node_by_id(sources, NodeId(616)).unwrap();
         let doc_text = extract_documentation(decl).unwrap();
         let inherited = resolve_inheritdoc(sources, decl, &doc_text);
         let formatted = format_natspec(&doc_text, inherited.as_deref());
@@ -1942,8 +1942,8 @@ mod tests {
         let sources = ast.get("sources").unwrap();
         let doc_index = build_doc_index(&ast);
 
-        // PriceLimitAlreadyExceeded.sqrtPriceCurrentX96 (id=4760)
-        let param_node = find_node_by_id(sources, NodeId(4760)).unwrap();
+        // PriceLimitAlreadyExceeded.sqrtPriceCurrentX96 (id=3821)
+        let param_node = find_node_by_id(sources, NodeId(3821)).unwrap();
         assert_eq!(
             param_node.get("name").and_then(|v| v.as_str()),
             Some("sqrtPriceCurrentX96")
@@ -1962,8 +1962,8 @@ mod tests {
         let sources = ast.get("sources").unwrap();
         let doc_index = build_doc_index(&ast);
 
-        // PriceLimitAlreadyExceeded.sqrtPriceLimitX96 (id=4762)
-        let param_node = find_node_by_id(sources, NodeId(4762)).unwrap();
+        // PriceLimitAlreadyExceeded.sqrtPriceLimitX96 (id=3823)
+        let param_node = find_node_by_id(sources, NodeId(3823)).unwrap();
         let doc = lookup_param_doc(&doc_index, param_node, sources).unwrap();
         assert!(
             doc.contains("surpassed price limit"),
@@ -1977,8 +1977,8 @@ mod tests {
         let sources = ast.get("sources").unwrap();
         let doc_index = build_doc_index(&ast);
 
-        // Pool.modifyLiquidity return param "delta" (id=4994)
-        let param_node = find_node_by_id(sources, NodeId(4994)).unwrap();
+        // Pool.modifyLiquidity return param "delta" (id=4055)
+        let param_node = find_node_by_id(sources, NodeId(4055)).unwrap();
         assert_eq!(
             param_node.get("name").and_then(|v| v.as_str()),
             Some("delta")
@@ -1997,9 +1997,9 @@ mod tests {
         let sources = ast.get("sources").unwrap();
         let doc_index = build_doc_index(&ast);
 
-        // Pool.modifyLiquidity input param "params" (id 4992 or similar)
+        // Pool.modifyLiquidity input param "params"
         // Find it via the function's parameters
-        let fn_node = find_node_by_id(sources, NodeId(5310)).unwrap();
+        let fn_node = find_node_by_id(sources, NodeId(4371)).unwrap();
         let params_arr = fn_node
             .get("parameters")
             .and_then(|p| p.get("parameters"))
@@ -2023,9 +2023,9 @@ mod tests {
         let sources = ast.get("sources").unwrap();
         let doc_index = build_doc_index(&ast);
 
-        // PoolManager.swap `key` param (id=1029) — parent has @inheritdoc IPoolManager
+        // PoolManager.swap `key` param (id=478) — parent has @inheritdoc IPoolManager
         // The DocIndex should have the resolved devdoc from IPoolManager
-        let param_node = find_node_by_id(sources, NodeId(1029)).unwrap();
+        let param_node = find_node_by_id(sources, NodeId(478)).unwrap();
         assert_eq!(param_node.get("name").and_then(|v| v.as_str()), Some("key"));
 
         let doc = lookup_param_doc(&doc_index, param_node, sources).unwrap();
@@ -2041,8 +2041,8 @@ mod tests {
         let sources = ast.get("sources").unwrap();
         let doc_index = build_doc_index(&ast);
 
-        // PoolManager contract (id=1767) is not a parameter
-        let node = find_node_by_id(sources, NodeId(1767)).unwrap();
+        // PoolManager contract (id=1216) is not a parameter
+        let node = find_node_by_id(sources, NodeId(1216)).unwrap();
         assert!(lookup_param_doc(&doc_index, node, sources).is_none());
     }
 
