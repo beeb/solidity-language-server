@@ -1,5 +1,53 @@
 # Changelog
 
+## v0.1.24
+
+### Features
+
+- Project-wide source indexing for cross-file references (#115, #119)
+- Semantic tokens range and delta support
+- LSP settings configuration (#112)
+- Benchmark configs with server registry and didChange snapshots (#121)
+
+### Performance
+
+- `textDocument/documentLink` returns only import links, not every identifier (#122)
+- Drop optimizer and conditionally exclude gasEstimates from solc input (#117)
+
+### Fixes
+
+- Handle `{value: ...}` / `{gas: ...}` modifier calls in inlay hints and signature help (#125, #116)
+- Correct signatureHelp cursor positions to inside function call parens
+- Remap all tests from forge to solc fixture (#123)
+- CI: checkout submodules so fixture-based tests can find v4-core
+
+### Tests
+
+- 466 total tests, 0 warnings
+
+### Benchmark (v4-core Pool.sol)
+
+| Method | p95 |
+|--------|-----|
+| initialize | 12.9ms |
+| completion | 0.4ms |
+| hover | 23.1ms |
+| definition | 11.1ms |
+| references | 19.4ms |
+| rename | 21.2ms |
+| inlayHint | 2.8ms |
+| signatureHelp | 11.7ms |
+| semanticTokens/full | 3.7ms |
+
+Scorecard: **15/18 wins** vs solc, nomicfoundation, juanfranblanco, qiuxiang
+
+## v0.1.23
+
+### Features
+
+- `textDocument/signatureHelp` — shows function signature and active parameter while typing (#110)
+- Opt-in gas estimates via `@custom:lsp-enable gas-estimates` NatSpec tag (#109)
+
 ## v0.1.22
 
 ### Improvements
