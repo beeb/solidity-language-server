@@ -18,8 +18,6 @@ Or download a pre-built binary from the [latest release](https://github.com/mmsa
 
 ## Benchmarks
 
-### Single file benchmark — [full results](benchmarks/shop/README.md)
-
 | Method | [mmsaki](https://github.com/mmsaki/solidity-language-server) 0.1.24 | [solc](https://docs.soliditylang.org) 0.8.26 | [nomicfoundation](https://github.com/NomicFoundation/hardhat-vscode) 0.8.25 | [juanfranblanco](https://github.com/juanfranblanco/vscode-solidity) 0.0.187 | [qiuxiang](https://github.com/qiuxiang/solidity-ls) 0.5.4 |
 |--------|--------|------|-----------------|----------------|----------|
 | initialize | 12.2ms ⚡ | 122.5ms | 846.0ms | 576.9ms | 93.0ms |
@@ -39,14 +37,18 @@ Or download a pre-built binary from the [latest release](https://github.com/mmsa
 | semanticTokens/delta | 1.5ms ⚡ | - | - | - | - |
 | workspace/symbol | 1.1ms ⚡ | - | - | - | - |
 
+- Single file benchmark — [Shop.sol results](benchmarks/shop/README.md)
+- Foundry project benchmark — [Pool.sol results](benchmarks/pool/README.md)
+- Foundry test contract benchmark (`.t.sol`) — [PoolManager.t.sol results](benchmarks/poolmanager-t/README.md)
+
 p95 latency. `-` = unsupported, empty, error, or crash.
 
 ## Docs
 
+- [DOCS.md](DOCS.md) - Docs on how to install.
 - [FEATURES.md](FEATURES.md) — full LSP feature set and roadmap
 - [CONTRIBUTING.md](CONTRIBUTING.md) — development setup, project structure, and how to contribute
 - [CHANGELOG.md](CHANGELOG.md) — release history
-- [DOCS](DOCS.md) - Docs on how to install.
 
 ## Neovim
 
