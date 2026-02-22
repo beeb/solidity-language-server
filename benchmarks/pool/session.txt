@@ -2,7 +2,7 @@
 
 ── initialize (7.1ms) ──
 
-← mmsaki v0.1.24 [content] "ok"
+← mmsaki [content] "ok"
 ← solc [content] "ok"
 ← qiuxiang [content] "ok"
 ← juanfranblanco [content] "ok"
@@ -10,7 +10,7 @@
 
 ── textDocument/diagnostic (509.5ms, 54.4 MB) ──
 
-← mmsaki v0.1.24 [content] { diagnostics: Array(4) [{ code: "mixed-case-function", message: "function names should use mixedCase", range: { end: { character: 21, line: 114 }, start: { character: 13, line: 114 } }, severity: ...
+← mmsaki [content] { diagnostics: Array(4) [{ code: "mixed-case-function", message: "function names should use mixedCase", range: { end: { character: 21, line: 114 }, start: { character: 13, line: 114 } }, severity: ...
 ← solc [content] { diagnostics: [], uri: "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/lib/forg..." }
 ← qiuxiang [content] { diagnostics: [], uri: "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libr..." }
 ← juanfranblanco [error] crash
@@ -18,7 +18,7 @@
 
 ── textDocument/semanticTokens/full/delta (3.8ms, 53.0 MB) ──
 
-← mmsaki v0.1.24 [content] { edits: [], resultId: "3" }
+← mmsaki [content] { edits: [], resultId: "3" }
 ← solc [error] error
 ← qiuxiang [unsupported] unsupported
 ← juanfranblanco [error] crash
@@ -41,7 +41,7 @@
   }
 }
 
-← mmsaki v0.1.24 [content] { range: { end: { character: 16, line: 9 }, start: { character: 8, line: 9 } }, uri: "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libr..." }
+← mmsaki [content] { range: { end: { character: 16, line: 9 }, start: { character: 8, line: 9 } }, uri: "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libr..." }
 ← solc [error] empty
 ← qiuxiang [content] { range: { end: { character: 0, line: 103 }, start: { character: 10, line: 102 } }, uri: "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libr..." }
 ← juanfranblanco [error] crash
@@ -64,7 +64,7 @@
   }
 }
 
-← mmsaki v0.1.24 [content] { range: { end: { character: 16, line: 9 }, start: { character: 8, line: 9 } }, uri: "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libr..." }
+← mmsaki [content] { range: { end: { character: 16, line: 9 }, start: { character: 8, line: 9 } }, uri: "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libr..." }
 ← solc [unsupported] unsupported
 ← qiuxiang [unsupported] unsupported
 ← juanfranblanco [error] crash
@@ -87,7 +87,7 @@
   }
 }
 
-← mmsaki v0.1.24 [content] { contents: { kind: "markdown", value: "```solidity
+← mmsaki [content] { contents: { kind: "markdown", value: "```solidity
 function modifyLiquidity(struct Pool.State storage self, struct P..." } }
 ← solc [error] crash
 ← qiuxiang [error] empty
@@ -114,7 +114,7 @@ function modifyLiquidity(struct Pool.State storage self, struct P..." } }
   }
 }
 
-← mmsaki v0.1.24 [content] Array(24) [{ range: { end: { character: 16, line: 8 }, start: { character: 8, line: 8 } }, uri: "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libr..." }, { range: { end:...
+← mmsaki [content] Array(24) [{ range: { end: { character: 16, line: 8 }, start: { character: 8, line: 8 } }, uri: "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libr..." }, { range: { end:...
 ← solc [unsupported] unsupported
 ← qiuxiang [error] empty
 ← juanfranblanco [error] crash
@@ -141,7 +141,7 @@ function modifyLiquidity(struct Pool.State storage self, struct P..." } }
   }
 }
 
-← mmsaki v0.1.24 [content] { isIncomplete: false, items: Array(28) [{ detail: "Slot0", kind: 5, label: "slot0" }, { detail: "uint256", kind: 5, label: "feeGrowthGlobal0X128" }, { detail: "uint256", kind: 5, label: "feeGrowth...
+← mmsaki [content] { isIncomplete: false, items: Array(28) [{ detail: "Slot0", kind: 5, label: "slot0" }, { detail: "uint256", kind: 5, label: "feeGrowthGlobal0X128" }, { detail: "uint256", kind: 5, label: "feeGrowth...
 ← solc [unsupported] unsupported
 ← qiuxiang [content] Array(7) [{ detail: "(member) Slot0 slot0", kind: 6, label: "slot0" }, { detail: "(member) uint256 feeGrowthGlobal0X128", kind: 6, label: "feeGrowthGlobal0X128" }, { detail: "(member) uint256 feeGr...
 ← juanfranblanco [error] crash
@@ -164,7 +164,7 @@ function modifyLiquidity(struct Pool.State storage self, struct P..." } }
   }
 }
 
-← mmsaki v0.1.24 [content] { activeParameter: 0, activeSignature: 0, signatures: Array(1) [{ activeParameter: 0, label: "function getTickAtSqrtPrice(uint160 sqrtPriceX96) internal pure returns (int2...", parameters: Array(1)...
+← mmsaki [content] { activeParameter: 0, activeSignature: 0, signatures: Array(1) [{ activeParameter: 0, label: "function getTickAtSqrtPrice(uint160 sqrtPriceX96) internal pure returns (int2...", parameters: Array(1)...
 ← solc [unsupported] unsupported
 ← qiuxiang [error] empty
 ← juanfranblanco [error] crash
@@ -188,7 +188,7 @@ function modifyLiquidity(struct Pool.State storage self, struct P..." } }
   }
 }
 
-← mmsaki v0.1.24 [content] { changes: { file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libraries/Pool.sol: Array(13) [{ newText: "__lsp_bench_rename__", range: { end: { character: 30, line: 158 }, s...
+← mmsaki [content] { changes: { file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libraries/Pool.sol: Array(13) [{ newText: "__lsp_bench_rename__", range: { end: { character: 30, line: 158 }, s...
 ← solc [error] error
 ← qiuxiang [content] { changes: {} }
 ← juanfranblanco [error] crash
@@ -211,7 +211,7 @@ function modifyLiquidity(struct Pool.State storage self, struct P..." } }
   }
 }
 
-← mmsaki v0.1.24 [content] { end: { character: 23, line: 102 }, start: { character: 15, line: 102 } }
+← mmsaki [content] { end: { character: 23, line: 102 }, start: { character: 15, line: 102 } }
 ← solc [unsupported] unsupported
 ← qiuxiang [unsupported] unsupported
 ← juanfranblanco [error] crash
@@ -230,7 +230,7 @@ function modifyLiquidity(struct Pool.State storage self, struct P..." } }
   }
 }
 
-← mmsaki v0.1.24 [content] Array(16) [{ kind: 15, name: "pragma solidity ^0.8.0", range: { end: { character: 23, line: 1 }, start: { character: 0, line: 1 } }, selectionRange: { end: { character: 23, line: 1 }, start: { char...
+← mmsaki [content] Array(16) [{ kind: 15, name: "pragma solidity ^0.8.0", range: { end: { character: 23, line: 1 }, start: { character: 0, line: 1 } }, selectionRange: { end: { character: 23, line: 1 }, start: { char...
 ← solc [unsupported] unsupported
 ← qiuxiang [unsupported] unsupported
 ← juanfranblanco [error] crash
@@ -249,7 +249,7 @@ function modifyLiquidity(struct Pool.State storage self, struct P..." } }
   }
 }
 
-← mmsaki v0.1.24 [content] Array(14) [{ range: { end: { character: 38, line: 3 }, start: { character: 24, line: 3 } }, target: "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libr...", tooltip: "src...
+← mmsaki [content] Array(14) [{ range: { end: { character: 38, line: 3 }, start: { character: 24, line: 3 } }, target: "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libr...", tooltip: "src...
 ← solc [unsupported] unsupported
 ← qiuxiang [unsupported] unsupported
 ← juanfranblanco [error] crash
@@ -272,7 +272,7 @@ function modifyLiquidity(struct Pool.State storage self, struct P..." } }
   }
 }
 
-← mmsaki v0.1.24 [content] Array(1) [{ newText: "// SPDX-License-Identifier: BUSL-1.1
+← mmsaki [content] Array(1) [{ newText: "// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.0;
 
 import {SafeCas...", range: { end: { character: 0, line: 623 }, start: { character: 0, line: 0 } } }]
@@ -307,7 +307,7 @@ import {SafeCas...", range: { end: { character: 0, line: 623 }, start: { charact
   }
 }
 
-← mmsaki v0.1.24 [content] Array(114) [{ kind: 2, label: "value1:", paddingRight: true, position: { character: 72, line: 94 } }, { kind: 2, label: "value2:", paddingRight: true, position: { character: 83, line: 94 } }, { kin...
+← mmsaki [content] Array(114) [{ kind: 2, label: "value1:", paddingRight: true, position: { character: 72, line: 94 } }, { kind: 2, label: "value2:", paddingRight: true, position: { character: 83, line: 94 } }, { kin...
 ← solc [unsupported] unsupported
 ← qiuxiang [unsupported] unsupported
 ← juanfranblanco [error] crash
@@ -326,7 +326,7 @@ import {SafeCas...", range: { end: { character: 0, line: 623 }, start: { charact
   }
 }
 
-← mmsaki v0.1.24 [content] { data: Array(3485) [0, 0, 36, ... 3482 more], resultId: "2" }
+← mmsaki [content] { data: Array(3485) [0, 0, 36, ... 3482 more], resultId: "2" }
 ← solc [error] error
 ← qiuxiang [unsupported] unsupported
 ← juanfranblanco [error] crash
@@ -355,7 +355,7 @@ import {SafeCas...", range: { end: { character: 0, line: 623 }, start: { charact
   }
 }
 
-← mmsaki v0.1.24 [content] { data: Array(1370) [0, 0, 36, ... 1367 more] }
+← mmsaki [content] { data: Array(1370) [0, 0, 36, ... 1367 more] }
 ← solc [unsupported] unsupported
 ← qiuxiang [unsupported] unsupported
 ← juanfranblanco [error] crash
@@ -372,7 +372,7 @@ import {SafeCas...", range: { end: { character: 0, line: 623 }, start: { charact
   }
 }
 
-← mmsaki v0.1.24 [content] Array(68) [{ kind: 3, location: { range: { end: { character: 1, line: 612 }, start: { character: 0, line: 19 } }, uri: "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libr...
+← mmsaki [content] Array(68) [{ kind: 3, location: { range: { end: { character: 1, line: 612 }, start: { character: 0, line: 19 } }, uri: "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libr...
 ← solc [unsupported] unsupported
 ← qiuxiang [unsupported] unsupported
 ← juanfranblanco [error] crash

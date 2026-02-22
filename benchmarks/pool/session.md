@@ -6,7 +6,7 @@
 
 **Responses:**
 
-**mmsaki v0.1.24** (7.1ms) — ok
+**mmsaki** (7.1ms) — ok
 
 <details>
 <summary>Summary: <code>"ok"</code></summary>
@@ -69,7 +69,7 @@
 
 **Responses:**
 
-**mmsaki v0.1.24** (509.5ms, 54.4 MB) — 4 diagnostics
+**mmsaki** (509.5ms, 54.4 MB) — 4 diagnostics
 
 <details>
 <summary>Summary: <code>{ diagnostics: Array(4) [{ code: "mixed-case-function", message: "function names should use mixedCase", range: { end:...</code></summary>
@@ -200,7 +200,7 @@
 
 **Responses:**
 
-**mmsaki v0.1.24** (3.8ms, 53.0 MB) — delta
+**mmsaki** (3.8ms, 53.0 MB) — delta
 
 <details>
 <summary>Summary: <code>{ edits: [], resultId: "3" }</code></summary>
@@ -247,7 +247,7 @@
 
 **Responses:**
 
-**mmsaki v0.1.24** (14.4ms, 54.5 MB) — `TickMath.sol:9`
+**mmsaki** (14.4ms, 54.5 MB) — `TickMath.sol:9`
 
 <details>
 <summary>Summary: <code>{ range: { end: { character: 16, line: 9 }, start: { character: 8, line: 9 } }, uri: "file:///Users/meek/developer/mm...</code></summary>
@@ -324,7 +324,7 @@
 
 **Responses:**
 
-**mmsaki v0.1.24** (8.4ms, 52.7 MB) — `TickMath.sol:9`
+**mmsaki** (8.4ms, 52.7 MB) — `TickMath.sol:9`
 
 <details>
 <summary>Summary: <code>{ range: { end: { character: 16, line: 9 }, start: { character: 8, line: 9 } }, uri: "file:///Users/meek/developer/mm...</code></summary>
@@ -380,7 +380,7 @@
 
 **Responses:**
 
-**mmsaki v0.1.24** (14.1ms, 53.5 MB) — function modifyLiquidity(struct Pool.State storage...
+**mmsaki** (14.1ms, 53.5 MB) — function modifyLiquidity(struct Pool.State storage...
 
 <details>
 <summary>Summary: <code>{ contents: { kind: "markdown", value: "```solidity
@@ -433,7 +433,7 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
 
 **Responses:**
 
-**mmsaki v0.1.24** (11.4ms, 52.2 MB) — 24 references
+**mmsaki** (11.4ms, 52.2 MB) — 24 references
 
 <details>
 <summary>Summary: <code>Array(24) [{ range: { end: { character: 16, line: 8 }, start: { character: 8, line: 8 } }, uri: "file:///Users/meek/d...</code></summary>
@@ -548,7 +548,7 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
 
 **Responses:**
 
-**mmsaki v0.1.24** (0.2ms, 54.2 MB) — 28 items (slot0, feeGrowthGlobal0X128, feeGrowthGlobal1X128)
+**mmsaki** (0.2ms, 54.2 MB) — 28 items (slot0, feeGrowthGlobal0X128, feeGrowthGlobal1X128)
 
 <details>
 <summary>Summary: <code>{ isIncomplete: false, items: Array(28) [{ detail: "Slot0", kind: 5, label: "slot0" }, { detail: "uint256", kind: 5, ...</code></summary>
@@ -712,7 +712,7 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
 
 **Responses:**
 
-**mmsaki v0.1.24** (12.7ms, 52.5 MB) — function getTickAtSqrtPrice(uint160 sqrtPriceX96) ...
+**mmsaki** (12.7ms, 52.5 MB) — function getTickAtSqrtPrice(uint160 sqrtPriceX96) ...
 
 <details>
 <summary>Summary: <code>{ activeParameter: 0, activeSignature: 0, signatures: Array(1) [{ activeParameter: 0, label: "function getTickAtSqrtP...</code></summary>
@@ -774,7 +774,7 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
 
 **Responses:**
 
-**mmsaki v0.1.24** (18.8ms, 54.0 MB) — 13 edits in 1 files
+**mmsaki** (18.8ms, 54.0 MB) — 13 edits in 1 files
 
 <details>
 <summary>Summary: <code>{ changes: { file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libraries/Pool.sol: Array(13) [...</code></summary>
@@ -911,7 +911,7 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
 
 **Responses:**
 
-**mmsaki v0.1.24** (0.5ms, 55.3 MB) — ready (line 102)
+**mmsaki** (0.5ms, 55.3 MB) — ready (line 102)
 
 <details>
 <summary>Summary: <code>{ end: { character: 23, line: 102 }, start: { character: 15, line: 102 } }</code></summary>
@@ -960,7 +960,7 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
 
 **Responses:**
 
-**mmsaki v0.1.24** (2.6ms, 54.3 MB) — 16 symbols
+**mmsaki** (2.6ms, 54.3 MB) — 16 symbols
 
 <details>
 <summary>Summary: <code>Array(16) [{ kind: 15, name: "pragma solidity ^0.8.0", range: { end: { character: 23, line: 1 }, start: { character: ...</code></summary>
@@ -1284,7 +1284,7 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
 
 **Responses:**
 
-**mmsaki v0.1.24** (1.0ms, 53.2 MB) — 14 links
+**mmsaki** (1.0ms, 53.2 MB) — 14 links
 
 <details>
 <summary>Summary: <code>Array(14) [{ range: { end: { character: 38, line: 3 }, start: { character: 24, line: 3 } }, target: "file:///Users/me...</code></summary>
@@ -1400,7 +1400,7 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
 
 **Responses:**
 
-**mmsaki v0.1.24** (19.6ms, 54.1 MB) — 1 edits
+**mmsaki** (19.6ms, 54.1 MB) — 1 edits
 
 <details>
 <summary>Summary: <code>Array(1) [{ newText: "// SPDX-License-Identifier: BUSL-1.1
@@ -1497,7 +1497,7 @@ import {SafeCas...", range: { end...</code></summary>
 
 **Responses:**
 
-**mmsaki v0.1.24** (2.9ms, 54.3 MB) — 114 hints (value1:, value2:, value:)
+**mmsaki** (2.9ms, 54.3 MB) — 114 hints (value1:, value2:, value:)
 
 <details>
 <summary>Summary: <code>Array(114) [{ kind: 2, label: "value1:", paddingRight: true, position: { character: 72, line: 94 } }, { kind: 2, labe...</code></summary>
@@ -1584,7 +1584,7 @@ import {SafeCas...", range: { end...</code></summary>
 
 **Responses:**
 
-**mmsaki v0.1.24** (4.7ms, 53.4 MB) — 697 tokens
+**mmsaki** (4.7ms, 53.4 MB) — 697 tokens
 
 <details>
 <summary>Summary: <code>{ data: Array(3485) [0, 0, 36, ... 3482 more], resultId: "2" }</code></summary>
@@ -1662,7 +1662,7 @@ import {SafeCas...", range: { end...</code></summary>
 
 **Responses:**
 
-**mmsaki v0.1.24** (2.5ms, 53.6 MB) — 274 tokens
+**mmsaki** (2.5ms, 53.6 MB) — 274 tokens
 
 <details>
 <summary>Summary: <code>{ data: Array(1370) [0, 0, 36, ... 1367 more] }</code></summary>
@@ -1709,7 +1709,7 @@ import {SafeCas...", range: { end...</code></summary>
 
 **Responses:**
 
-**mmsaki v0.1.24** (2.2ms, 53.2 MB) — 68 symbols
+**mmsaki** (2.2ms, 53.2 MB) — 68 symbols
 
 <details>
 <summary>Summary: <code>Array(68) [{ kind: 3, location: { range: { end: { character: 1, line: 612 }, start: { character: 0, line: 19 } }, uri...</code></summary>

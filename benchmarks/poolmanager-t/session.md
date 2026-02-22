@@ -6,7 +6,7 @@
 
 **Responses:**
 
-**mmsaki latest** (7.8ms) — ok
+**mmsaki** (7.8ms) — ok
 
 <details>
 <summary>Summary: <code>"ok"</code></summary>
@@ -64,7 +64,7 @@
 
 **Responses:**
 
-**mmsaki latest** (2.3s, 228.5 MB) — 15 diagnostics
+**mmsaki** (2.3s, 228.5 MB) — 15 diagnostics
 
 <details>
 <summary>Summary: <code>{ diagnostics: Array(15) [{ code: "mixed-case-variable", message: "mutable variables should use mixedCase", range: { ...</code></summary>
@@ -241,7 +241,7 @@
 
 **Responses:**
 
-**mmsaki latest** (9.8ms, 229.0 MB) — delta
+**mmsaki** (9.8ms, 229.0 MB) — delta
 
 <details>
 <summary>Summary: <code>{ edits: [], resultId: "3" }</code></summary>
@@ -286,7 +286,7 @@
 
 **Responses:**
 
-**mmsaki latest** (139.4ms, 226.8 MB) — `TickMath.sol:9`
+**mmsaki** (139.4ms, 226.8 MB) — `TickMath.sol:9`
 
 <details>
 <summary>Summary: <code>{ range: { end: { character: 16, line: 9 }, start: { character: 8, line: 9 } }, uri: "file:///Users/meek/developer/mm...</code></summary>
@@ -340,7 +340,7 @@
 
 **Responses:**
 
-**mmsaki latest** (133.1ms, 228.3 MB) — `TickMath.sol:9`
+**mmsaki** (133.1ms, 228.3 MB) — `TickMath.sol:9`
 
 <details>
 <summary>Summary: <code>{ range: { end: { character: 16, line: 9 }, start: { character: 8, line: 9 } }, uri: "file:///Users/meek/developer/mm...</code></summary>
@@ -394,7 +394,7 @@
 
 **Responses:**
 
-**mmsaki latest** (239.8ms, 227.2 MB) — error PoolNotInitialized()
+**mmsaki** (239.8ms, 227.2 MB) — error PoolNotInitialized()
 
 <details>
 <summary>Summary: <code>{ contents: { kind: "markdown", value: "```solidity
@@ -451,7 +451,7 @@ Throw...</code></summary>
 
 **Responses:**
 
-**mmsaki latest** (136.8ms, 228.8 MB) — 7 references
+**mmsaki** (136.8ms, 228.8 MB) — 7 references
 
 <details>
 <summary>Summary: <code>Array(7) [{ range: { end: { character: 62, line: 107 }, start: { character: 46, line: 107 } }, uri: "file:///Users/me...</code></summary>
@@ -564,7 +564,7 @@ Throw...</code></summary>
 
 **Responses:**
 
-**mmsaki latest** (0.7ms, 228.2 MB) — 23 items (amount0, amount1, checkTicks)
+**mmsaki** (0.7ms, 228.2 MB) — 23 items (amount0, amount1, checkTicks)
 
 <details>
 <summary>Summary: <code>{ isIncomplete: false, items: Array(23) [{ detail: "amount0(BalanceDelta balanceDelta) returns (int128 _amount0)", ki...</code></summary>
@@ -636,7 +636,7 @@ Throw...</code></summary>
 
 **Responses:**
 
-**mmsaki latest** (33.5ms, 227.9 MB) — function bound(uint256 x, uint256 min, uint256 max...
+**mmsaki** (33.5ms, 227.9 MB) — function bound(uint256 x, uint256 min, uint256 max...
 
 <details>
 <summary>Summary: <code>{ activeParameter: 0, activeSignature: 0, signatures: Array(1) [{ activeParameter: 0, label: "function bound(uint256 ...</code></summary>
@@ -708,7 +708,7 @@ Throw...</code></summary>
 
 **Responses:**
 
-**mmsaki latest** (266.3ms, 228.8 MB) — 9 edits in 1 files
+**mmsaki** (266.3ms, 228.8 MB) — 9 edits in 1 files
 
 <details>
 <summary>Summary: <code>{ changes: { file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/test/PoolManager.t.sol: Array(9) [{...</code></summary>
@@ -841,7 +841,7 @@ Throw...</code></summary>
 
 **Responses:**
 
-**mmsaki latest** (0.2ms, 228.2 MB) — ready (line 116)
+**mmsaki** (0.2ms, 228.2 MB) — ready (line 116)
 
 <details>
 <summary>Summary: <code>{ end: { character: 59, line: 116 }, start: { character: 51, line: 116 } }</code></summary>
@@ -888,7 +888,7 @@ Throw...</code></summary>
 
 **Responses:**
 
-**mmsaki latest** (6.2ms, 227.2 MB) — 35 symbols
+**mmsaki** (6.2ms, 227.2 MB) — 35 symbols
 
 <details>
 <summary>Summary: <code>Array(35) [{ kind: 15, name: "pragma solidity ^0.8.20", range: { end: { character: 24, line: 1 }, start: { character:...</code></summary>
@@ -1209,7 +1209,7 @@ Throw...</code></summary>
 
 **Responses:**
 
-**mmsaki latest** (2.2ms, 227.4 MB) — 33 links
+**mmsaki** (2.2ms, 227.4 MB) — 33 links
 
 <details>
 <summary>Summary: <code>Array(33) [{ range: { end: { character: 38, line: 3 }, start: { character: 20, line: 3 } }, target: "file:///Users/me...</code></summary>
@@ -1323,7 +1323,7 @@ Throw...</code></summary>
 
 **Responses:**
 
-**mmsaki latest** (20.4ms, 226.7 MB) — 1 edits
+**mmsaki** (20.4ms, 226.7 MB) — 1 edits
 
 <details>
 <summary>Summary: <code>Array(1) [{ newText: "// SPDX-License-Identifier: UNLICENSED
@@ -1417,7 +1417,7 @@ import {Test...", range: { end...</code></summary>
 
 **Responses:**
 
-**mmsaki latest** (9.1ms, 226.9 MB) — 1080 hints (name:, hooks:, name:)
+**mmsaki** (9.1ms, 226.9 MB) — 1080 hints (name:, hooks:, name:)
 
 <details>
 <summary>Summary: <code>Array(1080) [{ kind: 2, label: "name:", paddingRight: true, position: { character: 40, line: 76 } }, { kind: 2, label...</code></summary>
@@ -1502,7 +1502,7 @@ import {Test...", range: { end...</code></summary>
 
 **Responses:**
 
-**mmsaki latest** (9.8ms, 227.8 MB) — 1512 tokens
+**mmsaki** (9.8ms, 227.8 MB) — 1512 tokens
 
 <details>
 <summary>Summary: <code>{ data: Array(7560) [0, 0, 38, ... 7557 more], resultId: "2" }</code></summary>
@@ -1577,7 +1577,7 @@ import {Test...", range: { end...</code></summary>
 
 **Responses:**
 
-**mmsaki latest** (6.6ms, 228.2 MB) — 417 tokens
+**mmsaki** (6.6ms, 228.2 MB) — 417 tokens
 
 <details>
 <summary>Summary: <code>{ data: Array(2085) [0, 0, 38, ... 2082 more] }</code></summary>
@@ -1622,7 +1622,7 @@ import {Test...", range: { end...</code></summary>
 
 **Responses:**
 
-**mmsaki latest** (5.8ms, 228.0 MB) — 90 symbols
+**mmsaki** (5.8ms, 228.0 MB) — 90 symbols
 
 <details>
 <summary>Summary: <code>Array(90) [{ kind: 5, location: { range: { end: { character: 1, line: 1261 }, start: { character: 0, line: 37 } }, ur...</code></summary>

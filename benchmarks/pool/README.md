@@ -15,18 +15,18 @@ Benchmarked against `v4-core` — `src/libraries/Pool.sol`.
 
 | Server | Version |
 |--------|---------|
-| [mmsaki v0.1.24](https://github.com/mmsaki/solidity-language-server) | `solidity-language-server 0.1.24+commit.9746134.macos.aarch64` |
-| [solc](https://docs.soliditylang.org) | `0.8.26+commit.8a97fa7a.Darwin.appleclang` |
-| [qiuxiang](https://github.com/qiuxiang/solidity-ls) | `solidity-ls 0.5.4` |
-| [juanfranblanco](https://github.com/juanfranblanco/vscode-solidity) | `vscode-solidity-server 0.0.187` |
-| [nomicfoundation](https://github.com/NomicFoundation/hardhat-vscode) | `@nomicfoundation/solidity-language-server 0.8.25` |
+| [mmsaki](https://github.com/mmsaki/solidity-language-server) | `0.1.24` |
+| [solc](https://docs.soliditylang.org) | `0.8.26` |
+| [qiuxiang](https://github.com/qiuxiang/solidity-ls) | `0.5.4` |
+| [juanfranblanco](https://github.com/juanfranblanco/vscode-solidity) | `0.0.187` |
+| [nomicfoundation](https://github.com/NomicFoundation/hardhat-vscode) | `0.8.25` |
 
 ---
 
 ## Summary
 
-| Method | [mmsaki v0.1.24](https://github.com/mmsaki/solidity-language-server) | [solc](https://docs.soliditylang.org) | [qiuxiang](https://github.com/qiuxiang/solidity-ls) | [juanfranblanco](https://github.com/juanfranblanco/vscode-solidity) | [nomicfoundation](https://github.com/NomicFoundation/hardhat-vscode) |
-|--------|----------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|-----------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|
+| Method | mmsaki | solc | qiuxiang | juanfranblanco | nomicfoundation |
+|--------|--------|------|----------|----------------|-----------------|
 | [initialize](#initialize) | 7.1ms ⚡ | 109.9ms | 110.1ms | 537.4ms | 878.2ms |
 | [textDocument/diagnostic](#textdocumentdiagnostic) | 509.5ms | 183.2ms ⚡ | 258.0ms | crash | 941.3ms |
 | [textDocument/semanticTokens/full/delta](#textdocumentsemantictokensfulldelta) | 3.8ms ⚡ | error | unsupported | crash | unsupported |
@@ -50,7 +50,7 @@ Benchmarked against `v4-core` — `src/libraries/Pool.sol`.
 
 | Server | Wins | Out of |
 |--------|------|--------|
-| **mmsaki v0.1.24** | **16** | **18** |
+| **mmsaki** | **16** | **18** |
 | solc | 1 | 18 |
 | qiuxiang | 1 | 18 |
 
@@ -62,7 +62,7 @@ Benchmarked against `v4-core` — `src/libraries/Pool.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 7.1ms ⚡ | - | ok | ✓ |
+| **mmsaki** | 7.1ms ⚡ | - | ok | ✓ |
 | **solc** | 109.9ms | - | ok | ✓ |
 | **qiuxiang** | 110.1ms | - | ok | ✓ |
 | **juanfranblanco** | 537.4ms | - | ok | ✓ |
@@ -72,7 +72,7 @@ Benchmarked against `v4-core` — `src/libraries/Pool.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 509.5ms | 54.4 MB | 4 diagnostics | ✓ |
+| **mmsaki** | 509.5ms | 54.4 MB | 4 diagnostics | ✓ |
 | **solc** | 183.2ms ⚡ | **26.2 MB** | 0 diagnostics | ✓ |
 | **qiuxiang** | 258.0ms | 72.5 MB | 0 diagnostics | ✓ |
 | **juanfranblanco** | - | - | crash | ✗ |
@@ -82,7 +82,7 @@ Benchmarked against `v4-core` — `src/libraries/Pool.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 3.8ms ⚡ | **53.0 MB** | delta | ✓ |
+| **mmsaki** | 3.8ms ⚡ | **53.0 MB** | delta | ✓ |
 | **solc** | - | 26.0 MB | error | ✗ |
 | **qiuxiang** | - | 72.2 MB | unsupported | ✗ |
 | **juanfranblanco** | - | - | crash | ✗ |
@@ -92,7 +92,7 @@ Benchmarked against `v4-core` — `src/libraries/Pool.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 14.4ms | **54.5 MB** | `TickMath.sol:9` | ✓ |
+| **mmsaki** | 14.4ms | **54.5 MB** | `TickMath.sol:9` | ✓ |
 | **solc** | - | 26.0 MB | empty | ✗ |
 | **qiuxiang** | 0.5ms ⚡ | 70.3 MB | `Pool.sol:102` | ✓ |
 | **juanfranblanco** | - | - | crash | ✗ |
@@ -102,7 +102,7 @@ Benchmarked against `v4-core` — `src/libraries/Pool.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 8.4ms ⚡ | **52.7 MB** | `TickMath.sol:9` | ✓ |
+| **mmsaki** | 8.4ms ⚡ | **52.7 MB** | `TickMath.sol:9` | ✓ |
 | **solc** | - | 26.0 MB | unsupported | ✗ |
 | **qiuxiang** | - | 71.6 MB | unsupported | ✗ |
 | **juanfranblanco** | - | - | crash | ✗ |
@@ -112,7 +112,7 @@ Benchmarked against `v4-core` — `src/libraries/Pool.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 14.1ms ⚡ | **53.5 MB** | function modifyLiquidity(struct Pool.State storage... | ✓ |
+| **mmsaki** | 14.1ms ⚡ | **53.5 MB** | function modifyLiquidity(struct Pool.State storage... | ✓ |
 | **solc** | - | 26.0 MB | crash | ✗ |
 | **qiuxiang** | - | 72.3 MB | empty | ✗ |
 | **juanfranblanco** | - | - | crash | ✗ |
@@ -122,7 +122,7 @@ Benchmarked against `v4-core` — `src/libraries/Pool.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 11.4ms ⚡ | **52.2 MB** | 24 references | ✓ |
+| **mmsaki** | 11.4ms ⚡ | **52.2 MB** | 24 references | ✓ |
 | **solc** | - | 25.8 MB | unsupported | ✗ |
 | **qiuxiang** | - | 71.2 MB | empty | ✗ |
 | **juanfranblanco** | - | - | crash | ✗ |
@@ -132,7 +132,7 @@ Benchmarked against `v4-core` — `src/libraries/Pool.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 0.2ms ⚡ | **54.2 MB** | 28 items (slot0, feeGrowthGlobal0X128, feeGrowthGlobal1X128) | ✓ |
+| **mmsaki** | 0.2ms ⚡ | **54.2 MB** | 28 items (slot0, feeGrowthGlobal0X128, feeGrowthGlobal1X128) | ✓ |
 | **solc** | - | 25.9 MB | unsupported | ✗ |
 | **qiuxiang** | 0.3ms | 71.1 MB | 7 items (slot0, feeGrowthGlobal0X128, feeGrowthGlobal1X128) | ✓ |
 | **juanfranblanco** | - | - | crash | ✗ |
@@ -142,7 +142,7 @@ Benchmarked against `v4-core` — `src/libraries/Pool.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 12.7ms ⚡ | **52.5 MB** | function getTickAtSqrtPrice(uint160 sqrtPriceX96) ... | ✓ |
+| **mmsaki** | 12.7ms ⚡ | **52.5 MB** | function getTickAtSqrtPrice(uint160 sqrtPriceX96) ... | ✓ |
 | **solc** | - | 25.9 MB | unsupported | ✗ |
 | **qiuxiang** | - | 70.4 MB | empty | ✗ |
 | **juanfranblanco** | - | - | crash | ✗ |
@@ -152,7 +152,7 @@ Benchmarked against `v4-core` — `src/libraries/Pool.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 18.8ms ⚡ | **54.0 MB** | 13 edits in 1 files | ✓ |
+| **mmsaki** | 18.8ms ⚡ | **54.0 MB** | 13 edits in 1 files | ✓ |
 | **solc** | - | 26.0 MB | error | ✗ |
 | **qiuxiang** | 0.3ms | 71.7 MB | 0 edits in 0 files | ✗ |
 | **juanfranblanco** | - | - | crash | ✗ |
@@ -162,7 +162,7 @@ Benchmarked against `v4-core` — `src/libraries/Pool.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 0.5ms ⚡ | **55.3 MB** | ready (line 102) | ✓ |
+| **mmsaki** | 0.5ms ⚡ | **55.3 MB** | ready (line 102) | ✓ |
 | **solc** | - | 26.0 MB | unsupported | ✗ |
 | **qiuxiang** | - | 70.2 MB | unsupported | ✗ |
 | **juanfranblanco** | - | - | crash | ✗ |
@@ -172,7 +172,7 @@ Benchmarked against `v4-core` — `src/libraries/Pool.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 2.6ms ⚡ | **54.3 MB** | 16 symbols | ✓ |
+| **mmsaki** | 2.6ms ⚡ | **54.3 MB** | 16 symbols | ✓ |
 | **solc** | - | 26.0 MB | unsupported | ✗ |
 | **qiuxiang** | - | 70.3 MB | unsupported | ✗ |
 | **juanfranblanco** | - | - | crash | ✗ |
@@ -182,7 +182,7 @@ Benchmarked against `v4-core` — `src/libraries/Pool.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 1.0ms ⚡ | **53.2 MB** | 14 links | ✓ |
+| **mmsaki** | 1.0ms ⚡ | **53.2 MB** | 14 links | ✓ |
 | **solc** | - | 25.8 MB | unsupported | ✗ |
 | **qiuxiang** | - | 72.0 MB | unsupported | ✗ |
 | **juanfranblanco** | - | - | crash | ✗ |
@@ -192,7 +192,7 @@ Benchmarked against `v4-core` — `src/libraries/Pool.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 19.6ms ⚡ | **54.1 MB** | 1 edits | ✓ |
+| **mmsaki** | 19.6ms ⚡ | **54.1 MB** | 1 edits | ✓ |
 | **solc** | 275.4ms | 25.9 MB | {"error":"Unknown method textDocument/fo... | ✗ |
 | **qiuxiang** | 2.8ms | 70.3 MB | {"error":"Request textDocument/formattin... | ✗ |
 | **juanfranblanco** | - | - | crash | ✗ |
@@ -202,7 +202,7 @@ Benchmarked against `v4-core` — `src/libraries/Pool.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 2.9ms ⚡ | **54.3 MB** | 114 hints (value1:, value2:, value:) | ✓ |
+| **mmsaki** | 2.9ms ⚡ | **54.3 MB** | 114 hints (value1:, value2:, value:) | ✓ |
 | **solc** | - | 25.8 MB | unsupported | ✗ |
 | **qiuxiang** | - | 71.9 MB | unsupported | ✗ |
 | **juanfranblanco** | - | - | crash | ✗ |
@@ -212,7 +212,7 @@ Benchmarked against `v4-core` — `src/libraries/Pool.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 4.7ms ⚡ | **53.4 MB** | 697 tokens | ✓ |
+| **mmsaki** | 4.7ms ⚡ | **53.4 MB** | 697 tokens | ✓ |
 | **solc** | - | 26.1 MB | error | ✗ |
 | **qiuxiang** | - | 71.1 MB | unsupported | ✗ |
 | **juanfranblanco** | - | - | crash | ✗ |
@@ -222,7 +222,7 @@ Benchmarked against `v4-core` — `src/libraries/Pool.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 2.5ms ⚡ | **53.6 MB** | 274 tokens | ✓ |
+| **mmsaki** | 2.5ms ⚡ | **53.6 MB** | 274 tokens | ✓ |
 | **solc** | - | 26.1 MB | unsupported | ✗ |
 | **qiuxiang** | - | 70.6 MB | unsupported | ✗ |
 | **juanfranblanco** | - | - | crash | ✗ |
@@ -232,7 +232,7 @@ Benchmarked against `v4-core` — `src/libraries/Pool.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 2.2ms ⚡ | **53.2 MB** | 68 symbols | ✓ |
+| **mmsaki** | 2.2ms ⚡ | **53.2 MB** | 68 symbols | ✓ |
 | **solc** | - | 26.1 MB | unsupported | ✗ |
 | **qiuxiang** | - | 71.5 MB | unsupported | ✗ |
 | **juanfranblanco** | - | - | crash | ✗ |

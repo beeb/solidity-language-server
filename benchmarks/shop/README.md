@@ -15,18 +15,18 @@ Benchmarked against `example` — `Shop.sol`.
 
 | Server | Version |
 |--------|---------|
-| [mmsaki v0.1.24](https://github.com/mmsaki/solidity-language-server) | `solidity-language-server 0.1.24+commit.9746134.macos.aarch64` |
-| [solc](https://docs.soliditylang.org) | `0.8.26+commit.8a97fa7a.Darwin.appleclang` |
-| [qiuxiang](https://github.com/qiuxiang/solidity-ls) | `solidity-ls 0.5.4` |
-| [juanfranblanco](https://github.com/juanfranblanco/vscode-solidity) | `vscode-solidity-server 0.0.187` |
-| [nomicfoundation](https://github.com/NomicFoundation/hardhat-vscode) | `@nomicfoundation/solidity-language-server 0.8.25` |
+| [mmsaki](https://github.com/mmsaki/solidity-language-server) | `0.1.24` |
+| [solc](https://docs.soliditylang.org) | `0.8.26` |
+| [qiuxiang](https://github.com/qiuxiang/solidity-ls) | `0.5.4` |
+| [juanfranblanco](https://github.com/juanfranblanco/vscode-solidity) | `0.0.187` |
+| [nomicfoundation](https://github.com/NomicFoundation/hardhat-vscode) | `0.8.25` |
 
 ---
 
 ## Summary
 
-| Method | [mmsaki v0.1.24](https://github.com/mmsaki/solidity-language-server) solidity-language-server 0.1.24+commit.9746134.macos.aarch64 | [solc](https://docs.soliditylang.org) 0.8.26+commit.8a97fa7a.Darwin.appleclang | [qiuxiang](https://github.com/qiuxiang/solidity-ls) solidity-ls 0.5.4 | [juanfranblanco](https://github.com/juanfranblanco/vscode-solidity) vscode-solidity-server 0.0.187 | [nomicfoundation](https://github.com/NomicFoundation/hardhat-vscode) @nomicfoundation/solidity-language-server 0.8.25 |
-|--------|----------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|-----------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|
+| Method | mmsaki | solc | qiuxiang | juanfranblanco | nomicfoundation |
+|--------|--------|------|----------|----------------|-----------------|
 | [initialize](#initialize) | 7.0ms ⚡ | 116.6ms | 137.3ms | 570.2ms | 854.0ms |
 | [textDocument/diagnostic](#textdocumentdiagnostic) | 78.7ms | 2.4ms ⚡ | 216.8ms | 872.8ms | 512.9ms |
 | [textDocument/semanticTokens/full/delta](#textdocumentsemantictokensfulldelta) | 1.5ms ⚡ | error | unsupported | unsupported | unsupported |
@@ -50,7 +50,7 @@ Benchmarked against `example` — `Shop.sol`.
 
 | Server | Wins | Out of |
 |--------|------|--------|
-| **mmsaki v0.1.24** | **13** | **18** |
+| **mmsaki** | **13** | **18** |
 | nomicfoundation | 2 | 18 |
 | solc | 1 | 18 |
 | qiuxiang | 1 | 18 |
@@ -63,7 +63,7 @@ Benchmarked against `example` — `Shop.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 7.0ms ⚡ | - | ok | ✓ |
+| **mmsaki** | 7.0ms ⚡ | - | ok | ✓ |
 | **solc** | 116.6ms | - | ok | ✓ |
 | **qiuxiang** | 137.3ms | - | ok | ✓ |
 | **juanfranblanco** | 570.2ms | - | ok | ✓ |
@@ -73,7 +73,7 @@ Benchmarked against `example` — `Shop.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 78.7ms | **12.8 MB** | 1 diagnostics | ✓ |
+| **mmsaki** | 78.7ms | **12.8 MB** | 1 diagnostics | ✓ |
 | **solc** | 2.4ms ⚡ | 26.2 MB | 0 diagnostics | ✓ |
 | **qiuxiang** | 216.8ms | 64.6 MB | 0 diagnostics | ✓ |
 | **juanfranblanco** | 872.8ms | 438.2 MB | 0 diagnostics | ✓ |
@@ -83,7 +83,7 @@ Benchmarked against `example` — `Shop.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 1.5ms ⚡ | **12.6 MB** | delta | ✓ |
+| **mmsaki** | 1.5ms ⚡ | **12.6 MB** | delta | ✓ |
 | **solc** | - | 26.1 MB | error | ✗ |
 | **qiuxiang** | - | 64.0 MB | unsupported | ✗ |
 | **juanfranblanco** | - | 438.3 MB | unsupported | ✗ |
@@ -93,7 +93,7 @@ Benchmarked against `example` — `Shop.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 2.9ms | **12.8 MB** | `Shop.sol:68` | ✓ |
+| **mmsaki** | 2.9ms | **12.8 MB** | `Shop.sol:68` | ✓ |
 | **solc** | 2.3ms | 25.8 MB | empty | ✗ |
 | **qiuxiang** | 2.4ms ⚡ | 64.5 MB | `Shop.sol:121` | ✓ |
 | **juanfranblanco** | 55.2ms | 427.5 MB | `Shop.sol:68` | ✓ |
@@ -103,7 +103,7 @@ Benchmarked against `example` — `Shop.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 1.5ms ⚡ | **12.6 MB** | `Shop.sol:68` | ✓ |
+| **mmsaki** | 1.5ms ⚡ | **12.6 MB** | `Shop.sol:68` | ✓ |
 | **solc** | - | 26.1 MB | unsupported | ✗ |
 | **qiuxiang** | - | 64.5 MB | unsupported | ✗ |
 | **juanfranblanco** | - | 438.0 MB | unsupported | ✗ |
@@ -113,7 +113,7 @@ Benchmarked against `example` — `Shop.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 4.2ms ⚡ | **12.5 MB** | function addTax(uint256 amount, uint16 tax, uint16... | ✓ |
+| **mmsaki** | 4.2ms ⚡ | **12.5 MB** | function addTax(uint256 amount, uint16 tax, uint16... | ✓ |
 | **solc** | - | 26.1 MB | crash | ✗ |
 | **qiuxiang** | 2.1ms | 64.3 MB | empty | ✗ |
 | **juanfranblanco** | 53.1ms | 426.8 MB | ### Function: addTax | ✓ |
@@ -123,7 +123,7 @@ Benchmarked against `example` — `Shop.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 2.3ms | **12.7 MB** | 11 references | ✓ |
+| **mmsaki** | 2.3ms | **12.7 MB** | 11 references | ✓ |
 | **solc** | 2.3ms | 26.1 MB | {"error":"Unknown method textDocument/re... | ✗ |
 | **qiuxiang** | 2.5ms | 64.4 MB | 2 references | ✓ |
 | **juanfranblanco** | 73.2ms | 433.1 MB | 42 references | ✓ |
@@ -133,7 +133,7 @@ Benchmarked against `example` — `Shop.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 1.0ms ⚡ | **12.6 MB** | 5 items (buyer, nonce, amount) | ✓ |
+| **mmsaki** | 1.0ms ⚡ | **12.6 MB** | 5 items (buyer, nonce, amount) | ✓ |
 | **solc** | 2.4ms | 25.8 MB | {"error":"Unknown method textDocument/co... | ✗ |
 | **qiuxiang** | 2.3ms | 64.8 MB | 3 items (data, sender, sig) | ✓ |
 | **juanfranblanco** | 53.2ms | 428.1 MB | 0 items | ✗ |
@@ -143,7 +143,7 @@ Benchmarked against `example` — `Shop.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 2.6ms ⚡ | **12.6 MB** | function addTax(uint256 amount, uint16 tax, uint16... | ✓ |
+| **mmsaki** | 2.6ms ⚡ | **12.6 MB** | function addTax(uint256 amount, uint16 tax, uint16... | ✓ |
 | **solc** | - | 25.9 MB | unsupported | ✗ |
 | **qiuxiang** | - | 64.6 MB | empty | ✗ |
 | **juanfranblanco** | - | 427.1 MB | empty | ✗ |
@@ -153,7 +153,7 @@ Benchmarked against `example` — `Shop.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 3.9ms | **12.7 MB** | 3 edits in 1 files | ✓ |
+| **mmsaki** | 3.9ms | **12.7 MB** | 3 edits in 1 files | ✓ |
 | **solc** | 2.3ms | 26.0 MB | {"error":"Unhandled exception: /solidity... | ✗ |
 | **qiuxiang** | 2.6ms | 64.7 MB | 2 edits in 1 files | ✓ |
 | **juanfranblanco** | 50.4ms | 433.9 MB | {"error":"Unhandled method textDocument/... | ✗ |
@@ -163,7 +163,7 @@ Benchmarked against `example` — `Shop.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 0.2ms ⚡ | **12.7 MB** | ready (line 136) | ✓ |
+| **mmsaki** | 0.2ms ⚡ | **12.7 MB** | ready (line 136) | ✓ |
 | **solc** | - | 26.2 MB | unsupported | ✗ |
 | **qiuxiang** | - | 64.4 MB | unsupported | ✗ |
 | **juanfranblanco** | - | 425.9 MB | unsupported | ✗ |
@@ -173,7 +173,7 @@ Benchmarked against `example` — `Shop.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 1.2ms ⚡ | **12.5 MB** | 3 symbols | ✓ |
+| **mmsaki** | 1.2ms ⚡ | **12.5 MB** | 3 symbols | ✓ |
 | **solc** | - | 26.1 MB | unsupported | ✗ |
 | **qiuxiang** | - | 64.3 MB | unsupported | ✗ |
 | **juanfranblanco** | 13.7ms | 426.9 MB | 2 symbols | ✓ |
@@ -183,7 +183,7 @@ Benchmarked against `example` — `Shop.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | - | 12.8 MB | empty | ✗ |
+| **mmsaki** | - | 12.8 MB | empty | ✗ |
 | **solc** | - | 26.2 MB | unsupported | ✗ |
 | **qiuxiang** | - | 64.4 MB | unsupported | ✗ |
 | **juanfranblanco** | - | 438.5 MB | unsupported | ✗ |
@@ -193,7 +193,7 @@ Benchmarked against `example` — `Shop.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 11.1ms ⚡ | **12.5 MB** | 1 edits | ✓ |
+| **mmsaki** | 11.1ms ⚡ | **12.5 MB** | 1 edits | ✓ |
 | **solc** | 2.3ms | 26.1 MB | {"error":"Unknown method textDocument/fo... | ✗ |
 | **qiuxiang** | 1.8ms | 64.4 MB | {"error":"Request textDocument/formattin... | ✗ |
 | **juanfranblanco** | 62.1ms | 432.6 MB | {"error":"Unhandled method textDocument/... | ✗ |
@@ -203,7 +203,7 @@ Benchmarked against `example` — `Shop.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 1.5ms ⚡ | **12.7 MB** | 24 hints (tax:, base:, buyer:) | ✓ |
+| **mmsaki** | 1.5ms ⚡ | **12.7 MB** | 24 hints (tax:, base:, buyer:) | ✓ |
 | **solc** | - | 26.2 MB | unsupported | ✗ |
 | **qiuxiang** | - | 64.3 MB | unsupported | ✗ |
 | **juanfranblanco** | - | 433.0 MB | unsupported | ✗ |
@@ -213,7 +213,7 @@ Benchmarked against `example` — `Shop.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 1.6ms ⚡ | **12.7 MB** | 451 tokens | ✓ |
+| **mmsaki** | 1.6ms ⚡ | **12.7 MB** | 451 tokens | ✓ |
 | **solc** | - | 25.9 MB | error | ✗ |
 | **qiuxiang** | - | 64.4 MB | unsupported | ✗ |
 | **juanfranblanco** | - | 435.2 MB | unsupported | ✗ |
@@ -223,7 +223,7 @@ Benchmarked against `example` — `Shop.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 1.0ms ⚡ | **12.6 MB** | 160 tokens | ✓ |
+| **mmsaki** | 1.0ms ⚡ | **12.6 MB** | 160 tokens | ✓ |
 | **solc** | - | 25.9 MB | unsupported | ✗ |
 | **qiuxiang** | - | 64.5 MB | unsupported | ✗ |
 | **juanfranblanco** | - | 425.7 MB | unsupported | ✗ |
@@ -233,7 +233,7 @@ Benchmarked against `example` — `Shop.sol`.
 
 | Server | p95 | RSS | Result | Responded |
 |--------|-----|-----|--------|-----------|
-| **mmsaki v0.1.24** | 1.1ms ⚡ | **12.7 MB** | 61 symbols | ✓ |
+| **mmsaki** | 1.1ms ⚡ | **12.7 MB** | 61 symbols | ✓ |
 | **solc** | - | 25.9 MB | unsupported | ✗ |
 | **qiuxiang** | - | 64.6 MB | unsupported | ✗ |
 | **juanfranblanco** | - | 418.3 MB | timeout | ✗ |

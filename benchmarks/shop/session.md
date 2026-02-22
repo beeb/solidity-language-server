@@ -6,7 +6,7 @@
 
 **Responses:**
 
-**mmsaki v0.1.24** (7.0ms) — ok
+**mmsaki** (7.0ms) — ok
 
 <details>
 <summary>Summary: <code>"ok"</code></summary>
@@ -69,7 +69,7 @@
 
 **Responses:**
 
-**mmsaki v0.1.24** (78.7ms, 12.8 MB) — 1 diagnostics
+**mmsaki** (78.7ms, 12.8 MB) — 1 diagnostics
 
 <details>
 <summary>Summary: <code>{ diagnostics: Array(1) [{ code: "asm-keccak256", message: "use of inefficient hashing mechanism; consider using inli...</code></summary>
@@ -164,7 +164,7 @@
 
 **Responses:**
 
-**mmsaki v0.1.24** (1.5ms, 12.6 MB) — delta
+**mmsaki** (1.5ms, 12.6 MB) — delta
 
 <details>
 <summary>Summary: <code>{ edits: [], resultId: "3" }</code></summary>
@@ -211,7 +211,7 @@
 
 **Responses:**
 
-**mmsaki v0.1.24** (2.9ms, 12.8 MB) — `Shop.sol:68`
+**mmsaki** (2.9ms, 12.8 MB) — `Shop.sol:68`
 
 <details>
 <summary>Summary: <code>{ range: { end: { character: 27, line: 68 }, start: { character: 22, line: 68 } }, uri: "file:///Users/meek/developer...</code></summary>
@@ -313,7 +313,7 @@
 
 **Responses:**
 
-**mmsaki v0.1.24** (1.5ms, 12.6 MB) — `Shop.sol:68`
+**mmsaki** (1.5ms, 12.6 MB) — `Shop.sol:68`
 
 <details>
 <summary>Summary: <code>{ range: { end: { character: 27, line: 68 }, start: { character: 22, line: 68 } }, uri: "file:///Users/meek/developer...</code></summary>
@@ -369,7 +369,7 @@
 
 **Responses:**
 
-**mmsaki v0.1.24** (4.2ms, 12.5 MB) — function addTax(uint256 amount, uint16 tax, uint16...
+**mmsaki** (4.2ms, 12.5 MB) — function addTax(uint256 amount, uint16 tax, uint16...
 
 <details>
 <summary>Summary: <code>{ contents: { kind: "markdown", value: "```solidity
@@ -438,7 +438,7 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
 
 **Responses:**
 
-**mmsaki v0.1.24** (2.3ms, 12.7 MB) — 11 references
+**mmsaki** (2.3ms, 12.7 MB) — 11 references
 
 <details>
 <summary>Summary: <code>Array(11) [{ range: { end: { character: 54, line: 258 }, start: { character: 49, line: 258 } }, uri: "file:///Users/m...</code></summary>
@@ -743,7 +743,7 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
 
 **Responses:**
 
-**mmsaki v0.1.24** (1.0ms, 12.6 MB) — 5 items (buyer, nonce, amount)
+**mmsaki** (1.0ms, 12.6 MB) — 5 items (buyer, nonce, amount)
 
 <details>
 <summary>Summary: <code>{ isIncomplete: false, items: Array(5) [{ detail: "address", kind: 5, label: "buyer" }, { detail: "uint256", kind: 5,...</code></summary>
@@ -848,7 +848,7 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
 
 **Responses:**
 
-**mmsaki v0.1.24** (2.6ms, 12.6 MB) — function addTax(uint256 amount, uint16 tax, uint16...
+**mmsaki** (2.6ms, 12.6 MB) — function addTax(uint256 amount, uint16 tax, uint16...
 
 <details>
 <summary>Summary: <code>{ activeParameter: 1, activeSignature: 0, signatures: Array(1) [{ activeParameter: 1, label: "function addTax(uint256...</code></summary>
@@ -922,7 +922,7 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
 
 **Responses:**
 
-**mmsaki v0.1.24** (3.9ms, 12.7 MB) — 3 edits in 1 files
+**mmsaki** (3.9ms, 12.7 MB) — 3 edits in 1 files
 
 <details>
 <summary>Summary: <code>{ changes: { file:///Users/meek/developer/mmsaki/solidity-language-server/example/Shop.sol: Array(3) [{ newText: "__l...</code></summary>
@@ -1134,7 +1134,7 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
 
 **Responses:**
 
-**mmsaki v0.1.24** (0.2ms, 12.7 MB) — ready (line 136)
+**mmsaki** (0.2ms, 12.7 MB) — ready (line 136)
 
 <details>
 <summary>Summary: <code>{ end: { character: 37, line: 136 }, start: { character: 32, line: 136 } }</code></summary>
@@ -1183,7 +1183,7 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
 
 **Responses:**
 
-**mmsaki v0.1.24** (1.2ms, 12.5 MB) — 3 symbols
+**mmsaki** (1.2ms, 12.5 MB) — 3 symbols
 
 <details>
 <summary>Summary: <code>Array(3) [{ kind: 15, name: "pragma solidity ^0.8.0", range: { end: { character: 23, line: 1 }, start: { character: 0...</code></summary>
@@ -2835,7 +2835,7 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
 
 **Responses:**
 
-**mmsaki v0.1.24** (12.8 MB) — empty
+**mmsaki** (12.8 MB) — empty
 
 **solc** (26.2 MB) — unsupported
 
@@ -2870,7 +2870,7 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
 
 **Responses:**
 
-**mmsaki v0.1.24** (11.1ms, 12.5 MB) — 1 edits
+**mmsaki** (11.1ms, 12.5 MB) — 1 edits
 
 <details>
 <summary>Summary: <code>Array(1) [{ newText: "// SPDX-License-Identifier: MIT
@@ -2971,7 +2971,7 @@ pragma solidity ^0.8.0;
 
 **Responses:**
 
-**mmsaki v0.1.24** (1.5ms, 12.7 MB) — 24 hints (tax:, base:, buyer:)
+**mmsaki** (1.5ms, 12.7 MB) — 24 hints (tax:, base:, buyer:)
 
 <details>
 <summary>Summary: <code>Array(24) [{ kind: 2, label: "tax:", paddingRight: true, position: { character: 12, line: 143 } }, { kind: 2, label: ...</code></summary>
@@ -3058,7 +3058,7 @@ pragma solidity ^0.8.0;
 
 **Responses:**
 
-**mmsaki v0.1.24** (1.6ms, 12.7 MB) — 451 tokens
+**mmsaki** (1.6ms, 12.7 MB) — 451 tokens
 
 <details>
 <summary>Summary: <code>{ data: Array(2255) [0, 0, 31, ... 2252 more], resultId: "2" }</code></summary>
@@ -3136,7 +3136,7 @@ pragma solidity ^0.8.0;
 
 **Responses:**
 
-**mmsaki v0.1.24** (1.0ms, 12.6 MB) — 160 tokens
+**mmsaki** (1.0ms, 12.6 MB) — 160 tokens
 
 <details>
 <summary>Summary: <code>{ data: Array(800) [0, 0, 31, ... 797 more] }</code></summary>
@@ -3183,7 +3183,7 @@ pragma solidity ^0.8.0;
 
 **Responses:**
 
-**mmsaki v0.1.24** (1.1ms, 12.7 MB) — 61 symbols
+**mmsaki** (1.1ms, 12.7 MB) — 61 symbols
 
 <details>
 <summary>Summary: <code>Array(61) [{ kind: 3, location: { range: { end: { character: 1, line: 53 }, start: { character: 0, line: 21 } }, uri:...</code></summary>
