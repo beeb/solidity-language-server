@@ -1,0 +1,385 @@
+# v4-core / test/PoolManager.t.sol
+
+── initialize (12.5ms) ──
+
+← mmsaki latest [content] "ok"
+← solc [content] "ok"
+← qiuxiang [content] "ok"
+← juanfranblanco [content] "ok"
+← nomicfoundation [content] "ok"
+
+── textDocument/diagnostic (2.2s, 229.1 MB) ──
+
+← mmsaki latest [content] { diagnostics: Array(15) [{ code: "mixed-case-variable", message: "mutable variables should use mixedCase", range: { end: { character: 40, line: 354 }, start: { character: 16, line: 354 } }, severi...
+← solc [content] { diagnostics: [], uri: "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/lib/forg..." }
+← qiuxiang [content] { diagnostics: Array(1) [{ code: "6275", message: "ParserError: Source "forge-std/Test.sol" not found: File not found. Searched ...", range: { end: { character: 40, line: 3 }, start: { character: 0...
+← juanfranblanco [error] crash
+← nomicfoundation [content] { diagnostics: Array(1) [{ code: "6275", message: "Source "forge-std/Test.sol" not found: File not found. Searched the following...", range: { end: { character: 40, line: 3 }, start: { character: 0...
+
+── textDocument/semanticTokens/full/delta (12.1ms, 227.7 MB) ──
+
+← mmsaki latest [content] { edits: [], resultId: "3" }
+← solc [error] error
+← qiuxiang [unsupported] unsupported
+← juanfranblanco [error] crash
+← nomicfoundation [unsupported] unsupported
+
+── textDocument/definition (138.9ms, 227.5 MB) ──
+
+{
+  "id": 1,
+  "jsonrpc": "2.0",
+  "method": "textDocument/definition",
+  "params": {
+    "position": {
+      "character": 51,
+      "line": 116
+    },
+    "textDocument": {
+      "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/test/PoolManager.t.sol"
+    }
+  }
+}
+
+← mmsaki latest [content] { range: { end: { character: 16, line: 9 }, start: { character: 8, line: 9 } }, uri: "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libr..." }
+← solc [error] empty
+← qiuxiang [error] empty
+← juanfranblanco [error] crash
+← nomicfoundation [error] empty
+
+── textDocument/declaration (133.2ms, 227.8 MB) ──
+
+{
+  "id": 1,
+  "jsonrpc": "2.0",
+  "method": "textDocument/declaration",
+  "params": {
+    "position": {
+      "character": 51,
+      "line": 116
+    },
+    "textDocument": {
+      "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/test/PoolManager.t.sol"
+    }
+  }
+}
+
+← mmsaki latest [content] { range: { end: { character: 16, line: 9 }, start: { character: 8, line: 9 } }, uri: "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libr..." }
+← solc [unsupported] unsupported
+← qiuxiang [unsupported] unsupported
+← juanfranblanco [error] crash
+← nomicfoundation [unsupported] unsupported
+
+── textDocument/hover (242.6ms, 227.7 MB) ──
+
+{
+  "id": 1,
+  "jsonrpc": "2.0",
+  "method": "textDocument/hover",
+  "params": {
+    "position": {
+      "character": 29,
+      "line": 96
+    },
+    "textDocument": {
+      "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/test/PoolManager.t.sol"
+    }
+  }
+}
+
+← mmsaki latest [content] { contents: { kind: "markdown", value: "```solidity
+error PoolNotInitialized()
+```
+
+Selector: `0x486aa307`
+
+---
+Throw..." } }
+← solc [error] crash
+← qiuxiang [error] empty
+← juanfranblanco [error] crash
+← nomicfoundation [error] empty
+
+── textDocument/references (137.9ms, 227.0 MB) ──
+
+{
+  "id": 1,
+  "jsonrpc": "2.0",
+  "method": "textDocument/references",
+  "params": {
+    "context": {
+      "includeDeclaration": true
+    },
+    "position": {
+      "character": 32,
+      "line": 102
+    },
+    "textDocument": {
+      "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/test/PoolManager.t.sol"
+    }
+  }
+}
+
+← mmsaki latest [content] Array(7) [{ range: { end: { character: 62, line: 97 }, start: { character: 46, line: 97 } }, uri: "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/test/Poo..." }, { range: { en...
+← solc [unsupported] unsupported
+← qiuxiang [error] empty
+← juanfranblanco [error] crash
+← nomicfoundation [error] empty
+
+── textDocument/completion (4.8s, 227.6 MB) ──
+
+{
+  "id": 1,
+  "jsonrpc": "2.0",
+  "method": "textDocument/completion",
+  "params": {
+    "context": {
+      "triggerCharacter": ".",
+      "triggerKind": 2
+    },
+    "position": {
+      "character": 35,
+      "line": 815
+    },
+    "textDocument": {
+      "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/test/PoolManager.t.sol"
+    }
+  }
+}
+
+← mmsaki latest [content] { isIncomplete: false, items: Array(23) [{ detail: "amount0(BalanceDelta balanceDelta) returns (int128 _amount0)", kind: 3, label: "amount0" }, { detail: "amount1(BalanceDelta balanceDelta) returns...
+← solc [unsupported] unsupported
+← qiuxiang [error] empty
+← juanfranblanco [error] crash
+← nomicfoundation [error] empty
+
+── textDocument/signatureHelp (33.2ms, 227.6 MB) ──
+
+{
+  "id": 1,
+  "jsonrpc": "2.0",
+  "method": "textDocument/signatureHelp",
+  "params": {
+    "position": {
+      "character": 37,
+      "line": 116
+    },
+    "textDocument": {
+      "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/test/PoolManager.t.sol"
+    }
+  }
+}
+
+← mmsaki latest [content] { activeParameter: 0, activeSignature: 0, signatures: Array(1) [{ activeParameter: 0, label: "function bound(uint256 x, uint256 min, uint256 max) internal pure returns (ui...", parameters: Array(3)...
+← solc [unsupported] unsupported
+← qiuxiang [error] empty
+← juanfranblanco [error] crash
+← nomicfoundation [error] empty
+
+── textDocument/rename (270.5ms, 227.9 MB) ──
+
+{
+  "id": 1,
+  "jsonrpc": "2.0",
+  "method": "textDocument/rename",
+  "params": {
+    "newName": "__lsp_bench_rename__",
+    "position": {
+      "character": 18,
+      "line": 254
+    },
+    "textDocument": {
+      "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/test/PoolManager.t.sol"
+    }
+  }
+}
+
+← mmsaki latest [content] { changes: { file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/test/PoolManager.t.sol: Array(9) [{ newText: "__lsp_bench_rename__", range: { end: { character: 42, line: 258 }, st...
+← solc [error] error
+← qiuxiang [content] { changes: {} }
+← juanfranblanco [error] crash
+← nomicfoundation [content] { changes: {} }
+
+── textDocument/prepareRename (0.2ms, 227.2 MB) ──
+
+{
+  "id": 1,
+  "jsonrpc": "2.0",
+  "method": "textDocument/prepareRename",
+  "params": {
+    "position": {
+      "character": 51,
+      "line": 116
+    },
+    "textDocument": {
+      "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/test/PoolManager.t.sol"
+    }
+  }
+}
+
+← mmsaki latest [content] { end: { character: 59, line: 116 }, start: { character: 51, line: 116 } }
+← solc [unsupported] unsupported
+← qiuxiang [unsupported] unsupported
+← juanfranblanco [error] crash
+← nomicfoundation [unsupported] unsupported
+
+── textDocument/documentSymbol (6.2ms, 227.1 MB) ──
+
+{
+  "id": 1,
+  "jsonrpc": "2.0",
+  "method": "textDocument/documentSymbol",
+  "params": {
+    "textDocument": {
+      "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/test/PoolManager.t.sol"
+    }
+  }
+}
+
+← mmsaki latest [content] Array(35) [{ kind: 15, name: "pragma solidity ^0.8.20", range: { end: { character: 24, line: 1 }, start: { character: 0, line: 1 } }, selectionRange: { end: { character: 24, line: 1 }, start: { cha...
+← solc [unsupported] unsupported
+← qiuxiang [unsupported] unsupported
+← juanfranblanco [error] crash
+← nomicfoundation [content] Array(1) [{ children: Array(89) [{ children: [], kind: 24, name: "UnlockCallback", range: { end: { character: 0, line: 46 }, start: { character: 0, line: 44 } }, selectionRange: { end: { character:...
+
+── textDocument/documentLink (2.7ms, 227.2 MB) ──
+
+{
+  "id": 1,
+  "jsonrpc": "2.0",
+  "method": "textDocument/documentLink",
+  "params": {
+    "textDocument": {
+      "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/test/PoolManager.t.sol"
+    }
+  }
+}
+
+← mmsaki latest [content] Array(33) [{ range: { end: { character: 38, line: 3 }, start: { character: 20, line: 3 } }, target: "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/lib/forg...", tooltip: "lib...
+← solc [unsupported] unsupported
+← qiuxiang [unsupported] unsupported
+← juanfranblanco [error] crash
+← nomicfoundation [unsupported] unsupported
+
+── textDocument/formatting (21.0ms, 227.3 MB) ──
+
+{
+  "id": 1,
+  "jsonrpc": "2.0",
+  "method": "textDocument/formatting",
+  "params": {
+    "options": {
+      "insertSpaces": true,
+      "tabSize": 4
+    },
+    "textDocument": {
+      "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/test/PoolManager.t.sol"
+    }
+  }
+}
+
+← mmsaki latest [content] Array(1) [{ newText: "// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.20;
+
+import {Test...", range: { end: { character: 0, line: 1272 }, start: { character: 0, line: 0 } } }]
+← solc [error] { error: "Unknown method textDocument/formatting" }
+← qiuxiang [error] { error: "Request textDocument/formatting failed with message: resolveConfig.sync is no..." }
+← juanfranblanco [error] crash
+← nomicfoundation [content] Array(1) [{ newText: "// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.20;
+
+import {Test...", range: { end: { character: 0, line: 1272 }, start: { character: 0, line: 0 } } }]
+
+── textDocument/inlayHint (32.8ms, 228.2 MB) ──
+
+{
+  "id": 1,
+  "jsonrpc": "2.0",
+  "method": "textDocument/inlayHint",
+  "params": {
+    "range": {
+      "end": {
+        "character": 0,
+        "line": 9999
+      },
+      "start": {
+        "character": 0,
+        "line": 0
+      }
+    },
+    "textDocument": {
+      "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/test/PoolManager.t.sol"
+    }
+  }
+}
+
+← mmsaki latest [content] Array(1080) [{ kind: 2, label: "name:", paddingRight: true, position: { character: 40, line: 76 } }, { kind: 2, label: "hooks:", paddingRight: true, position: { character: 48, line: 79 } }, { kind:...
+← solc [unsupported] unsupported
+← qiuxiang [unsupported] unsupported
+← juanfranblanco [error] crash
+← nomicfoundation [unsupported] unsupported
+
+── textDocument/semanticTokens/full (10.2ms, 228.7 MB) ──
+
+{
+  "id": 1,
+  "jsonrpc": "2.0",
+  "method": "textDocument/semanticTokens/full",
+  "params": {
+    "textDocument": {
+      "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/test/PoolManager.t.sol"
+    }
+  }
+}
+
+← mmsaki latest [content] { data: Array(7560) [0, 0, 38, ... 7557 more], resultId: "2" }
+← solc [error] error
+← qiuxiang [unsupported] unsupported
+← juanfranblanco [error] crash
+← nomicfoundation [content] { data: Array(1925) [37, 9, 15, ... 1922 more] }
+
+── textDocument/semanticTokens/range (6.8ms, 226.9 MB) ──
+
+{
+  "id": 1,
+  "jsonrpc": "2.0",
+  "method": "textDocument/semanticTokens/range",
+  "params": {
+    "range": {
+      "end": {
+        "character": 0,
+        "line": 300
+      },
+      "start": {
+        "character": 0,
+        "line": 0
+      }
+    },
+    "textDocument": {
+      "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/test/PoolManager.t.sol"
+    }
+  }
+}
+
+← mmsaki latest [content] { data: Array(2085) [0, 0, 38, ... 2082 more] }
+← solc [unsupported] unsupported
+← qiuxiang [unsupported] unsupported
+← juanfranblanco [error] crash
+← nomicfoundation [unsupported] unsupported
+
+── workspace/symbol (6.1ms, 227.4 MB) ──
+
+{
+  "id": 1,
+  "jsonrpc": "2.0",
+  "method": "workspace/symbol",
+  "params": {
+    "query": ""
+  }
+}
+
+← mmsaki latest [content] Array(90) [{ kind: 5, location: { range: { end: { character: 1, line: 1261 }, start: { character: 0, line: 37 } }, uri: "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/test/Po...
+← solc [unsupported] unsupported
+← qiuxiang [unsupported] unsupported
+← juanfranblanco [error] crash
+← nomicfoundation [unsupported] unsupported
