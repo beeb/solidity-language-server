@@ -55,9 +55,7 @@ See [FEATURES.md](FEATURES.md) for the full LSP feature set and roadmap.
 | semanticTokens/delta | 1.5ms ⚡ | - | - | - | - |
 | workspace/symbol | 1.1ms ⚡ | - | - | - | - |
 
-p95 latency. `-` = unsupported, empty, error, or crash. ⚡ = fastest.
-
-**Winner: mmsaki 14/18 ⚡**
+p95 latency. `-` = unsupported, empty, error, or crash.
 
 ## Docs
 
