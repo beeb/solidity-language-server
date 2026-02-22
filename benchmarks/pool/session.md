@@ -6,7 +6,7 @@
 
 **Responses:**
 
-**mmsaki latest** (7.9ms) — ok
+**mmsaki v0.1.24** (7.1ms) — ok
 
 <details>
 <summary>Summary: <code>"ok"</code></summary>
@@ -14,9 +14,10 @@
 ```json
 "ok"
 ```
+
 </details>
 
-**solc** (113.9ms) — ok
+**solc** (109.9ms) — ok
 
 <details>
 <summary>Summary: <code>"ok"</code></summary>
@@ -24,9 +25,10 @@
 ```json
 "ok"
 ```
+
 </details>
 
-**qiuxiang** (116.7ms) — ok
+**qiuxiang** (110.1ms) — ok
 
 <details>
 <summary>Summary: <code>"ok"</code></summary>
@@ -34,9 +36,10 @@
 ```json
 "ok"
 ```
+
 </details>
 
-**juanfranblanco** (541.6ms) — ok
+**juanfranblanco** (537.4ms) — ok
 
 <details>
 <summary>Summary: <code>"ok"</code></summary>
@@ -44,9 +47,10 @@
 ```json
 "ok"
 ```
+
 </details>
 
-**nomicfoundation** (869.0ms) — ok
+**nomicfoundation** (878.2ms) — ok
 
 <details>
 <summary>Summary: <code>"ok"</code></summary>
@@ -54,6 +58,7 @@
 ```json
 "ok"
 ```
+
 </details>
 
 ---
@@ -64,7 +69,7 @@
 
 **Responses:**
 
-**mmsaki latest** (499.1ms, 54.5 MB) — 4 diagnostics
+**mmsaki v0.1.24** (509.5ms, 54.4 MB) — 4 diagnostics
 
 <details>
 <summary>Summary: <code>{ diagnostics: Array(4) [{ code: "mixed-case-function", message: "function names should use mixedCase", range: { end:...</code></summary>
@@ -140,9 +145,10 @@
   "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libraries/Pool.sol"
 }
 ```
+
 </details>
 
-**solc** (149.2ms, 26.2 MB) — 0 diagnostics
+**solc** (183.2ms, 26.2 MB) — 0 diagnostics
 
 <details>
 <summary>Summary: <code>{ diagnostics: [], uri: "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/lib/forg..." }</code></summary>
@@ -153,9 +159,10 @@
   "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/lib/forge-std/src/Base.sol"
 }
 ```
+
 </details>
 
-**qiuxiang** (256.4ms, 72.4 MB) — 0 diagnostics
+**qiuxiang** (258.0ms, 72.5 MB) — 0 diagnostics
 
 <details>
 <summary>Summary: <code>{ diagnostics: [], uri: "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libr..." }</code></summary>
@@ -166,11 +173,12 @@
   "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libraries/Pool.sol"
 }
 ```
+
 </details>
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (945.5ms, 525.5 MB) — 0 diagnostics
+**nomicfoundation** (941.3ms, 527.3 MB) — 0 diagnostics
 
 <details>
 <summary>Summary: <code>{ diagnostics: [], uri: "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libr..." }</code></summary>
@@ -181,6 +189,7 @@
   "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libraries/Pool.sol"
 }
 ```
+
 </details>
 
 ---
@@ -191,7 +200,7 @@
 
 **Responses:**
 
-**mmsaki latest** (3.5ms, 53.7 MB) — delta
+**mmsaki v0.1.24** (3.8ms, 53.0 MB) — delta
 
 <details>
 <summary>Summary: <code>{ edits: [], resultId: "3" }</code></summary>
@@ -202,27 +211,23 @@
   "resultId": "3"
 }
 ```
+
 </details>
 
-**solc** (0.1ms, 26.1 MB) — {"error":"Unknown method textDocument/se...
+**solc** (26.0 MB) — error
 
-`[error]` `{ error: "Unknown method textDocument/semanticTokens/full/delta" }`
-
-**qiuxiang** (0.2ms, 70.9 MB) — {"error":"Unhandled method textDocument/...
-
-`[error]` `{ error: "Unhandled method textDocument/semanticTokens/full/delta" }`
+**qiuxiang** (72.2 MB) — unsupported
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (0.2ms, 524.8 MB) — {"error":"Unhandled method textDocument/...
-
-`[error]` `{ error: "Unhandled method textDocument/semanticTokens/full/delta" }`
+**nomicfoundation** (526.1 MB) — unsupported
 
 ---
 
 ## textDocument/definition
 
 **Request:**
+
 ```json
 {
   "id": 1,
@@ -242,7 +247,7 @@
 
 **Responses:**
 
-**mmsaki latest** (11.0ms, 52.5 MB) — `TickMath.sol:9`
+**mmsaki v0.1.24** (14.4ms, 54.5 MB) — `TickMath.sol:9`
 
 <details>
 <summary>Summary: <code>{ range: { end: { character: 16, line: 9 }, start: { character: 8, line: 9 } }, uri: "file:///Users/meek/developer/mm...</code></summary>
@@ -262,11 +267,12 @@
   "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libraries/TickMath.sol"
 }
 ```
+
 </details>
 
 **solc** (26.0 MB) — empty
 
-**qiuxiang** (0.4ms, 71.6 MB) — `Pool.sol:102`
+**qiuxiang** (0.5ms, 70.3 MB) — `Pool.sol:102`
 
 <details>
 <summary>Summary: <code>{ range: { end: { character: 0, line: 103 }, start: { character: 10, line: 102 } }, uri: "file:///Users/meek/develope...</code></summary>
@@ -286,17 +292,19 @@
   "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libraries/Pool.sol"
 }
 ```
+
 </details>
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (525.7 MB) — empty
+**nomicfoundation** (526.0 MB) — empty
 
 ---
 
 ## textDocument/declaration
 
 **Request:**
+
 ```json
 {
   "id": 1,
@@ -316,7 +324,7 @@
 
 **Responses:**
 
-**mmsaki latest** (9.2ms, 52.6 MB) — `TickMath.sol:9`
+**mmsaki v0.1.24** (8.4ms, 52.7 MB) — `TickMath.sol:9`
 
 <details>
 <summary>Summary: <code>{ range: { end: { character: 16, line: 9 }, start: { character: 8, line: 9 } }, uri: "file:///Users/meek/developer/mm...</code></summary>
@@ -336,21 +344,23 @@
   "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libraries/TickMath.sol"
 }
 ```
+
 </details>
 
-**solc** (26.2 MB) — unsupported
+**solc** (26.0 MB) — unsupported
 
-**qiuxiang** (71.8 MB) — unsupported
+**qiuxiang** (71.6 MB) — unsupported
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (524.2 MB) — unsupported
+**nomicfoundation** (523.7 MB) — unsupported
 
 ---
 
 ## textDocument/hover
 
 **Request:**
+
 ```json
 {
   "id": 1,
@@ -370,7 +380,7 @@
 
 **Responses:**
 
-**mmsaki latest** (14.0ms, 52.7 MB) — function modifyLiquidity(struct Pool.State storage...
+**mmsaki v0.1.24** (14.1ms, 53.5 MB) — function modifyLiquidity(struct Pool.State storage...
 
 <details>
 <summary>Summary: <code>{ contents: { kind: "markdown", value: "```solidity
@@ -384,21 +394,23 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
   }
 }
 ```
+
 </details>
 
-**solc** (25.9 MB) — crash
+**solc** (26.0 MB) — crash
 
-**qiuxiang** (71.6 MB) — empty
+**qiuxiang** (72.3 MB) — empty
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (524.0 MB) — empty
+**nomicfoundation** (526.1 MB) — empty
 
 ---
 
 ## textDocument/references
 
 **Request:**
+
 ```json
 {
   "id": 1,
@@ -421,35 +433,48 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
 
 **Responses:**
 
-**mmsaki latest** (12.0ms, 52.8 MB) — 24 references
+**mmsaki v0.1.24** (11.4ms, 52.2 MB) — 24 references
 
 <details>
-<summary>Summary: <code>Array(24) [{ range: { end: { character: 33, line: 571 }, start: { character: 25, line: 571 } }, uri: "file:///Users/m...</code></summary>
+<summary>Summary: <code>Array(24) [{ range: { end: { character: 16, line: 8 }, start: { character: 8, line: 8 } }, uri: "file:///Users/meek/d...</code></summary>
 
 ```json
 [
   {
     "range": {
       "end": {
-        "character": 33,
-        "line": 571
+        "character": 16,
+        "line": 8
       },
       "start": {
-        "character": 25,
-        "line": 571
+        "character": 8,
+        "line": 8
       }
     },
     "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libraries/Pool.sol"
+  },
+  {
+    "range": {
+      "end": {
+        "character": 16,
+        "line": 9
+      },
+      "start": {
+        "character": 8,
+        "line": 9
+      }
+    },
+    "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libraries/TickMath.sol"
   },
   {
     "range": {
       "end": {
         "character": 41,
-        "line": 353
+        "line": 350
       },
       "start": {
         "character": 33,
-        "line": 353
+        "line": 350
       }
     },
     "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libraries/Pool.sol"
@@ -457,12 +482,12 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
   {
     "range": {
       "end": {
-        "character": 32,
-        "line": 96
+        "character": 40,
+        "line": 354
       },
       "start": {
-        "character": 24,
-        "line": 96
+        "character": 32,
+        "line": 354
       }
     },
     "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libraries/Pool.sol"
@@ -480,37 +505,26 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
     },
     "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libraries/Pool.sol"
   },
-  {
-    "range": {
-      "end": {
-        "character": 32,
-        "line": 95
-      },
-      "start": {
-        "character": 24,
-        "line": 95
-      }
-    },
-    "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libraries/Pool.sol"
-  },
   "... 19 more (24 total)"
 ]
 ```
+
 </details>
 
-**solc** (26.0 MB) — unsupported
+**solc** (25.8 MB) — unsupported
 
-**qiuxiang** (71.5 MB) — empty
+**qiuxiang** (71.2 MB) — empty
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (524.7 MB) — empty
+**nomicfoundation** (525.2 MB) — empty
 
 ---
 
 ## textDocument/completion
 
 **Request:**
+
 ```json
 {
   "id": 1,
@@ -534,7 +548,7 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
 
 **Responses:**
 
-**mmsaki latest** (0.2ms, 54.0 MB) — 28 items (slot0, feeGrowthGlobal0X128, feeGrowthGlobal1X128)
+**mmsaki v0.1.24** (0.2ms, 54.2 MB) — 28 items (slot0, feeGrowthGlobal0X128, feeGrowthGlobal1X128)
 
 <details>
 <summary>Summary: <code>{ isIncomplete: false, items: Array(28) [{ detail: "Slot0", kind: 5, label: "slot0" }, { detail: "uint256", kind: 5, ...</code></summary>
@@ -572,11 +586,12 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
   ]
 }
 ```
+
 </details>
 
-**solc** (25.8 MB) — unsupported
+**solc** (25.9 MB) — unsupported
 
-**qiuxiang** (0.3ms, 71.5 MB) — 7 items (slot0, feeGrowthGlobal0X128, feeGrowthGlobal1X128)
+**qiuxiang** (0.3ms, 71.1 MB) — 7 items (slot0, feeGrowthGlobal0X128, feeGrowthGlobal1X128)
 
 <details>
 <summary>Summary: <code>Array(7) [{ detail: "(member) Slot0 slot0", kind: 6, label: "slot0" }, { detail: "(member) uint256 feeGrowthGlobal0X1...</code></summary>
@@ -611,11 +626,12 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
   "... 2 more (7 total)"
 ]
 ```
+
 </details>
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (16.0ms, 525.1 MB) — 7 items (slot0, feeGrowthGlobal0X128, feeGrowthGlobal1X128)
+**nomicfoundation** (17.5ms, 527.0 MB) — 7 items (slot0, feeGrowthGlobal0X128, feeGrowthGlobal1X128)
 
 <details>
 <summary>Summary: <code>{ isIncomplete: false, items: Array(7) [{ documentation: { kind: "markdown", value: "*(variable)* Slot0 slot0" }, kin...</code></summary>
@@ -668,6 +684,7 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
   ]
 }
 ```
+
 </details>
 
 ---
@@ -675,6 +692,7 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
 ## textDocument/signatureHelp
 
 **Request:**
+
 ```json
 {
   "id": 1,
@@ -694,7 +712,7 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
 
 **Responses:**
 
-**mmsaki latest** (11.7ms, 53.3 MB) — function getTickAtSqrtPrice(uint160 sqrtPriceX96) ...
+**mmsaki v0.1.24** (12.7ms, 52.5 MB) — function getTickAtSqrtPrice(uint160 sqrtPriceX96) ...
 
 <details>
 <summary>Summary: <code>{ activeParameter: 0, activeSignature: 0, signatures: Array(1) [{ activeParameter: 0, label: "function getTickAtSqrtP...</code></summary>
@@ -719,21 +737,23 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
   ]
 }
 ```
+
 </details>
 
-**solc** (25.8 MB) — unsupported
+**solc** (25.9 MB) — unsupported
 
-**qiuxiang** (72.2 MB) — empty
+**qiuxiang** (70.4 MB) — empty
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (524.7 MB) — empty
+**nomicfoundation** (524.1 MB) — empty
 
 ---
 
 ## textDocument/rename
 
 **Request:**
+
 ```json
 {
   "id": 1,
@@ -754,7 +774,7 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
 
 **Responses:**
 
-**mmsaki latest** (20.1ms, 53.6 MB) — 13 edits in 1 files
+**mmsaki v0.1.24** (18.8ms, 54.0 MB) — 13 edits in 1 files
 
 <details>
 <summary>Summary: <code>{ changes: { file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/libraries/Pool.sol: Array(13) [...</code></summary>
@@ -768,11 +788,11 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
         "range": {
           "end": {
             "character": 30,
-            "line": 195
+            "line": 158
           },
           "start": {
             "character": 16,
-            "line": 195
+            "line": 158
           }
         }
       },
@@ -781,11 +801,11 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
         "range": {
           "end": {
             "character": 30,
-            "line": 158
+            "line": 195
           },
           "start": {
             "character": 16,
-            "line": 158
+            "line": 195
           }
         }
       },
@@ -793,12 +813,25 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
         "newText": "__lsp_bench_rename__",
         "range": {
           "end": {
-            "character": 29,
-            "line": 149
+            "character": 86,
+            "line": 225
           },
           "start": {
-            "character": 15,
-            "line": 149
+            "character": 72,
+            "line": 225
+          }
+        }
+      },
+      {
+        "newText": "__lsp_bench_rename__",
+        "range": {
+          "end": {
+            "character": 62,
+            "line": 160
+          },
+          "start": {
+            "character": 48,
+            "line": 160
           }
         }
       },
@@ -807,24 +840,11 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
         "range": {
           "end": {
             "character": 118,
-            "line": 213
+            "line": 219
           },
           "start": {
             "character": 104,
-            "line": 213
-          }
-        }
-      },
-      {
-        "newText": "__lsp_bench_rename__",
-        "range": {
-          "end": {
-            "character": 113,
-            "line": 161
-          },
-          "start": {
-            "character": 99,
-            "line": 161
+            "line": 219
           }
         }
       },
@@ -833,11 +853,12 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
   }
 }
 ```
+
 </details>
 
-**solc** (25.9 MB) — error
+**solc** (26.0 MB) — error
 
-**qiuxiang** (0.3ms, 72.3 MB) — 0 edits in 0 files
+**qiuxiang** (0.3ms, 71.7 MB) — 0 edits in 0 files
 
 <details>
 <summary>Summary: <code>{ changes: {} }</code></summary>
@@ -847,11 +868,12 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
   "changes": {}
 }
 ```
+
 </details>
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (0.6ms, 526.5 MB) — 0 edits in 0 files
+**nomicfoundation** (1.1ms, 525.3 MB) — 0 edits in 0 files
 
 <details>
 <summary>Summary: <code>{ changes: {} }</code></summary>
@@ -861,6 +883,7 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
   "changes": {}
 }
 ```
+
 </details>
 
 ---
@@ -868,6 +891,7 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
 ## textDocument/prepareRename
 
 **Request:**
+
 ```json
 {
   "id": 1,
@@ -887,7 +911,7 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
 
 **Responses:**
 
-**mmsaki latest** (0.2ms, 53.2 MB) — ready (line 102)
+**mmsaki v0.1.24** (0.5ms, 55.3 MB) — ready (line 102)
 
 <details>
 <summary>Summary: <code>{ end: { character: 23, line: 102 }, start: { character: 15, line: 102 } }</code></summary>
@@ -904,21 +928,23 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
   }
 }
 ```
+
 </details>
 
-**solc** (26.1 MB) — unsupported
+**solc** (26.0 MB) — unsupported
 
-**qiuxiang** (71.6 MB) — unsupported
+**qiuxiang** (70.2 MB) — unsupported
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (526.3 MB) — unsupported
+**nomicfoundation** (526.9 MB) — unsupported
 
 ---
 
 ## textDocument/documentSymbol
 
 **Request:**
+
 ```json
 {
   "id": 1,
@@ -934,7 +960,7 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
 
 **Responses:**
 
-**mmsaki latest** (2.5ms, 53.0 MB) — 16 symbols
+**mmsaki v0.1.24** (2.6ms, 54.3 MB) — 16 symbols
 
 <details>
 <summary>Summary: <code>Array(16) [{ kind: 15, name: "pragma solidity ^0.8.0", range: { end: { character: 23, line: 1 }, start: { character: ...</code></summary>
@@ -1064,15 +1090,16 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
   "... 11 more (16 total)"
 ]
 ```
+
 </details>
 
-**solc** (25.9 MB) — unsupported
+**solc** (26.0 MB) — unsupported
 
-**qiuxiang** (71.6 MB) — unsupported
+**qiuxiang** (70.3 MB) — unsupported
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (29.8ms, 524.0 MB) — 1 symbols
+**nomicfoundation** (29.7ms, 524.8 MB) — 1 symbols
 
 <details>
 <summary>Summary: <code>Array(1) [{ children: Array(30) [{ children: [], kind: 24, name: "TicksMisordered", range: { end: { character: 0, lin...</code></summary>
@@ -1233,6 +1260,7 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
   }
 ]
 ```
+
 </details>
 
 ---
@@ -1240,6 +1268,7 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
 ## textDocument/documentLink
 
 **Request:**
+
 ```json
 {
   "id": 1,
@@ -1255,7 +1284,7 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
 
 **Responses:**
 
-**mmsaki latest** (0.8ms, 52.9 MB) — 14 links
+**mmsaki v0.1.24** (1.0ms, 53.2 MB) — 14 links
 
 <details>
 <summary>Summary: <code>Array(14) [{ range: { end: { character: 38, line: 3 }, start: { character: 24, line: 3 } }, target: "file:///Users/me...</code></summary>
@@ -1335,6 +1364,7 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
   "... 9 more (14 total)"
 ]
 ```
+
 </details>
 
 **solc** (25.8 MB) — unsupported
@@ -1343,13 +1373,14 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (523.4 MB) — unsupported
+**nomicfoundation** (525.5 MB) — unsupported
 
 ---
 
 ## textDocument/formatting
 
 **Request:**
+
 ```json
 {
   "id": 1,
@@ -1369,7 +1400,7 @@ function modifyLiquidity(struct Pool.State storage self, struct P...</code></sum
 
 **Responses:**
 
-**mmsaki latest** (19.5ms, 54.1 MB) — 1 edits
+**mmsaki v0.1.24** (19.6ms, 54.1 MB) — 1 edits
 
 <details>
 <summary>Summary: <code>Array(1) [{ newText: "// SPDX-License-Identifier: BUSL-1.1
@@ -1394,19 +1425,20 @@ import {SafeCas...", range: { end...</code></summary>
   }
 ]
 ```
+
 </details>
 
-**solc** (276.3ms, 26.1 MB) — {"error":"Unknown method textDocument/fo...
+**solc** (275.4ms, 25.9 MB) — {"error":"Unknown method textDocument/fo...
 
 `[error]` `{ error: "Unknown method textDocument/formatting" }`
 
-**qiuxiang** (2.0ms, 71.3 MB) — {"error":"Request textDocument/formattin...
+**qiuxiang** (2.8ms, 70.3 MB) — {"error":"Request textDocument/formattin...
 
 `[error]` `{ error: "Request textDocument/formatting failed with message: resolveConfig.sync is no..." }`
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (430.4ms, 525.1 MB) — 1 edits
+**nomicfoundation** (422.8ms, 523.8 MB) — 1 edits
 
 <details>
 <summary>Summary: <code>Array(1) [{ newText: "// SPDX-License-Identifier: BUSL-1.1
@@ -1431,6 +1463,7 @@ import {SafeCas...", range: { end...</code></summary>
   }
 ]
 ```
+
 </details>
 
 ---
@@ -1438,6 +1471,7 @@ import {SafeCas...", range: { end...</code></summary>
 ## textDocument/inlayHint
 
 **Request:**
+
 ```json
 {
   "id": 1,
@@ -1463,7 +1497,7 @@ import {SafeCas...", range: { end...</code></summary>
 
 **Responses:**
 
-**mmsaki latest** (2.7ms, 52.5 MB) — 114 hints (value1:, value2:, value:)
+**mmsaki v0.1.24** (2.9ms, 54.3 MB) — 114 hints (value1:, value2:, value:)
 
 <details>
 <summary>Summary: <code>Array(114) [{ kind: 2, label: "value1:", paddingRight: true, position: { character: 72, line: 94 } }, { kind: 2, labe...</code></summary>
@@ -1518,21 +1552,23 @@ import {SafeCas...", range: { end...</code></summary>
   "... 109 more (114 total)"
 ]
 ```
+
 </details>
 
-**solc** (26.1 MB) — unsupported
+**solc** (25.8 MB) — unsupported
 
-**qiuxiang** (71.5 MB) — unsupported
+**qiuxiang** (71.9 MB) — unsupported
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (527.5 MB) — unsupported
+**nomicfoundation** (527.7 MB) — unsupported
 
 ---
 
 ## textDocument/semanticTokens/full
 
 **Request:**
+
 ```json
 {
   "id": 1,
@@ -1548,7 +1584,7 @@ import {SafeCas...", range: { end...</code></summary>
 
 **Responses:**
 
-**mmsaki latest** (3.7ms, 52.7 MB) — 697 tokens
+**mmsaki v0.1.24** (4.7ms, 53.4 MB) — 697 tokens
 
 <details>
 <summary>Summary: <code>{ data: Array(3485) [0, 0, 36, ... 3482 more], resultId: "2" }</code></summary>
@@ -1566,15 +1602,16 @@ import {SafeCas...", range: { end...</code></summary>
   "resultId": "2"
 }
 ```
+
 </details>
 
-**solc** (26.0 MB) — error
+**solc** (26.1 MB) — error
 
-**qiuxiang** (71.4 MB) — unsupported
+**qiuxiang** (71.1 MB) — unsupported
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (28.4ms, 524.6 MB) — 82 tokens
+**nomicfoundation** (30.5ms, 524.4 MB) — 82 tokens
 
 <details>
 <summary>Summary: <code>{ data: Array(410) [19, 8, 4, ... 407 more] }</code></summary>
@@ -1591,6 +1628,7 @@ import {SafeCas...", range: { end...</code></summary>
   ]
 }
 ```
+
 </details>
 
 ---
@@ -1598,6 +1636,7 @@ import {SafeCas...", range: { end...</code></summary>
 ## textDocument/semanticTokens/range
 
 **Request:**
+
 ```json
 {
   "id": 1,
@@ -1623,7 +1662,7 @@ import {SafeCas...", range: { end...</code></summary>
 
 **Responses:**
 
-**mmsaki latest** (2.5ms, 53.6 MB) — 274 tokens
+**mmsaki v0.1.24** (2.5ms, 53.6 MB) — 274 tokens
 
 <details>
 <summary>Summary: <code>{ data: Array(1370) [0, 0, 36, ... 1367 more] }</code></summary>
@@ -1640,21 +1679,23 @@ import {SafeCas...", range: { end...</code></summary>
   ]
 }
 ```
+
 </details>
 
-**solc** (26.0 MB) — unsupported
+**solc** (26.1 MB) — unsupported
 
-**qiuxiang** (71.3 MB) — unsupported
+**qiuxiang** (70.6 MB) — unsupported
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (525.0 MB) — unsupported
+**nomicfoundation** (527.8 MB) — unsupported
 
 ---
 
 ## workspace/symbol
 
 **Request:**
+
 ```json
 {
   "id": 1,
@@ -1668,7 +1709,7 @@ import {SafeCas...", range: { end...</code></summary>
 
 **Responses:**
 
-**mmsaki latest** (2.2ms, 52.7 MB) — 68 symbols
+**mmsaki v0.1.24** (2.2ms, 53.2 MB) — 68 symbols
 
 <details>
 <summary>Summary: <code>Array(68) [{ kind: 3, location: { range: { end: { character: 1, line: 612 }, start: { character: 0, line: 19 } }, uri...</code></summary>
@@ -1767,14 +1808,15 @@ import {SafeCas...", range: { end...</code></summary>
   "... 63 more (68 total)"
 ]
 ```
+
 </details>
 
-**solc** (25.8 MB) — unsupported
+**solc** (26.1 MB) — unsupported
 
-**qiuxiang** (71.1 MB) — unsupported
+**qiuxiang** (71.5 MB) — unsupported
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (526.0 MB) — unsupported
+**nomicfoundation** (524.4 MB) — unsupported
 
 ---

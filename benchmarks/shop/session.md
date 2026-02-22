@@ -6,7 +6,7 @@
 
 **Responses:**
 
-**mmsaki latest** (12.2ms) — ok
+**mmsaki v0.1.24** (7.0ms) — ok
 
 <details>
 <summary>Summary: <code>"ok"</code></summary>
@@ -14,9 +14,10 @@
 ```json
 "ok"
 ```
+
 </details>
 
-**solc** (122.5ms) — ok
+**solc** (116.6ms) — ok
 
 <details>
 <summary>Summary: <code>"ok"</code></summary>
@@ -24,9 +25,10 @@
 ```json
 "ok"
 ```
+
 </details>
 
-**qiuxiang** (93.0ms) — ok
+**qiuxiang** (137.3ms) — ok
 
 <details>
 <summary>Summary: <code>"ok"</code></summary>
@@ -34,9 +36,10 @@
 ```json
 "ok"
 ```
+
 </details>
 
-**juanfranblanco** (576.9ms) — ok
+**juanfranblanco** (570.2ms) — ok
 
 <details>
 <summary>Summary: <code>"ok"</code></summary>
@@ -44,9 +47,10 @@
 ```json
 "ok"
 ```
+
 </details>
 
-**nomicfoundation** (846.0ms) — ok
+**nomicfoundation** (854.0ms) — ok
 
 <details>
 <summary>Summary: <code>"ok"</code></summary>
@@ -54,6 +58,7 @@
 ```json
 "ok"
 ```
+
 </details>
 
 ---
@@ -64,7 +69,7 @@
 
 **Responses:**
 
-**mmsaki latest** (81.8ms, 12.8 MB) — 1 diagnostics
+**mmsaki v0.1.24** (78.7ms, 12.8 MB) — 1 diagnostics
 
 <details>
 <summary>Summary: <code>{ diagnostics: Array(1) [{ code: "asm-keccak256", message: "use of inefficient hashing mechanism; consider using inli...</code></summary>
@@ -92,9 +97,10 @@
   "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/example/Shop.sol"
 }
 ```
+
 </details>
 
-**solc** (2.7ms, 26.2 MB) — 0 diagnostics
+**solc** (2.4ms, 26.2 MB) — 0 diagnostics
 
 <details>
 <summary>Summary: <code>{ diagnostics: [], uri: "file:///Users/meek/developer/mmsaki/solidity-language-server/example/A.sol" }</code></summary>
@@ -105,9 +111,10 @@
   "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/example/A.sol"
 }
 ```
+
 </details>
 
-**qiuxiang** (275.8ms, 6.7 MB) — 0 diagnostics
+**qiuxiang** (216.8ms, 64.6 MB) — 0 diagnostics
 
 <details>
 <summary>Summary: <code>{ diagnostics: [], uri: "file:///Users/meek/developer/mmsaki/solidity-language-server/example/Shop.sol" }</code></summary>
@@ -118,9 +125,10 @@
   "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/example/Shop.sol"
 }
 ```
+
 </details>
 
-**juanfranblanco** (771.4ms, 6.6 MB) — 0 diagnostics
+**juanfranblanco** (872.8ms, 438.2 MB) — 0 diagnostics
 
 <details>
 <summary>Summary: <code>{ diagnostics: [], uri: "file:///Users/meek/developer/mmsaki/solidity-language-server/example/Shop.sol" }</code></summary>
@@ -131,9 +139,10 @@
   "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/example/Shop.sol"
 }
 ```
+
 </details>
 
-**nomicfoundation** (506.3ms, 6.6 MB) — 0 diagnostics
+**nomicfoundation** (512.9ms, 412.8 MB) — 0 diagnostics
 
 <details>
 <summary>Summary: <code>{ diagnostics: [], uri: "file:///Users/meek/developer/mmsaki/solidity-language-server/example/Shop.sol" }</code></summary>
@@ -144,6 +153,7 @@
   "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/example/Shop.sol"
 }
 ```
+
 </details>
 
 ---
@@ -154,7 +164,7 @@
 
 **Responses:**
 
-**mmsaki latest** (1.5ms, 12.6 MB) — delta
+**mmsaki v0.1.24** (1.5ms, 12.6 MB) — delta
 
 <details>
 <summary>Summary: <code>{ edits: [], resultId: "3" }</code></summary>
@@ -165,21 +175,23 @@
   "resultId": "3"
 }
 ```
+
 </details>
 
-**solc** (26.0 MB) — error
+**solc** (26.1 MB) — error
 
-**qiuxiang** (6.6 MB) — unsupported
+**qiuxiang** (64.0 MB) — unsupported
 
-**juanfranblanco** (6.6 MB) — unsupported
+**juanfranblanco** (438.3 MB) — unsupported
 
-**nomicfoundation** (6.6 MB) — unsupported
+**nomicfoundation** (413.5 MB) — unsupported
 
 ---
 
 ## textDocument/definition
 
 **Request:**
+
 ```json
 {
   "id": 1,
@@ -199,7 +211,7 @@
 
 **Responses:**
 
-**mmsaki latest** (3.2ms, 12.6 MB) — `Shop.sol:68`
+**mmsaki v0.1.24** (2.9ms, 12.8 MB) — `Shop.sol:68`
 
 <details>
 <summary>Summary: <code>{ range: { end: { character: 27, line: 68 }, start: { character: 22, line: 68 } }, uri: "file:///Users/meek/developer...</code></summary>
@@ -219,13 +231,14 @@
   "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/example/Shop.sol"
 }
 ```
+
 </details>
 
-**solc** (2.5ms, 25.9 MB) — empty
+**solc** (2.3ms, 25.8 MB) — empty
 
 `[empty]` `[]`
 
-**qiuxiang** (21.1ms, 6.6 MB) — `Shop.sol:121`
+**qiuxiang** (2.4ms, 64.5 MB) — `Shop.sol:121`
 
 <details>
 <summary>Summary: <code>{ range: { end: { character: 5, line: 121 }, start: { character: 2, line: 121 } }, uri: "file:///Users/meek/developer...</code></summary>
@@ -245,9 +258,10 @@
   "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/example/Shop.sol"
 }
 ```
+
 </details>
 
-**juanfranblanco** (70.0ms, 6.6 MB) — `Shop.sol:68`
+**juanfranblanco** (55.2ms, 427.5 MB) — `Shop.sol:68`
 
 <details>
 <summary>Summary: <code>Array(1) [{ range: { end: { character: 28, line: 68 }, start: { character: 4, line: 68 } }, uri: "file:///Users/meek/...</code></summary>
@@ -269,15 +283,17 @@
   }
 ]
 ```
+
 </details>
 
-**nomicfoundation** (1.4ms, 6.5 MB) — empty
+**nomicfoundation** (1.4ms, 408.6 MB) — empty
 
 ---
 
 ## textDocument/declaration
 
 **Request:**
+
 ```json
 {
   "id": 1,
@@ -297,7 +313,7 @@
 
 **Responses:**
 
-**mmsaki latest** (1.4ms, 12.7 MB) — `Shop.sol:68`
+**mmsaki v0.1.24** (1.5ms, 12.6 MB) — `Shop.sol:68`
 
 <details>
 <summary>Summary: <code>{ range: { end: { character: 27, line: 68 }, start: { character: 22, line: 68 } }, uri: "file:///Users/meek/developer...</code></summary>
@@ -317,21 +333,23 @@
   "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/example/Shop.sol"
 }
 ```
+
 </details>
 
-**solc** (26.0 MB) — unsupported
+**solc** (26.1 MB) — unsupported
 
-**qiuxiang** (6.7 MB) — unsupported
+**qiuxiang** (64.5 MB) — unsupported
 
-**juanfranblanco** (6.6 MB) — unsupported
+**juanfranblanco** (438.0 MB) — unsupported
 
-**nomicfoundation** (6.5 MB) — unsupported
+**nomicfoundation** (412.9 MB) — unsupported
 
 ---
 
 ## textDocument/hover
 
 **Request:**
+
 ```json
 {
   "id": 1,
@@ -351,7 +369,7 @@
 
 **Responses:**
 
-**mmsaki latest** (4.4ms, 12.7 MB) — function addTax(uint256 amount, uint16 tax, uint16...
+**mmsaki v0.1.24** (4.2ms, 12.5 MB) — function addTax(uint256 amount, uint16 tax, uint16...
 
 <details>
 <summary>Summary: <code>{ contents: { kind: "markdown", value: "```solidity
@@ -365,18 +383,19 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
   }
 }
 ```
+
 </details>
 
-**solc** (26.0 MB) — crash
+**solc** (26.1 MB) — crash
 
-**qiuxiang** (20.0ms, 6.7 MB) — empty
+**qiuxiang** (2.1ms, 64.3 MB) — empty
 
-**juanfranblanco** (67.2ms, 6.6 MB) — ### Function: addTax
+**juanfranblanco** (53.1ms, 426.8 MB) — ### Function: addTax
 
 <details>
 <summary>Summary: <code>{ contents: { kind: "markdown", value: "### Function: addTax
 #### Library: Transaction
-	function addTax(uint256 amoun...</code></summary>
+ function addTax(uint256 amoun...</code></summary>
 
 ```json
 {
@@ -386,15 +405,17 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
   }
 }
 ```
+
 </details>
 
-**nomicfoundation** (1.5ms, 6.6 MB) — empty
+**nomicfoundation** (1.4ms, 409.8 MB) — empty
 
 ---
 
 ## textDocument/references
 
 **Request:**
+
 ```json
 {
   "id": 1,
@@ -417,13 +438,65 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
 
 **Responses:**
 
-**mmsaki latest** (2.2ms, 12.7 MB) — 11 references
+**mmsaki v0.1.24** (2.3ms, 12.7 MB) — 11 references
 
 <details>
-<summary>Summary: <code>Array(11) [{ range: { end: { character: 45, line: 254 }, start: { character: 40, line: 254 } }, uri: "file:///Users/m...</code></summary>
+<summary>Summary: <code>Array(11) [{ range: { end: { character: 54, line: 258 }, start: { character: 49, line: 258 } }, uri: "file:///Users/m...</code></summary>
 
 ```json
 [
+  {
+    "range": {
+      "end": {
+        "character": 54,
+        "line": 258
+      },
+      "start": {
+        "character": 49,
+        "line": 258
+      }
+    },
+    "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/example/Shop.sol"
+  },
+  {
+    "range": {
+      "end": {
+        "character": 39,
+        "line": 225
+      },
+      "start": {
+        "character": 34,
+        "line": 225
+      }
+    },
+    "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/example/Shop.sol"
+  },
+  {
+    "range": {
+      "end": {
+        "character": 32,
+        "line": 69
+      },
+      "start": {
+        "character": 27,
+        "line": 69
+      }
+    },
+    "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/example/Shop.sol"
+  },
+  {
+    "range": {
+      "end": {
+        "character": 29,
+        "line": 245
+      },
+      "start": {
+        "character": 24,
+        "line": 245
+      }
+    },
+    "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/example/Shop.sol"
+  },
   {
     "range": {
       "end": {
@@ -437,68 +510,17 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
     },
     "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/example/Shop.sol"
   },
-  {
-    "range": {
-      "end": {
-        "character": 39,
-        "line": 210
-      },
-      "start": {
-        "character": 34,
-        "line": 210
-      }
-    },
-    "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/example/Shop.sol"
-  },
-  {
-    "range": {
-      "end": {
-        "character": 31,
-        "line": 130
-      },
-      "start": {
-        "character": 26,
-        "line": 130
-      }
-    },
-    "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/example/Shop.sol"
-  },
-  {
-    "range": {
-      "end": {
-        "character": 13,
-        "line": 121
-      },
-      "start": {
-        "character": 8,
-        "line": 121
-      }
-    },
-    "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/example/Shop.sol"
-  },
-  {
-    "range": {
-      "end": {
-        "character": 13,
-        "line": 255
-      },
-      "start": {
-        "character": 8,
-        "line": 255
-      }
-    },
-    "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/example/Shop.sol"
-  },
   "... 6 more (11 total)"
 ]
 ```
+
 </details>
 
-**solc** (2.3ms, 25.9 MB) — {"error":"Unknown method textDocument/re...
+**solc** (2.3ms, 26.1 MB) — {"error":"Unknown method textDocument/re...
 
 `[error]` `{ error: "Unknown method textDocument/references" }`
 
-**qiuxiang** (21.0ms, 6.6 MB) — 2 references
+**qiuxiang** (2.5ms, 64.4 MB) — 2 references
 
 <details>
 <summary>Summary: <code>Array(2) [{ range: { end: { character: 40, line: 40 }, start: { character: 29, line: 40 } }, uri: "file:///Users/meek...</code></summary>
@@ -533,9 +555,10 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
   }
 ]
 ```
+
 </details>
 
-**juanfranblanco** (71.2ms, 6.6 MB) — 42 references
+**juanfranblanco** (73.2ms, 433.1 MB) — 42 references
 
 <details>
 <summary>Summary: <code>Array(42) [{ range: { end: { character: 33, line: 69 }, start: { character: 4, line: 69 } }, uri: "file:///Users/meek...</code></summary>
@@ -610,9 +633,10 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
   "... 37 more (42 total)"
 ]
 ```
+
 </details>
 
-**nomicfoundation** (1.8ms, 6.6 MB) — 11 references
+**nomicfoundation** (1.5ms, 408.8 MB) — 11 references
 
 <details>
 <summary>Summary: <code>Array(11) [{ range: { end: { character: 32, line: 69 }, start: { character: 27, line: 69 } }, uri: "file:///Users/mee...</code></summary>
@@ -687,6 +711,7 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
   "... 6 more (11 total)"
 ]
 ```
+
 </details>
 
 ---
@@ -694,6 +719,7 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
 ## textDocument/completion
 
 **Request:**
+
 ```json
 {
   "id": 1,
@@ -717,7 +743,7 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
 
 **Responses:**
 
-**mmsaki latest** (0.2ms, 12.7 MB) — 5 items (buyer, nonce, amount)
+**mmsaki v0.1.24** (1.0ms, 12.6 MB) — 5 items (buyer, nonce, amount)
 
 <details>
 <summary>Summary: <code>{ isIncomplete: false, items: Array(5) [{ detail: "address", kind: 5, label: "buyer" }, { detail: "uint256", kind: 5,...</code></summary>
@@ -754,13 +780,14 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
   ]
 }
 ```
+
 </details>
 
-**solc** (2.3ms, 26.0 MB) — {"error":"Unknown method textDocument/co...
+**solc** (2.4ms, 25.8 MB) — {"error":"Unknown method textDocument/co...
 
 `[error]` `{ error: "Unknown method textDocument/completion" }`
 
-**qiuxiang** (20.2ms, 6.7 MB) — 3 items (data, sender, sig)
+**qiuxiang** (2.3ms, 64.8 MB) — 3 items (data, sender, sig)
 
 <details>
 <summary>Summary: <code>Array(3) [{ detail: "(member) bytes calldata", documentation: "complete calldata", kind: 10, label: "data" }, { detai...</code></summary>
@@ -787,19 +814,21 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
   }
 ]
 ```
+
 </details>
 
-**juanfranblanco** (55.1ms, 6.5 MB) — 0 items
+**juanfranblanco** (53.2ms, 428.1 MB) — 0 items
 
 `[empty]` `[]`
 
-**nomicfoundation** (37.5ms, 6.6 MB) — empty
+**nomicfoundation** (37.5ms, 410.0 MB) — empty
 
 ---
 
 ## textDocument/signatureHelp
 
 **Request:**
+
 ```json
 {
   "id": 1,
@@ -819,7 +848,7 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
 
 **Responses:**
 
-**mmsaki latest** (2.7ms, 12.7 MB) — function addTax(uint256 amount, uint16 tax, uint16...
+**mmsaki v0.1.24** (2.6ms, 12.6 MB) — function addTax(uint256 amount, uint16 tax, uint16...
 
 <details>
 <summary>Summary: <code>{ activeParameter: 1, activeSignature: 0, signatures: Array(1) [{ activeParameter: 1, label: "function addTax(uint256...</code></summary>
@@ -856,21 +885,23 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
   ]
 }
 ```
+
 </details>
 
-**solc** (26.1 MB) — unsupported
+**solc** (25.9 MB) — unsupported
 
-**qiuxiang** (6.6 MB) — empty
+**qiuxiang** (64.6 MB) — empty
 
-**juanfranblanco** (6.6 MB) — empty
+**juanfranblanco** (427.1 MB) — empty
 
-**nomicfoundation** (6.6 MB) — empty
+**nomicfoundation** (411.5 MB) — empty
 
 ---
 
 ## textDocument/rename
 
 **Request:**
+
 ```json
 {
   "id": 1,
@@ -891,7 +922,7 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
 
 **Responses:**
 
-**mmsaki latest** (4.0ms, 12.7 MB) — 3 edits in 1 files
+**mmsaki v0.1.24** (3.9ms, 12.7 MB) — 3 edits in 1 files
 
 <details>
 <summary>Summary: <code>{ changes: { file:///Users/meek/developer/mmsaki/solidity-language-server/example/Shop.sol: Array(3) [{ newText: "__l...</code></summary>
@@ -905,11 +936,11 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
         "range": {
           "end": {
             "character": 13,
-            "line": 258
+            "line": 121
           },
           "start": {
             "character": 8,
-            "line": 258
+            "line": 121
           }
         }
       },
@@ -931,11 +962,11 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
         "range": {
           "end": {
             "character": 13,
-            "line": 121
+            "line": 258
           },
           "start": {
             "character": 8,
-            "line": 121
+            "line": 258
           }
         }
       }
@@ -943,13 +974,14 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
   }
 }
 ```
+
 </details>
 
-**solc** (2.7ms, 26.1 MB) — {"error":"Unhandled exception: /solidity...
+**solc** (2.3ms, 26.0 MB) — {"error":"Unhandled exception: /solidity...
 
 `[error]` `{ error: "Unhandled exception: /solidity/libsolidity/interface/CompilerStack.cpp(1178):..." }`
 
-**qiuxiang** (22.0ms, 6.6 MB) — 2 edits in 1 files
+**qiuxiang** (2.6ms, 64.7 MB) — 2 edits in 1 files
 
 <details>
 <summary>Summary: <code>{ changes: { file:///Users/meek/developer/mmsaki/solidity-language-server/example/Shop.sol: Array(2) [{ newText: "__l...</code></summary>
@@ -988,13 +1020,14 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
   }
 }
 ```
+
 </details>
 
-**juanfranblanco** (66.0ms, 6.6 MB) — {"error":"Unhandled method textDocument/...
+**juanfranblanco** (50.4ms, 433.9 MB) — {"error":"Unhandled method textDocument/...
 
 `[error]` `{ error: "Unhandled method textDocument/rename" }`
 
-**nomicfoundation** (1.9ms, 6.6 MB) — 11 edits in 1 files
+**nomicfoundation** (1.7ms, 413.4 MB) — 11 edits in 1 files
 
 <details>
 <summary>Summary: <code>{ changes: { file:///Users/meek/developer/mmsaki/solidity-language-server/example/Shop.sol: Array(11) [{ newText: "__...</code></summary>
@@ -1073,6 +1106,7 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
   }
 }
 ```
+
 </details>
 
 ---
@@ -1080,6 +1114,7 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
 ## textDocument/prepareRename
 
 **Request:**
+
 ```json
 {
   "id": 1,
@@ -1099,7 +1134,7 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
 
 **Responses:**
 
-**mmsaki latest** (0.2ms, 12.6 MB) — ready (line 136)
+**mmsaki v0.1.24** (0.2ms, 12.7 MB) — ready (line 136)
 
 <details>
 <summary>Summary: <code>{ end: { character: 37, line: 136 }, start: { character: 32, line: 136 } }</code></summary>
@@ -1116,21 +1151,23 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
   }
 }
 ```
+
 </details>
 
-**solc** (25.9 MB) — unsupported
+**solc** (26.2 MB) — unsupported
 
-**qiuxiang** (6.6 MB) — unsupported
+**qiuxiang** (64.4 MB) — unsupported
 
-**juanfranblanco** (6.6 MB) — unsupported
+**juanfranblanco** (425.9 MB) — unsupported
 
-**nomicfoundation** (6.6 MB) — unsupported
+**nomicfoundation** (410.7 MB) — unsupported
 
 ---
 
 ## textDocument/documentSymbol
 
 **Request:**
+
 ```json
 {
   "id": 1,
@@ -1146,7 +1183,7 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
 
 **Responses:**
 
-**mmsaki latest** (1.2ms, 12.8 MB) — 3 symbols
+**mmsaki v0.1.24** (1.2ms, 12.5 MB) — 3 symbols
 
 <details>
 <summary>Summary: <code>Array(3) [{ kind: 15, name: "pragma solidity ^0.8.0", range: { end: { character: 23, line: 1 }, start: { character: 0...</code></summary>
@@ -1548,13 +1585,14 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
   }
 ]
 ```
+
 </details>
 
 **solc** (26.1 MB) — unsupported
 
-**qiuxiang** (6.6 MB) — unsupported
+**qiuxiang** (64.3 MB) — unsupported
 
-**juanfranblanco** (6.8ms, 6.6 MB) — 2 symbols
+**juanfranblanco** (13.7ms, 426.9 MB) — 2 symbols
 
 <details>
 <summary>Summary: <code>Array(2) [{ children: Array(3) [{ children: Array(4) [{ detail: "Input Parameter:  uint256", kind: 13, name: "amount"...</code></summary>
@@ -2382,9 +2420,10 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
   }
 ]
 ```
+
 </details>
 
-**nomicfoundation** (16.0ms, 6.6 MB) — 2 symbols
+**nomicfoundation** (14.4ms, 407.0 MB) — 2 symbols
 
 <details>
 <summary>Summary: <code>Array(2) [{ children: Array(3) [{ children: Array(5) [{ children: [], kind: 7, name: "buyer", range: { end: { charact...</code></summary>
@@ -2772,6 +2811,7 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
   }
 ]
 ```
+
 </details>
 
 ---
@@ -2779,6 +2819,7 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
 ## textDocument/documentLink
 
 **Request:**
+
 ```json
 {
   "id": 1,
@@ -2794,21 +2835,22 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
 
 **Responses:**
 
-**mmsaki latest** (12.7 MB) — empty
+**mmsaki v0.1.24** (12.8 MB) — empty
 
-**solc** (26.0 MB) — unsupported
+**solc** (26.2 MB) — unsupported
 
-**qiuxiang** (6.7 MB) — unsupported
+**qiuxiang** (64.4 MB) — unsupported
 
-**juanfranblanco** (6.6 MB) — unsupported
+**juanfranblanco** (438.5 MB) — unsupported
 
-**nomicfoundation** (6.6 MB) — unsupported
+**nomicfoundation** (412.0 MB) — unsupported
 
 ---
 
 ## textDocument/formatting
 
 **Request:**
+
 ```json
 {
   "id": 1,
@@ -2828,7 +2870,7 @@ function addTax(uint256 amount, uint16 tax, uint16 base) internal...</code></sum
 
 **Responses:**
 
-**mmsaki latest** (12.7ms, 12.8 MB) — 1 edits
+**mmsaki v0.1.24** (11.1ms, 12.5 MB) — 1 edits
 
 <details>
 <summary>Summary: <code>Array(1) [{ newText: "// SPDX-License-Identifier: MIT
@@ -2854,21 +2896,22 @@ pragma solidity ^0.8.0;
   }
 ]
 ```
+
 </details>
 
-**solc** (2.5ms, 26.0 MB) — {"error":"Unknown method textDocument/fo...
+**solc** (2.3ms, 26.1 MB) — {"error":"Unknown method textDocument/fo...
 
 `[error]` `{ error: "Unknown method textDocument/formatting" }`
 
-**qiuxiang** (18.6ms, 6.6 MB) — {"error":"Request textDocument/formattin...
+**qiuxiang** (1.8ms, 64.4 MB) — {"error":"Request textDocument/formattin...
 
 `[error]` `{ error: "Request textDocument/formatting failed with message: resolveConfig.sync is no..." }`
 
-**juanfranblanco** (67.7ms, 6.6 MB) — {"error":"Unhandled method textDocument/...
+**juanfranblanco** (62.1ms, 432.6 MB) — {"error":"Unhandled method textDocument/...
 
 `[error]` `{ error: "Unhandled method textDocument/formatting" }`
 
-**nomicfoundation** (175.7ms, 6.6 MB) — 1 edits
+**nomicfoundation** (189.1ms, 412.2 MB) — 1 edits
 
 <details>
 <summary>Summary: <code>Array(1) [{ newText: "// SPDX-License-Identifier: MIT
@@ -2894,6 +2937,7 @@ pragma solidity ^0.8.0;
   }
 ]
 ```
+
 </details>
 
 ---
@@ -2901,6 +2945,7 @@ pragma solidity ^0.8.0;
 ## textDocument/inlayHint
 
 **Request:**
+
 ```json
 {
   "id": 1,
@@ -2926,7 +2971,7 @@ pragma solidity ^0.8.0;
 
 **Responses:**
 
-**mmsaki latest** (1.9ms, 12.6 MB) — 24 hints (tax:, base:, buyer:)
+**mmsaki v0.1.24** (1.5ms, 12.7 MB) — 24 hints (tax:, base:, buyer:)
 
 <details>
 <summary>Summary: <code>Array(24) [{ kind: 2, label: "tax:", paddingRight: true, position: { character: 12, line: 143 } }, { kind: 2, label: ...</code></summary>
@@ -2981,21 +3026,23 @@ pragma solidity ^0.8.0;
   "... 19 more (24 total)"
 ]
 ```
+
 </details>
 
-**solc** (26.1 MB) — unsupported
+**solc** (26.2 MB) — unsupported
 
-**qiuxiang** (6.6 MB) — unsupported
+**qiuxiang** (64.3 MB) — unsupported
 
-**juanfranblanco** (6.6 MB) — unsupported
+**juanfranblanco** (433.0 MB) — unsupported
 
-**nomicfoundation** (6.6 MB) — unsupported
+**nomicfoundation** (408.3 MB) — unsupported
 
 ---
 
 ## textDocument/semanticTokens/full
 
 **Request:**
+
 ```json
 {
   "id": 1,
@@ -3011,7 +3058,7 @@ pragma solidity ^0.8.0;
 
 **Responses:**
 
-**mmsaki latest** (1.6ms, 12.6 MB) — 451 tokens
+**mmsaki v0.1.24** (1.6ms, 12.7 MB) — 451 tokens
 
 <details>
 <summary>Summary: <code>{ data: Array(2255) [0, 0, 31, ... 2252 more], resultId: "2" }</code></summary>
@@ -3029,15 +3076,16 @@ pragma solidity ^0.8.0;
   "resultId": "2"
 }
 ```
+
 </details>
 
-**solc** (26.2 MB) — error
+**solc** (25.9 MB) — error
 
-**qiuxiang** (6.6 MB) — unsupported
+**qiuxiang** (64.4 MB) — unsupported
 
-**juanfranblanco** (6.5 MB) — unsupported
+**juanfranblanco** (435.2 MB) — unsupported
 
-**nomicfoundation** (14.3ms, 6.6 MB) — 56 tokens
+**nomicfoundation** (13.8ms, 408.9 MB) — 56 tokens
 
 <details>
 <summary>Summary: <code>{ data: Array(280) [21, 8, 11, ... 277 more] }</code></summary>
@@ -3054,6 +3102,7 @@ pragma solidity ^0.8.0;
   ]
 }
 ```
+
 </details>
 
 ---
@@ -3061,6 +3110,7 @@ pragma solidity ^0.8.0;
 ## textDocument/semanticTokens/range
 
 **Request:**
+
 ```json
 {
   "id": 1,
@@ -3086,7 +3136,7 @@ pragma solidity ^0.8.0;
 
 **Responses:**
 
-**mmsaki latest** (1.0ms, 12.7 MB) — 160 tokens
+**mmsaki v0.1.24** (1.0ms, 12.6 MB) — 160 tokens
 
 <details>
 <summary>Summary: <code>{ data: Array(800) [0, 0, 31, ... 797 more] }</code></summary>
@@ -3103,21 +3153,23 @@ pragma solidity ^0.8.0;
   ]
 }
 ```
+
 </details>
 
 **solc** (25.9 MB) — unsupported
 
-**qiuxiang** (6.7 MB) — unsupported
+**qiuxiang** (64.5 MB) — unsupported
 
-**juanfranblanco** (6.5 MB) — unsupported
+**juanfranblanco** (425.7 MB) — unsupported
 
-**nomicfoundation** (6.6 MB) — unsupported
+**nomicfoundation** (408.1 MB) — unsupported
 
 ---
 
 ## workspace/symbol
 
 **Request:**
+
 ```json
 {
   "id": 1,
@@ -3131,7 +3183,7 @@ pragma solidity ^0.8.0;
 
 **Responses:**
 
-**mmsaki latest** (1.1ms, 12.6 MB) — 61 symbols
+**mmsaki v0.1.24** (1.1ms, 12.7 MB) — 61 symbols
 
 <details>
 <summary>Summary: <code>Array(61) [{ kind: 3, location: { range: { end: { character: 1, line: 53 }, start: { character: 0, line: 21 } }, uri:...</code></summary>
@@ -3230,14 +3282,15 @@ pragma solidity ^0.8.0;
   "... 56 more (61 total)"
 ]
 ```
+
 </details>
 
 **solc** (25.9 MB) — unsupported
 
-**qiuxiang** (6.7 MB) — unsupported
+**qiuxiang** (64.6 MB) — unsupported
 
-**juanfranblanco** (6.6 MB) — timeout
+**juanfranblanco** (418.3 MB) — timeout
 
-**nomicfoundation** (6.6 MB) — unsupported
+**nomicfoundation** (409.3 MB) — unsupported
 
 ---

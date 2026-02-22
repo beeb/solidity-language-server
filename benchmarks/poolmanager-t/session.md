@@ -6,7 +6,7 @@
 
 **Responses:**
 
-**mmsaki latest** (12.5ms) — ok
+**mmsaki latest** (7.8ms) — ok
 
 <details>
 <summary>Summary: <code>"ok"</code></summary>
@@ -16,7 +16,7 @@
 ```
 </details>
 
-**solc** (124.6ms) — ok
+**solc** (122.4ms) — ok
 
 <details>
 <summary>Summary: <code>"ok"</code></summary>
@@ -26,7 +26,7 @@
 ```
 </details>
 
-**qiuxiang** (113.2ms) — ok
+**qiuxiang** (113.9ms) — ok
 
 <details>
 <summary>Summary: <code>"ok"</code></summary>
@@ -36,7 +36,7 @@
 ```
 </details>
 
-**juanfranblanco** (552.3ms) — ok
+**juanfranblanco** (546.7ms) — ok
 
 <details>
 <summary>Summary: <code>"ok"</code></summary>
@@ -46,7 +46,7 @@
 ```
 </details>
 
-**nomicfoundation** (873.6ms) — ok
+**nomicfoundation** (862.3ms) — ok
 
 <details>
 <summary>Summary: <code>"ok"</code></summary>
@@ -64,7 +64,7 @@
 
 **Responses:**
 
-**mmsaki latest** (2.2s, 229.1 MB) — 15 diagnostics
+**mmsaki latest** (2.3s, 228.5 MB) — 15 diagnostics
 
 <details>
 <summary>Summary: <code>{ diagnostics: Array(15) [{ code: "mixed-case-variable", message: "mutable variables should use mixedCase", range: { ...</code></summary>
@@ -159,7 +159,7 @@
 ```
 </details>
 
-**solc** (155.5ms, 26.1 MB) — 0 diagnostics
+**solc** (154.4ms, 26.2 MB) — 0 diagnostics
 
 <details>
 <summary>Summary: <code>{ diagnostics: [], uri: "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/lib/forg..." }</code></summary>
@@ -172,7 +172,7 @@
 ```
 </details>
 
-**qiuxiang** (204.4ms, 62.6 MB) — 1 diagnostics
+**qiuxiang** (208.6ms, 62.7 MB) — 1 diagnostics
 
 <details>
 <summary>Summary: <code>{ diagnostics: Array(1) [{ code: "6275", message: "ParserError: Source "forge-std/Test.sol" not found: File not found...</code></summary>
@@ -203,7 +203,7 @@
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (2.7s, 661.5 MB) — 1 diagnostics
+**nomicfoundation** (2.6s, 661.0 MB) — 1 diagnostics
 
 <details>
 <summary>Summary: <code>{ diagnostics: Array(1) [{ code: "6275", message: "Source "forge-std/Test.sol" not found: File not found. Searched th...</code></summary>
@@ -241,7 +241,7 @@
 
 **Responses:**
 
-**mmsaki latest** (12.1ms, 227.7 MB) — delta
+**mmsaki latest** (9.8ms, 229.0 MB) — delta
 
 <details>
 <summary>Summary: <code>{ edits: [], resultId: "3" }</code></summary>
@@ -256,11 +256,11 @@
 
 **solc** (26.0 MB) — error
 
-**qiuxiang** (62.3 MB) — unsupported
+**qiuxiang** (62.8 MB) — unsupported
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (659.6 MB) — unsupported
+**nomicfoundation** (660.4 MB) — unsupported
 
 ---
 
@@ -286,7 +286,7 @@
 
 **Responses:**
 
-**mmsaki latest** (138.9ms, 227.5 MB) — `TickMath.sol:9`
+**mmsaki latest** (139.4ms, 226.8 MB) — `TickMath.sol:9`
 
 <details>
 <summary>Summary: <code>{ range: { end: { character: 16, line: 9 }, start: { character: 8, line: 9 } }, uri: "file:///Users/meek/developer/mm...</code></summary>
@@ -308,13 +308,13 @@
 ```
 </details>
 
-**solc** (25.9 MB) — empty
+**solc** (26.0 MB) — empty
 
-**qiuxiang** (62.4 MB) — empty
+**qiuxiang** (62.6 MB) — empty
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (658.0 MB) — empty
+**nomicfoundation** (661.4 MB) — empty
 
 ---
 
@@ -340,7 +340,7 @@
 
 **Responses:**
 
-**mmsaki latest** (133.2ms, 227.8 MB) — `TickMath.sol:9`
+**mmsaki latest** (133.1ms, 228.3 MB) — `TickMath.sol:9`
 
 <details>
 <summary>Summary: <code>{ range: { end: { character: 16, line: 9 }, start: { character: 8, line: 9 } }, uri: "file:///Users/meek/developer/mm...</code></summary>
@@ -362,13 +362,13 @@
 ```
 </details>
 
-**solc** (25.8 MB) — unsupported
+**solc** (26.0 MB) — unsupported
 
-**qiuxiang** (62.3 MB) — unsupported
+**qiuxiang** (62.6 MB) — unsupported
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (657.8 MB) — unsupported
+**nomicfoundation** (660.1 MB) — unsupported
 
 ---
 
@@ -394,7 +394,7 @@
 
 **Responses:**
 
-**mmsaki latest** (242.6ms, 227.7 MB) — error PoolNotInitialized()
+**mmsaki latest** (239.8ms, 227.2 MB) — error PoolNotInitialized()
 
 <details>
 <summary>Summary: <code>{ contents: { kind: "markdown", value: "```solidity
@@ -416,13 +416,13 @@ Throw...</code></summary>
 ```
 </details>
 
-**solc** (25.9 MB) — crash
+**solc** (26.0 MB) — crash
 
-**qiuxiang** (62.2 MB) — empty
+**qiuxiang** (62.5 MB) — empty
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (658.0 MB) — empty
+**nomicfoundation** (659.8 MB) — empty
 
 ---
 
@@ -451,13 +451,39 @@ Throw...</code></summary>
 
 **Responses:**
 
-**mmsaki latest** (137.9ms, 227.0 MB) — 7 references
+**mmsaki latest** (136.8ms, 228.8 MB) — 7 references
 
 <details>
-<summary>Summary: <code>Array(7) [{ range: { end: { character: 62, line: 97 }, start: { character: 46, line: 97 } }, uri: "file:///Users/meek...</code></summary>
+<summary>Summary: <code>Array(7) [{ range: { end: { character: 62, line: 107 }, start: { character: 46, line: 107 } }, uri: "file:///Users/me...</code></summary>
 
 ```json
 [
+  {
+    "range": {
+      "end": {
+        "character": 62,
+        "line": 107
+      },
+      "start": {
+        "character": 46,
+        "line": 107
+      }
+    },
+    "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/test/PoolManager.t.sol"
+  },
+  {
+    "range": {
+      "end": {
+        "character": 28,
+        "line": 70
+      },
+      "start": {
+        "character": 12,
+        "line": 70
+      }
+    },
+    "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/test/utils/Deployers.sol"
+  },
   {
     "range": {
       "end": {
@@ -470,32 +496,6 @@ Throw...</code></summary>
       }
     },
     "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/test/PoolManager.t.sol"
-  },
-  {
-    "range": {
-      "end": {
-        "character": 24,
-        "line": 206
-      },
-      "start": {
-        "character": 8,
-        "line": 206
-      }
-    },
-    "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/test/utils/Deployers.sol"
-  },
-  {
-    "range": {
-      "end": {
-        "character": 24,
-        "line": 208
-      },
-      "start": {
-        "character": 8,
-        "line": 208
-      }
-    },
-    "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/test/utils/Deployers.sol"
   },
   {
     "range": {
@@ -513,12 +513,12 @@ Throw...</code></summary>
   {
     "range": {
       "end": {
-        "character": 62,
-        "line": 107
+        "character": 48,
+        "line": 102
       },
       "start": {
-        "character": 46,
-        "line": 107
+        "character": 32,
+        "line": 102
       }
     },
     "uri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/test/PoolManager.t.sol"
@@ -530,11 +530,11 @@ Throw...</code></summary>
 
 **solc** (25.9 MB) — unsupported
 
-**qiuxiang** (62.5 MB) — empty
+**qiuxiang** (62.7 MB) — empty
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (659.1 MB) — empty
+**nomicfoundation** (659.3 MB) — empty
 
 ---
 
@@ -564,7 +564,7 @@ Throw...</code></summary>
 
 **Responses:**
 
-**mmsaki latest** (4.8s, 227.6 MB) — 23 items (amount0, amount1, checkTicks)
+**mmsaki latest** (0.7ms, 228.2 MB) — 23 items (amount0, amount1, checkTicks)
 
 <details>
 <summary>Summary: <code>{ isIncomplete: false, items: Array(23) [{ detail: "amount0(BalanceDelta balanceDelta) returns (int128 _amount0)", ki...</code></summary>
@@ -604,13 +604,13 @@ Throw...</code></summary>
 ```
 </details>
 
-**solc** (25.9 MB) — unsupported
+**solc** (26.0 MB) — unsupported
 
-**qiuxiang** (62.2 MB) — empty
+**qiuxiang** (62.7 MB) — empty
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (659.9 MB) — empty
+**nomicfoundation** (660.1 MB) — empty
 
 ---
 
@@ -636,7 +636,7 @@ Throw...</code></summary>
 
 **Responses:**
 
-**mmsaki latest** (33.2ms, 227.6 MB) — function bound(uint256 x, uint256 min, uint256 max...
+**mmsaki latest** (33.5ms, 227.9 MB) — function bound(uint256 x, uint256 min, uint256 max...
 
 <details>
 <summary>Summary: <code>{ activeParameter: 0, activeSignature: 0, signatures: Array(1) [{ activeParameter: 0, label: "function bound(uint256 ...</code></summary>
@@ -675,13 +675,13 @@ Throw...</code></summary>
 ```
 </details>
 
-**solc** (26.1 MB) — unsupported
+**solc** (26.2 MB) — unsupported
 
-**qiuxiang** (62.4 MB) — empty
+**qiuxiang** (62.6 MB) — empty
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (659.9 MB) — empty
+**nomicfoundation** (657.8 MB) — empty
 
 ---
 
@@ -708,7 +708,7 @@ Throw...</code></summary>
 
 **Responses:**
 
-**mmsaki latest** (270.5ms, 227.9 MB) — 9 edits in 1 files
+**mmsaki latest** (266.3ms, 228.8 MB) — 9 edits in 1 files
 
 <details>
 <summary>Summary: <code>{ changes: { file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/test/PoolManager.t.sol: Array(9) [{...</code></summary>
@@ -717,6 +717,19 @@ Throw...</code></summary>
 {
   "changes": {
     "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/test/PoolManager.t.sol": [
+      {
+        "newText": "__lsp_bench_rename__",
+        "range": {
+          "end": {
+            "character": 81,
+            "line": 266
+          },
+          "start": {
+            "character": 72,
+            "line": 266
+          }
+        }
+      },
       {
         "newText": "__lsp_bench_rename__",
         "range": {
@@ -734,12 +747,12 @@ Throw...</code></summary>
         "newText": "__lsp_bench_rename__",
         "range": {
           "end": {
-            "character": 17,
-            "line": 258
+            "character": 42,
+            "line": 266
           },
           "start": {
-            "character": 8,
-            "line": 258
+            "character": 33,
+            "line": 266
           }
         }
       },
@@ -760,25 +773,12 @@ Throw...</code></summary>
         "newText": "__lsp_bench_rename__",
         "range": {
           "end": {
-            "character": 17,
-            "line": 259
+            "character": 27,
+            "line": 254
           },
           "start": {
-            "character": 8,
-            "line": 259
-          }
-        }
-      },
-      {
-        "newText": "__lsp_bench_rename__",
-        "range": {
-          "end": {
-            "character": 57,
-            "line": 256
-          },
-          "start": {
-            "character": 48,
-            "line": 256
+            "character": 18,
+            "line": 254
           }
         }
       },
@@ -789,9 +789,9 @@ Throw...</code></summary>
 ```
 </details>
 
-**solc** (26.0 MB) — error
+**solc** (26.1 MB) — error
 
-**qiuxiang** (0.3ms, 62.4 MB) — 0 edits in 0 files
+**qiuxiang** (0.3ms, 62.5 MB) — 0 edits in 0 files
 
 <details>
 <summary>Summary: <code>{ changes: {} }</code></summary>
@@ -805,7 +805,7 @@ Throw...</code></summary>
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (0.8ms, 658.0 MB) — 0 edits in 0 files
+**nomicfoundation** (0.7ms, 660.5 MB) — 0 edits in 0 files
 
 <details>
 <summary>Summary: <code>{ changes: {} }</code></summary>
@@ -841,7 +841,7 @@ Throw...</code></summary>
 
 **Responses:**
 
-**mmsaki latest** (0.2ms, 227.2 MB) — ready (line 116)
+**mmsaki latest** (0.2ms, 228.2 MB) — ready (line 116)
 
 <details>
 <summary>Summary: <code>{ end: { character: 59, line: 116 }, start: { character: 51, line: 116 } }</code></summary>
@@ -862,11 +862,11 @@ Throw...</code></summary>
 
 **solc** (25.9 MB) — unsupported
 
-**qiuxiang** (62.6 MB) — unsupported
+**qiuxiang** (62.5 MB) — unsupported
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (660.3 MB) — unsupported
+**nomicfoundation** (659.8 MB) — unsupported
 
 ---
 
@@ -888,7 +888,7 @@ Throw...</code></summary>
 
 **Responses:**
 
-**mmsaki latest** (6.2ms, 227.1 MB) — 35 symbols
+**mmsaki latest** (6.2ms, 227.2 MB) — 35 symbols
 
 <details>
 <summary>Summary: <code>Array(35) [{ kind: 15, name: "pragma solidity ^0.8.20", range: { end: { character: 24, line: 1 }, start: { character:...</code></summary>
@@ -1020,13 +1020,13 @@ Throw...</code></summary>
 ```
 </details>
 
-**solc** (25.7 MB) — unsupported
+**solc** (26.2 MB) — unsupported
 
-**qiuxiang** (62.4 MB) — unsupported
+**qiuxiang** (62.8 MB) — unsupported
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (90.0ms, 658.0 MB) — 1 symbols
+**nomicfoundation** (98.7ms, 660.8 MB) — 1 symbols
 
 <details>
 <summary>Summary: <code>Array(1) [{ children: Array(89) [{ children: [], kind: 24, name: "UnlockCallback", range: { end: { character: 0, line...</code></summary>
@@ -1209,7 +1209,7 @@ Throw...</code></summary>
 
 **Responses:**
 
-**mmsaki latest** (2.7ms, 227.2 MB) — 33 links
+**mmsaki latest** (2.2ms, 227.4 MB) — 33 links
 
 <details>
 <summary>Summary: <code>Array(33) [{ range: { end: { character: 38, line: 3 }, start: { character: 20, line: 3 } }, target: "file:///Users/me...</code></summary>
@@ -1293,11 +1293,11 @@ Throw...</code></summary>
 
 **solc** (26.0 MB) — unsupported
 
-**qiuxiang** (62.3 MB) — unsupported
+**qiuxiang** (62.4 MB) — unsupported
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (659.0 MB) — unsupported
+**nomicfoundation** (659.6 MB) — unsupported
 
 ---
 
@@ -1323,7 +1323,7 @@ Throw...</code></summary>
 
 **Responses:**
 
-**mmsaki latest** (21.0ms, 227.3 MB) — 1 edits
+**mmsaki latest** (20.4ms, 226.7 MB) — 1 edits
 
 <details>
 <summary>Summary: <code>Array(1) [{ newText: "// SPDX-License-Identifier: UNLICENSED
@@ -1350,17 +1350,17 @@ import {Test...", range: { end...</code></summary>
 ```
 </details>
 
-**solc** (275.9ms, 26.0 MB) — {"error":"Unknown method textDocument/fo...
+**solc** (271.0ms, 26.1 MB) — {"error":"Unknown method textDocument/fo...
 
 `[error]` `{ error: "Unknown method textDocument/formatting" }`
 
-**qiuxiang** (1.9ms, 62.5 MB) — {"error":"Request textDocument/formattin...
+**qiuxiang** (2.4ms, 62.4 MB) — {"error":"Request textDocument/formattin...
 
 `[error]` `{ error: "Request textDocument/formatting failed with message: resolveConfig.sync is no..." }`
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (1.0s, 659.0 MB) — 1 edits
+**nomicfoundation** (992.5ms, 659.5 MB) — 1 edits
 
 <details>
 <summary>Summary: <code>Array(1) [{ newText: "// SPDX-License-Identifier: UNLICENSED
@@ -1417,7 +1417,7 @@ import {Test...", range: { end...</code></summary>
 
 **Responses:**
 
-**mmsaki latest** (32.8ms, 228.2 MB) — 1080 hints (name:, hooks:, name:)
+**mmsaki latest** (9.1ms, 226.9 MB) — 1080 hints (name:, hooks:, name:)
 
 <details>
 <summary>Summary: <code>Array(1080) [{ kind: 2, label: "name:", paddingRight: true, position: { character: 40, line: 76 } }, { kind: 2, label...</code></summary>
@@ -1476,11 +1476,11 @@ import {Test...", range: { end...</code></summary>
 
 **solc** (26.1 MB) — unsupported
 
-**qiuxiang** (62.5 MB) — unsupported
+**qiuxiang** (62.8 MB) — unsupported
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (659.8 MB) — unsupported
+**nomicfoundation** (661.2 MB) — unsupported
 
 ---
 
@@ -1502,7 +1502,7 @@ import {Test...", range: { end...</code></summary>
 
 **Responses:**
 
-**mmsaki latest** (10.2ms, 228.7 MB) — 1512 tokens
+**mmsaki latest** (9.8ms, 227.8 MB) — 1512 tokens
 
 <details>
 <summary>Summary: <code>{ data: Array(7560) [0, 0, 38, ... 7557 more], resultId: "2" }</code></summary>
@@ -1522,13 +1522,13 @@ import {Test...", range: { end...</code></summary>
 ```
 </details>
 
-**solc** (26.1 MB) — error
+**solc** (25.9 MB) — error
 
-**qiuxiang** (62.4 MB) — unsupported
+**qiuxiang** (62.5 MB) — unsupported
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (89.9ms, 658.8 MB) — 385 tokens
+**nomicfoundation** (95.0ms, 657.6 MB) — 385 tokens
 
 <details>
 <summary>Summary: <code>{ data: Array(1925) [37, 9, 15, ... 1922 more] }</code></summary>
@@ -1577,7 +1577,7 @@ import {Test...", range: { end...</code></summary>
 
 **Responses:**
 
-**mmsaki latest** (6.8ms, 226.9 MB) — 417 tokens
+**mmsaki latest** (6.6ms, 228.2 MB) — 417 tokens
 
 <details>
 <summary>Summary: <code>{ data: Array(2085) [0, 0, 38, ... 2082 more] }</code></summary>
@@ -1596,13 +1596,13 @@ import {Test...", range: { end...</code></summary>
 ```
 </details>
 
-**solc** (25.9 MB) — unsupported
+**solc** (26.1 MB) — unsupported
 
-**qiuxiang** (62.7 MB) — unsupported
+**qiuxiang** (62.4 MB) — unsupported
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (659.2 MB) — unsupported
+**nomicfoundation** (658.7 MB) — unsupported
 
 ---
 
@@ -1622,7 +1622,7 @@ import {Test...", range: { end...</code></summary>
 
 **Responses:**
 
-**mmsaki latest** (6.1ms, 227.4 MB) — 90 symbols
+**mmsaki latest** (5.8ms, 228.0 MB) — 90 symbols
 
 <details>
 <summary>Summary: <code>Array(90) [{ kind: 5, location: { range: { end: { character: 1, line: 1261 }, start: { character: 0, line: 37 } }, ur...</code></summary>
@@ -1723,12 +1723,12 @@ import {Test...", range: { end...</code></summary>
 ```
 </details>
 
-**solc** (26.0 MB) — unsupported
+**solc** (25.7 MB) — unsupported
 
-**qiuxiang** (62.6 MB) — unsupported
+**qiuxiang** (62.2 MB) — unsupported
 
 **juanfranblanco** — crash
 
-**nomicfoundation** (659.3 MB) — unsupported
+**nomicfoundation** (659.5 MB) — unsupported
 
 ---
