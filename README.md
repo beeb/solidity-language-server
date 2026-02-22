@@ -16,22 +16,6 @@ cargo install solidity-language-server
 
 Or download a pre-built binary from the [latest release](https://github.com/mmsaki/solidity-language-server/releases/latest).
 
-## Features
-
-- **Go to Definition** / **Go to Declaration** — jump to any symbol across files
-- **Find References** — all usages of a symbol across the project
-- **Rename** — project-wide symbol rename with prepare support
-- **Hover** — signatures, NatSpec docs, function/error/event selectors, `@inheritdoc` resolution
-- **Completions** — scope-aware with two modes (fast cache vs full recomputation)
-- **Document Links** — clickable imports, type names, function calls
-- **Document Symbols** / **Workspace Symbols** — outline and search
-- **Formatting** — via `forge fmt`
-- **Diagnostics** — from `solc` and `forge lint`
-- **Signature Help** — parameter info on function calls, event emits, and mapping access
-- **Inlay Hints** — parameter names and gas estimates
-
-See [FEATURES.md](FEATURES.md) for the full LSP feature set and roadmap.
-
 ## Benchmarks
 
 ### Shop.sol (272 lines) — [full results](benchmarks/shop/README.md)
