@@ -14,7 +14,6 @@ index_timeout: 300
 exclude:
   - textDocument/typeDefinition
   - textDocument/implementation
-  - textDocument/foldingRange
   - textDocument/selectionRange
   - textDocument/codeLens
   - textDocument/documentColor

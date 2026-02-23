@@ -24,7 +24,6 @@ servers:
 exclude:
   - textDocument/typeDefinition
   - textDocument/implementation
-  - textDocument/foldingRange
   - textDocument/selectionRange
   - textDocument/codeLens
   - textDocument/documentColor
@@ -136,6 +135,6 @@ methods:
         # 10 extra blank lines at end — formatter should strip them
 
   textDocument/signatureHelp:
-    line: 143
-    col: 12
+    line: 136
+    col: 45
     # Inside addTax(TAX, TAX_BASE) — first argument position
