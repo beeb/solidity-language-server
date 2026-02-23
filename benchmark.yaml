@@ -12,6 +12,7 @@ index_timeout: 15
 output: benchmarks/v0.1.25
 report: README.md
 
+# Exclude unimplemented methods
 exclude:
   - textDocument/typeDefinition
   - textDocument/implementation
