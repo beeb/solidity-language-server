@@ -1,0 +1,93 @@
+# Solidity Language Server — PR benchmark config
+# Usage: cargo build --release && lsp-bench
+project: example
+file: Shop.sol
+line: 136
+col: 32
+
+iterations: 10
+warmup: 2
+timeout: 10
+index_timeout: 15
+output: benchmarks/v0.1.25
+report: README.md
+
+exclude:
+  - textDocument/typeDefinition
+  - textDocument/implementation
+  - textDocument/codeAction
+  - textDocument/codeLens
+  - textDocument/documentColor
+  - textDocument/colorPresentation
+  - textDocument/rangeFormatting
+  - textDocument/onTypeFormatting
+  - textDocument/selectionRange
+
+methods:
+  textDocument/completion:
+    line: 159
+    col: 18
+    trigger: "."
+
+  textDocument/signatureHelp:
+    line: 136
+    col: 47
+    # Inside PRICE.addTax(TAX, TAX_BASE) — parameter info on first arg
+
+  textDocument/documentHighlight:
+    line: 136
+    col: 32
+    # PRICE — immutable used across constructor and buy()
+
+  textDocument/inlayHint:
+    line: 134
+    col: 0
+    endLine: 146
+    endCol: 0
+    # buy() function body — parameter names + gas estimates
+
+  textDocument/semanticTokens/range:
+    startLine: 0
+    startCol: 0
+    line: 100
+    col: 0
+    # First 100 lines — library through contract declarations
+
+  textDocument/formatting:
+    didChange:
+      - file: Shop.unformatted.snapshot
+        line: 0
+        col: 0
+
+servers:
+  - label: v0.1.25
+    description: Latest version
+    cmd: ./target/release/solidity-language-server
+
+  - label: 0.1.24
+    description: Last deployed version
+    cmd: /Users/meek/.solidity-lsp/0.1.24/bin/solidity-language-server
+
+  # - label: solc
+  #   description: Official Solidity compiler LSP
+  #   link: https://docs.soliditylang.org
+  #   cmd: solc
+  #   args: ["--lsp"]
+  #
+  # - label: nomicfoundation
+  #   description: Hardhat/Nomic Foundation Solidity Language Server
+  #   link: https://github.com/NomicFoundation/hardhat-vscode
+  #   cmd: nomicfoundation-solidity-language-server
+  #   args: ["--stdio"]
+  #
+  # - label: juanfranblanco
+  #   description: VSCode Solidity by Juan Blanco
+  #   link: https://github.com/juanfranblanco/vscode-solidity
+  #   cmd: vscode-solidity-server
+  #   args: ["--stdio"]
+  #
+  # - label: qiuxiang
+  #   description: Solidity Language Server by qiuxiang
+  #   link: https://github.com/qiuxiang/solidity-ls
+  #   cmd: solidity-ls
+  #   args: ["--stdio"]
