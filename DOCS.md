@@ -61,6 +61,11 @@ return {
         -- Suppress specific lint rule IDs from diagnostics.
         exclude = {},
       },
+      fileOperations = {
+        -- Auto-generate scaffold for new .sol files.
+        -- Set to false to disable scaffold generation.
+        scaffoldOnCreate = true,
+      },
     },
   },
 }
@@ -139,6 +144,11 @@ return {
         -- Suppress specific lint rule IDs from diagnostics.
         exclude = {},
       },
+      fileOperations = {
+        -- Auto-generate scaffold for new .sol files.
+        -- Set to false to disable scaffold generation.
+        scaffoldOnCreate = true,
+      },
     },
   },
 }
@@ -154,6 +164,7 @@ inlayHints.gasEstimates = true
 lint.enabled = true
 lint.severity = ["high", "med"]
 lint.exclude = ["pascal-case-struct"]
+fileOperations.scaffoldOnCreate = true
 ```
 
 ### VSCode / Cursor
@@ -165,7 +176,8 @@ lint.exclude = ["pascal-case-struct"]
   "solidity-language-server.lint.enabled": true,
   "solidity-language-server.lint.severity": ["high", "med"],
   "solidity-language-server.lint.only": [],
-  "solidity-language-server.lint.exclude": ["pascal-case-struct"]
+  "solidity-language-server.lint.exclude": ["pascal-case-struct"],
+  "solidity-language-server.fileOperations.scaffoldOnCreate": true
 }
 ```
 
@@ -187,6 +199,9 @@ lint.exclude = ["pascal-case-struct"]
           "enabled": true,
           "severity": ["high", "med"],
           "exclude": ["pascal-case-struct"]
+        },
+        "fileOperations": {
+          "scaffoldOnCreate": true
         }
       }
     }

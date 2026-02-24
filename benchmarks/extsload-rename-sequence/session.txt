@@ -1,0 +1,19 @@
+# v4-core / src/PoolManager.sol
+
+── workspace/willRenameFiles (93.1ms) ──
+
+{
+  "id": 1,
+  "jsonrpc": "2.0",
+  "method": "workspace/willRenameFiles",
+  "params": {
+    "files": [
+      {
+        "newUri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/__lsp_bench_renamed__.sol",
+        "oldUri": "file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/PoolManager.sol"
+      }
+    ]
+  }
+}
+
+← mmsaki [content] { changes: { file:///Users/meek/developer/mmsaki/solidity-language-server/v4-core/src/PoolManager.sol: Array(1) [{ newText: ""./Extsloads.sol"", range: { end: { character: 39, line: 25 }, start: { ...

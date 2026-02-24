@@ -93,6 +93,10 @@ return {
         -- Suppress specific lint rule IDs from diagnostics.
         exclude = {},
       },
+      fileOperations = {
+        -- Auto-generate scaffold for new .sol files.
+        scaffoldOnCreate = true,
+      },
     },
   },
 }
@@ -108,6 +112,7 @@ inlayHints.gasEstimates = true
 lint.enabled = true
 lint.severity = ["high", "med"]
 lint.exclude = ["pascal-case-struct"]
+fileOperations.scaffoldOnCreate = true
 ```
 
 ## AI Integrations
@@ -129,6 +134,9 @@ Add to `~/.config/opencode/config.json`:
         },
         "lint": {
           "enabled": true
+        },
+        "fileOperations": {
+          "scaffoldOnCreate": true
         }
       }
     }

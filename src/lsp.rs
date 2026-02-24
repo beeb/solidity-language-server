@@ -585,8 +585,8 @@ impl LanguageServer for ForgeLsp {
                 .log_message(
                     MessageType::INFO,
                     format!(
-                        "settings: inlayHints.parameters={}, inlayHints.gasEstimates={}, lint.enabled={}, lint.severity={:?}, lint.only={:?}, lint.exclude={:?}",
-                        s.inlay_hints.parameters, s.inlay_hints.gas_estimates, s.lint.enabled, s.lint.severity, s.lint.only, s.lint.exclude,
+                        "settings: inlayHints.parameters={}, inlayHints.gasEstimates={}, lint.enabled={}, lint.severity={:?}, lint.only={:?}, lint.exclude={:?}, fileOperations.scaffoldOnCreate={}",
+                        s.inlay_hints.parameters, s.inlay_hints.gas_estimates, s.lint.enabled, s.lint.severity, s.lint.only, s.lint.exclude, s.file_operations.scaffold_on_create,
                     ),
                 )
                 .await;
@@ -1009,10 +1009,17 @@ impl LanguageServer for ForgeLsp {
             .await;
 
         let mut td = params.text_document;
+        let scaffold_on_create = self
+            .settings
+            .read()
+            .await
+            .file_operations
+            .scaffold_on_create;
 
         // Fallback path for clients/flows that don't emit file-operation
         // create events reliably: scaffold an empty newly-opened `.sol` file.
-        let should_attempt_scaffold = td.text.chars().all(|ch| ch.is_whitespace())
+        let should_attempt_scaffold = scaffold_on_create
+            && td.text.chars().all(|ch| ch.is_whitespace())
             && td.uri.scheme() == "file"
             && td
                 .uri
@@ -1155,9 +1162,17 @@ impl LanguageServer for ForgeLsp {
         // if a newly-created file is still whitespace-only at first save,
         // regenerate scaffold and apply it to the open buffer.
         let uri_str = params.text_document.uri.to_string();
+        let scaffold_on_create = self
+            .settings
+            .read()
+            .await
+            .file_operations
+            .scaffold_on_create;
         let needs_recover_scaffold = {
             let pending = self.pending_create_scaffold.read().await;
-            pending.contains(&uri_str) && !text_content.chars().any(|ch| !ch.is_whitespace())
+            scaffold_on_create
+                && pending.contains(&uri_str)
+                && !text_content.chars().any(|ch| !ch.is_whitespace())
         };
         if needs_recover_scaffold {
             let solc_version = self.foundry_config.read().await.solc_version.clone();
@@ -1340,8 +1355,8 @@ impl LanguageServer for ForgeLsp {
             .log_message(
                 MessageType::INFO,
                     format!(
-                    "settings updated: inlayHints.parameters={}, inlayHints.gasEstimates={}, lint.enabled={}, lint.severity={:?}, lint.only={:?}, lint.exclude={:?}",
-                    s.inlay_hints.parameters, s.inlay_hints.gas_estimates, s.lint.enabled, s.lint.severity, s.lint.only, s.lint.exclude,
+                    "settings updated: inlayHints.parameters={}, inlayHints.gasEstimates={}, lint.enabled={}, lint.severity={:?}, lint.only={:?}, lint.exclude={:?}, fileOperations.scaffoldOnCreate={}",
+                    s.inlay_hints.parameters, s.inlay_hints.gas_estimates, s.lint.enabled, s.lint.severity, s.lint.only, s.lint.exclude, s.file_operations.scaffold_on_create,
                 ),
             )
             .await;
@@ -3218,6 +3233,21 @@ impl LanguageServer for ForgeLsp {
                 format!("workspace/willCreateFiles: {} file(s)", params.files.len()),
             )
             .await;
+        if !self
+            .settings
+            .read()
+            .await
+            .file_operations
+            .scaffold_on_create
+        {
+            self.client
+                .log_message(
+                    MessageType::INFO,
+                    "willCreateFiles: scaffoldOnCreate disabled",
+                )
+                .await;
+            return Ok(None);
+        }
         self.client
             .log_message(
                 MessageType::INFO,
@@ -3234,6 +3264,21 @@ impl LanguageServer for ForgeLsp {
                 format!("workspace/didCreateFiles: {} file(s)", params.files.len()),
             )
             .await;
+        if !self
+            .settings
+            .read()
+            .await
+            .file_operations
+            .scaffold_on_create
+        {
+            self.client
+                .log_message(
+                    MessageType::INFO,
+                    "didCreateFiles: scaffoldOnCreate disabled",
+                )
+                .await;
+            return;
+        }
 
         let config = self.foundry_config.read().await;
         let solc_version = config.solc_version.clone();

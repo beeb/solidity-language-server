@@ -1,0 +1,19 @@
+# example / B.sol
+
+── workspace/willRenameFiles (9.9 MB) ──
+
+{
+  "id": 1,
+  "jsonrpc": "2.0",
+  "method": "workspace/willRenameFiles",
+  "params": {
+    "files": [
+      {
+        "newUri": "file:///Users/meek/developer/mmsaki/solidity-language-server/example/__lsp_bench_renamed__.sol",
+        "oldUri": "file:///Users/meek/developer/mmsaki/solidity-language-server/example/B.sol"
+      }
+    ]
+  }
+}
+
+← mmsaki [error] empty
