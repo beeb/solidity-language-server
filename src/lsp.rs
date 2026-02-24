@@ -589,8 +589,8 @@ impl LanguageServer for ForgeLsp {
                 .log_message(
                     MessageType::INFO,
                     format!(
-                        "settings: inlayHints.parameters={}, inlayHints.gasEstimates={}, lint.enabled={}, lint.severity={:?}, lint.only={:?}, lint.exclude={:?}, fileOperations.scaffoldOnCreate={}, fileOperations.updateImportsOnRename={}, fileOperations.updateImportsOnDelete={}",
-                        s.inlay_hints.parameters, s.inlay_hints.gas_estimates, s.lint.enabled, s.lint.severity, s.lint.only, s.lint.exclude, s.file_operations.scaffold_on_create, s.file_operations.update_imports_on_rename, s.file_operations.update_imports_on_delete,
+                        "settings: inlayHints.parameters={}, inlayHints.gasEstimates={}, lint.enabled={}, lint.severity={:?}, lint.only={:?}, lint.exclude={:?}, fileOperations.templateOnCreate={}, fileOperations.updateImportsOnRename={}, fileOperations.updateImportsOnDelete={}",
+                        s.inlay_hints.parameters, s.inlay_hints.gas_estimates, s.lint.enabled, s.lint.severity, s.lint.only, s.lint.exclude, s.file_operations.template_on_create, s.file_operations.update_imports_on_rename, s.file_operations.update_imports_on_delete,
                     ),
                 )
                 .await;
@@ -1013,16 +1013,16 @@ impl LanguageServer for ForgeLsp {
             .await;
 
         let mut td = params.text_document;
-        let scaffold_on_create = self
+        let template_on_create = self
             .settings
             .read()
             .await
             .file_operations
-            .scaffold_on_create;
+            .template_on_create;
 
         // Fallback path for clients/flows that don't emit file-operation
         // create events reliably: scaffold an empty newly-opened `.sol` file.
-        let should_attempt_scaffold = scaffold_on_create
+        let should_attempt_scaffold = template_on_create
             && td.text.chars().all(|ch| ch.is_whitespace())
             && td.uri.scheme() == "file"
             && td
@@ -1166,15 +1166,15 @@ impl LanguageServer for ForgeLsp {
         // if a newly-created file is still whitespace-only at first save,
         // regenerate scaffold and apply it to the open buffer.
         let uri_str = params.text_document.uri.to_string();
-        let scaffold_on_create = self
+        let template_on_create = self
             .settings
             .read()
             .await
             .file_operations
-            .scaffold_on_create;
+            .template_on_create;
         let needs_recover_scaffold = {
             let pending = self.pending_create_scaffold.read().await;
-            scaffold_on_create
+            template_on_create
                 && pending.contains(&uri_str)
                 && !text_content.chars().any(|ch| !ch.is_whitespace())
         };
@@ -1359,8 +1359,8 @@ impl LanguageServer for ForgeLsp {
                 .log_message(
                     MessageType::INFO,
                     format!(
-                    "settings updated: inlayHints.parameters={}, inlayHints.gasEstimates={}, lint.enabled={}, lint.severity={:?}, lint.only={:?}, lint.exclude={:?}, fileOperations.scaffoldOnCreate={}, fileOperations.updateImportsOnRename={}, fileOperations.updateImportsOnDelete={}",
-                    s.inlay_hints.parameters, s.inlay_hints.gas_estimates, s.lint.enabled, s.lint.severity, s.lint.only, s.lint.exclude, s.file_operations.scaffold_on_create, s.file_operations.update_imports_on_rename, s.file_operations.update_imports_on_delete,
+                    "settings updated: inlayHints.parameters={}, inlayHints.gasEstimates={}, lint.enabled={}, lint.severity={:?}, lint.only={:?}, lint.exclude={:?}, fileOperations.templateOnCreate={}, fileOperations.updateImportsOnRename={}, fileOperations.updateImportsOnDelete={}",
+                    s.inlay_hints.parameters, s.inlay_hints.gas_estimates, s.lint.enabled, s.lint.severity, s.lint.only, s.lint.exclude, s.file_operations.template_on_create, s.file_operations.update_imports_on_rename, s.file_operations.update_imports_on_delete,
                 ),
             )
             .await;
@@ -3266,12 +3266,12 @@ impl LanguageServer for ForgeLsp {
             .read()
             .await
             .file_operations
-            .scaffold_on_create
+            .template_on_create
         {
             self.client
                 .log_message(
                     MessageType::INFO,
-                    "willCreateFiles: scaffoldOnCreate disabled",
+                    "willCreateFiles: templateOnCreate disabled",
                 )
                 .await;
             return Ok(None);
@@ -3297,12 +3297,12 @@ impl LanguageServer for ForgeLsp {
             .read()
             .await
             .file_operations
-            .scaffold_on_create
+            .template_on_create
         {
             self.client
                 .log_message(
                     MessageType::INFO,
-                    "didCreateFiles: scaffoldOnCreate disabled",
+                    "didCreateFiles: templateOnCreate disabled",
                 )
                 .await;
             return;

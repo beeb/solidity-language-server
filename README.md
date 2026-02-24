@@ -95,7 +95,7 @@ return {
       },
       fileOperations = {
         -- Auto-generate scaffold for new .sol files.
-        scaffoldOnCreate = true,
+        templateOnCreate = true,
         -- Auto-update imports via workspace/willRenameFiles.
         updateImportsOnRename = true,
         -- Auto-remove imports via workspace/willDeleteFiles.
@@ -116,7 +116,7 @@ inlayHints.gasEstimates = true
 lint.enabled = true
 lint.severity = ["high", "med"]
 lint.exclude = ["pascal-case-struct"]
-fileOperations.scaffoldOnCreate = true
+fileOperations.templateOnCreate = true
 fileOperations.updateImportsOnRename = true
 fileOperations.updateImportsOnDelete = true
 ```
@@ -142,7 +142,7 @@ Add to `~/.config/opencode/config.json`:
           "enabled": true
         },
         "fileOperations": {
-          "scaffoldOnCreate": true,
+          "templateOnCreate": true,
           "updateImportsOnRename": true,
           "updateImportsOnDelete": true
         }

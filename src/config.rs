@@ -91,7 +91,7 @@ impl Default for LintSettings {
 pub struct FileOperationsSettings {
     /// Auto-generate Solidity scaffold when creating a new `.sol` file.
     #[serde(default = "default_true")]
-    pub scaffold_on_create: bool,
+    pub template_on_create: bool,
     /// Auto-update Solidity imports during `workspace/willRenameFiles`.
     #[serde(default = "default_true")]
     pub update_imports_on_rename: bool,
@@ -103,7 +103,7 @@ pub struct FileOperationsSettings {
 impl Default for FileOperationsSettings {
     fn default() -> Self {
         Self {
-            scaffold_on_create: true,
+            template_on_create: true,
             update_imports_on_rename: true,
             update_imports_on_delete: true,
         }
@@ -920,7 +920,7 @@ src = "src"
         assert!(s.inlay_hints.parameters);
         assert!(s.inlay_hints.gas_estimates);
         assert!(s.lint.enabled);
-        assert!(s.file_operations.scaffold_on_create);
+        assert!(s.file_operations.template_on_create);
         assert!(s.file_operations.update_imports_on_rename);
         assert!(s.file_operations.update_imports_on_delete);
         assert!(s.lint.severity.is_empty());
@@ -940,7 +940,7 @@ src = "src"
                     "exclude": ["pascal-case-struct", "mixed-case-variable"]
                 },
                 "fileOperations": {
-                    "scaffoldOnCreate": false,
+                    "templateOnCreate": false,
                     "updateImportsOnRename": false,
                     "updateImportsOnDelete": false
                 },
@@ -950,7 +950,7 @@ src = "src"
         assert!(!s.inlay_hints.parameters);
         assert!(!s.inlay_hints.gas_estimates);
         assert!(s.lint.enabled);
-        assert!(!s.file_operations.scaffold_on_create);
+        assert!(!s.file_operations.template_on_create);
         assert!(!s.file_operations.update_imports_on_rename);
         assert!(!s.file_operations.update_imports_on_delete);
         assert_eq!(s.lint.severity, vec!["high", "med"]);
@@ -967,7 +967,7 @@ src = "src"
             "inlayHints": { "parameters": false },
             "lint": { "enabled": false },
             "fileOperations": {
-                "scaffoldOnCreate": false,
+                "templateOnCreate": false,
                 "updateImportsOnRename": false,
                 "updateImportsOnDelete": false
             }
@@ -975,7 +975,7 @@ src = "src"
         let s = parse_settings(&value);
         assert!(!s.inlay_hints.parameters);
         assert!(!s.lint.enabled);
-        assert!(!s.file_operations.scaffold_on_create);
+        assert!(!s.file_operations.template_on_create);
         assert!(!s.file_operations.update_imports_on_rename);
         assert!(!s.file_operations.update_imports_on_delete);
     }
@@ -993,7 +993,7 @@ src = "src"
         assert!(s.inlay_hints.gas_estimates);
         // lint.enabled not specified → defaults to true
         assert!(s.lint.enabled);
-        assert!(s.file_operations.scaffold_on_create);
+        assert!(s.file_operations.template_on_create);
         assert!(s.file_operations.update_imports_on_rename);
         assert!(s.file_operations.update_imports_on_delete);
         assert!(s.lint.severity.is_empty());
@@ -1010,7 +1010,7 @@ src = "src"
         assert!(s.inlay_hints.parameters);
         assert!(s.inlay_hints.gas_estimates);
         assert!(s.lint.enabled);
-        assert!(s.file_operations.scaffold_on_create);
+        assert!(s.file_operations.template_on_create);
         assert!(s.file_operations.update_imports_on_rename);
         assert!(s.file_operations.update_imports_on_delete);
         assert!(s.lint.severity.is_empty());
