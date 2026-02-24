@@ -654,11 +654,6 @@ pub fn apply_text_edits(source: &str, edits: &[TextEdit]) -> String {
             let start = utils::position_to_byte_offset(source, e.range.start);
             let end = utils::position_to_byte_offset(source, e.range.end);
             if start > end {
-                tracing::warn!(
-                    "apply_text_edits: skipping invalid edit range start={} end={}",
-                    start,
-                    end
-                );
                 None
             } else {
                 Some((start, end, e.new_text.as_str()))
@@ -674,12 +669,6 @@ pub fn apply_text_edits(source: &str, edits: &[TextEdit]) -> String {
         if let Some((_, last_end, _)) = filtered.last()
             && start < *last_end
         {
-            tracing::warn!(
-                "apply_text_edits: skipping overlapping edit range start={} end={} last_end={}",
-                start,
-                end,
-                last_end
-            );
             continue;
         }
         filtered.push((start, end, new_text));
@@ -689,6 +678,133 @@ pub fn apply_text_edits(source: &str, edits: &[TextEdit]) -> String {
     let mut result = source.to_string();
     for (start, end, new_text) in filtered.into_iter().rev() {
         result.replace_range(start..end, new_text);
+    }
+    result
+}
+
+// ---------------------------------------------------------------------------
+// File scaffold generation
+// ---------------------------------------------------------------------------
+
+/// Generate scaffold content for a new `.sol` file.
+///
+/// Returns SPDX license identifier, pragma, and a stub contract/library/interface
+/// named after the file. The `solc_version` from `foundry.toml` is used for
+/// the pragma if available, otherwise defaults to `^0.8.0`.
+///
+/// `uri` is the file:// URI of the new file (used to derive the contract name).
+pub fn generate_scaffold(uri: &Url, solc_version: Option<&str>) -> Option<String> {
+    let path = uri.to_file_path().ok()?;
+    let stem = path.file_stem()?.to_str()?;
+
+    // Only scaffold .sol files.
+    let ext = path.extension()?;
+    if ext != "sol" {
+        return None;
+    }
+
+    let contract_name = sanitize_identifier(stem);
+    if contract_name.is_empty() {
+        return None;
+    }
+
+    // Derive pragma from solc_version.
+    // "0.8.26" → "^0.8.26", already-prefixed values pass through.
+    let pragma = match solc_version {
+        Some(v) if !v.is_empty() => {
+            let v = v.trim();
+            if v.starts_with('^')
+                || v.starts_with('>')
+                || v.starts_with('<')
+                || v.starts_with('=')
+                || v.starts_with('~')
+            {
+                v.to_string()
+            } else {
+                format!("^{v}")
+            }
+        }
+        _ => "^0.8.0".to_string(),
+    };
+
+    // Detect file kind from naming conventions.
+    let is_test = stem.ends_with(".t");
+    let is_script = stem.ends_with(".s");
+
+    let kind = if is_test || is_script {
+        // Foundry test/script files must always be contracts because they
+        // inherit from Test/Script.
+        "contract"
+    } else if stem.starts_with('I')
+        && stem.len() > 1
+        && stem.chars().nth(1).map_or(false, |c| c.is_uppercase())
+    {
+        "interface"
+    } else if stem.starts_with("Lib") || stem.starts_with("lib") {
+        "library"
+    } else {
+        "contract"
+    };
+
+    if is_test {
+        Some(format!(
+            "// SPDX-License-Identifier: MIT\n\
+             pragma solidity {pragma};\n\
+             \n\
+             import {{Test}} from \"forge-std/Test.sol\";\n\
+             \n\
+             {kind} {contract_name} is Test {{\n\
+             \n\
+             }}\n"
+        ))
+    } else if is_script {
+        Some(format!(
+            "// SPDX-License-Identifier: MIT\n\
+             pragma solidity {pragma};\n\
+             \n\
+             import {{Script}} from \"forge-std/Script.sol\";\n\
+             \n\
+             {kind} {contract_name} is Script {{\n\
+             \n\
+             }}\n"
+        ))
+    } else {
+        Some(format!(
+            "// SPDX-License-Identifier: MIT\n\
+             pragma solidity {pragma};\n\
+             \n\
+             {kind} {contract_name} {{\n\
+             \n\
+             }}\n"
+        ))
+    }
+}
+
+/// Convert a filename stem to a valid Solidity identifier.
+///
+/// Strips `.t` and `.s` suffixes (Foundry test/script convention),
+/// removes non-alphanumeric/underscore characters, and ensures
+/// the result doesn't start with a digit.
+fn sanitize_identifier(stem: &str) -> String {
+    // Strip common Foundry suffixes: "Foo.t" → "Foo", "Bar.s" → "Bar"
+    let stem = stem
+        .strip_suffix(".t")
+        .or_else(|| stem.strip_suffix(".s"))
+        .unwrap_or(stem);
+
+    let mut result = String::with_capacity(stem.len());
+    for ch in stem.chars() {
+        if ch.is_ascii_alphanumeric() || ch == '_' {
+            result.push(ch);
+        }
+    }
+    // Identifiers can't start with a digit.
+    if result.starts_with(|c: char| c.is_ascii_digit()) {
+        result.insert(0, '_');
+    }
+    // Avoid Solidity keywords as identifiers.
+    if !result.is_empty() && !utils::is_valid_solidity_identifier(&result) {
+        result.insert(0, '_');
     }
     result
 }

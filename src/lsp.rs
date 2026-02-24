@@ -50,6 +50,9 @@ pub struct ForgeLsp {
     root_uri: Arc<RwLock<Option<Url>>>,
     /// Whether background project indexing has already been triggered.
     project_indexed: Arc<std::sync::atomic::AtomicBool>,
+    /// URIs recently scaffolded in willCreateFiles (used to avoid re-applying
+    /// edits again in didCreateFiles for the same create operation).
+    pending_create_scaffold: Arc<RwLock<HashSet<String>>>,
 }
 
 impl ForgeLsp {
@@ -81,6 +84,7 @@ impl ForgeLsp {
             semantic_token_id: Arc::new(AtomicU64::new(0)),
             root_uri: Arc::new(RwLock::new(None)),
             project_indexed: Arc::new(std::sync::atomic::AtomicBool::new(false)),
+            pending_create_scaffold: Arc::new(RwLock::new(HashSet::new())),
         }
     }
 
@@ -542,9 +546,20 @@ impl ForgeLsp {
         match std::fs::read(file_path) {
             Ok(bytes) => Some(bytes),
             Err(e) => {
-                self.client
-                    .log_message(MessageType::ERROR, format!("failed to read file: {e}"))
-                    .await;
+                if e.kind() == std::io::ErrorKind::NotFound {
+                    // Benign during create/delete races when the editor emits
+                    // didOpen/didChange before the file is materialized on disk.
+                    self.client
+                        .log_message(
+                            MessageType::INFO,
+                            format!("file not found yet (transient): {e}"),
+                        )
+                        .await;
+                } else {
+                    self.client
+                        .log_message(MessageType::ERROR, format!("failed to read file: {e}"))
+                        .await;
+                }
                 None
             }
         }
@@ -799,6 +814,26 @@ impl LanguageServer for ForgeLsp {
                                 },
                             ],
                         }),
+                        will_create: Some(FileOperationRegistrationOptions {
+                            filters: vec![FileOperationFilter {
+                                scheme: Some("file".to_string()),
+                                pattern: FileOperationPattern {
+                                    glob: "**/*.sol".to_string(),
+                                    matches: Some(FileOperationPatternKind::File),
+                                    options: None,
+                                },
+                            }],
+                        }),
+                        did_create: Some(FileOperationRegistrationOptions {
+                            filters: vec![FileOperationFilter {
+                                scheme: Some("file".to_string()),
+                                pattern: FileOperationPattern {
+                                    glob: "**/*.sol".to_string(),
+                                    matches: Some(FileOperationPatternKind::File),
+                                    options: None,
+                                },
+                            }],
+                        }),
                         ..Default::default()
                     }),
                 }),
@@ -973,7 +1008,90 @@ impl LanguageServer for ForgeLsp {
             .log_message(MessageType::INFO, "file opened")
             .await;
 
-        self.on_change(params.text_document).await
+        let mut td = params.text_document;
+
+        // Fallback path for clients/flows that don't emit file-operation
+        // create events reliably: scaffold an empty newly-opened `.sol` file.
+        let should_attempt_scaffold = td.text.chars().all(|ch| ch.is_whitespace())
+            && td.uri.scheme() == "file"
+            && td
+                .uri
+                .to_file_path()
+                .ok()
+                .and_then(|p| p.extension().map(|e| e == "sol"))
+                .unwrap_or(false);
+
+        if should_attempt_scaffold {
+            let uri_str = td.uri.to_string();
+            let create_flow_pending = {
+                let pending = self.pending_create_scaffold.read().await;
+                pending.contains(&uri_str)
+            };
+            if create_flow_pending {
+                self.client
+                    .log_message(
+                        MessageType::INFO,
+                        format!(
+                            "didOpen: skip scaffold for {} (didCreateFiles scaffold pending)",
+                            uri_str
+                        ),
+                    )
+                    .await;
+            } else {
+                let cache_has_content = {
+                    let tc = self.text_cache.read().await;
+                    tc.get(&uri_str)
+                        .map_or(false, |(_, c)| c.chars().any(|ch| !ch.is_whitespace()))
+                };
+
+                if !cache_has_content {
+                    let file_has_content = td.uri.to_file_path().ok().is_some_and(|p| {
+                        std::fs::read_to_string(&p)
+                            .map_or(false, |c| c.chars().any(|ch| !ch.is_whitespace()))
+                    });
+
+                    if !file_has_content {
+                        let solc_version = self.foundry_config.read().await.solc_version.clone();
+                        if let Some(scaffold) =
+                            file_operations::generate_scaffold(&td.uri, solc_version.as_deref())
+                        {
+                            let end = utils::byte_offset_to_position(&td.text, td.text.len());
+                            let edit = WorkspaceEdit {
+                                changes: Some(HashMap::from([(
+                                    td.uri.clone(),
+                                    vec![TextEdit {
+                                        range: Range {
+                                            start: Position::default(),
+                                            end,
+                                        },
+                                        new_text: scaffold.clone(),
+                                    }],
+                                )])),
+                                document_changes: None,
+                                change_annotations: None,
+                            };
+                            if self
+                                .client
+                                .apply_edit(edit)
+                                .await
+                                .as_ref()
+                                .is_ok_and(|r| r.applied)
+                            {
+                                td.text = scaffold;
+                                self.client
+                                    .log_message(
+                                        MessageType::INFO,
+                                        format!("didOpen: scaffolded empty file {}", uri_str),
+                                    )
+                                    .await;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        self.on_change(td).await
     }
 
     async fn did_change(&self, params: DidChangeTextDocumentParams) {
@@ -983,11 +1101,20 @@ impl LanguageServer for ForgeLsp {
 
         // update text cache
         if let Some(change) = params.content_changes.into_iter().next() {
+            let has_substantive_content = change.text.chars().any(|ch| !ch.is_whitespace());
             let mut text_cache = self.text_cache.write().await;
             text_cache.insert(
                 params.text_document.uri.to_string(),
                 (params.text_document.version, change.text),
             );
+            drop(text_cache);
+
+            if has_substantive_content {
+                self.pending_create_scaffold
+                    .write()
+                    .await
+                    .remove(params.text_document.uri.as_str());
+            }
         }
     }
 
@@ -996,7 +1123,7 @@ impl LanguageServer for ForgeLsp {
             .log_message(MessageType::INFO, "file saved")
             .await;
 
-        let text_content = if let Some(text) = params.text {
+        let mut text_content = if let Some(text) = params.text {
             text
         } else {
             // Prefer text_cache (reflects unsaved changes), fall back to disk
@@ -1023,6 +1150,65 @@ impl LanguageServer for ForgeLsp {
                 }
             }
         };
+
+        // Recovery path for create-file races:
+        // if a newly-created file is still whitespace-only at first save,
+        // regenerate scaffold and apply it to the open buffer.
+        let uri_str = params.text_document.uri.to_string();
+        let needs_recover_scaffold = {
+            let pending = self.pending_create_scaffold.read().await;
+            pending.contains(&uri_str) && !text_content.chars().any(|ch| !ch.is_whitespace())
+        };
+        if needs_recover_scaffold {
+            let solc_version = self.foundry_config.read().await.solc_version.clone();
+            if let Some(scaffold) = file_operations::generate_scaffold(
+                &params.text_document.uri,
+                solc_version.as_deref(),
+            ) {
+                let end = utils::byte_offset_to_position(&text_content, text_content.len());
+                let edit = WorkspaceEdit {
+                    changes: Some(HashMap::from([(
+                        params.text_document.uri.clone(),
+                        vec![TextEdit {
+                            range: Range {
+                                start: Position::default(),
+                                end,
+                            },
+                            new_text: scaffold.clone(),
+                        }],
+                    )])),
+                    document_changes: None,
+                    change_annotations: None,
+                };
+                if self
+                    .client
+                    .apply_edit(edit)
+                    .await
+                    .as_ref()
+                    .is_ok_and(|r| r.applied)
+                {
+                    text_content = scaffold.clone();
+                    let version = self
+                        .text_cache
+                        .read()
+                        .await
+                        .get(params.text_document.uri.as_str())
+                        .map(|(v, _)| *v)
+                        .unwrap_or_default();
+                    self.text_cache
+                        .write()
+                        .await
+                        .insert(uri_str.clone(), (version, scaffold));
+                    self.pending_create_scaffold.write().await.remove(&uri_str);
+                    self.client
+                        .log_message(
+                            MessageType::INFO,
+                            format!("didSave: recovered scaffold for {}", uri_str),
+                        )
+                        .await;
+                }
+            }
+        }
 
         let version = self
             .text_cache
@@ -2919,30 +3105,64 @@ impl LanguageServer for ForgeLsp {
                 .await;
         }
 
+        let mut removed_text = 0usize;
+        let mut removed_ast = 0usize;
+        let mut removed_completion = 0usize;
+        let mut removed_semantic = 0usize;
+        let mut removed_pending_create = 0usize;
         {
             let mut tc = self.text_cache.write().await;
             for key in &deleted_keys {
-                tc.remove(key);
+                if tc.remove(key).is_some() {
+                    removed_text += 1;
+                }
             }
         }
         {
             let mut ac = self.ast_cache.write().await;
             for key in &deleted_keys {
-                ac.remove(key);
+                if ac.remove(key).is_some() {
+                    removed_ast += 1;
+                }
             }
         }
         {
             let mut cc = self.completion_cache.write().await;
             for key in &deleted_keys {
-                cc.remove(key);
+                if cc.remove(key).is_some() {
+                    removed_completion += 1;
+                }
             }
         }
         {
             let mut sc = self.semantic_token_cache.write().await;
             for key in &deleted_keys {
-                sc.remove(key);
+                if sc.remove(key).is_some() {
+                    removed_semantic += 1;
+                }
             }
         }
+        {
+            let mut pending = self.pending_create_scaffold.write().await;
+            for key in &deleted_keys {
+                if pending.remove(key) {
+                    removed_pending_create += 1;
+                }
+            }
+        }
+        self.client
+            .log_message(
+                MessageType::INFO,
+                format!(
+                    "didDeleteFiles: removed caches text={} ast={} completion={} semantic={} pendingCreate={}",
+                    removed_text,
+                    removed_ast,
+                    removed_completion,
+                    removed_semantic,
+                    removed_pending_create,
+                ),
+            )
+            .await;
 
         let root_key = self.root_uri.read().await.as_ref().map(|u| u.to_string());
         if let Some(ref key) = root_key {
@@ -2981,6 +3201,240 @@ impl LanguageServer for ForgeLsp {
                         .log_message(
                             MessageType::WARNING,
                             format!("didDeleteFiles: re-index failed: {e}"),
+                        )
+                        .await;
+                }
+            }
+        });
+    }
+
+    async fn will_create_files(
+        &self,
+        params: CreateFilesParams,
+    ) -> tower_lsp::jsonrpc::Result<Option<WorkspaceEdit>> {
+        self.client
+            .log_message(
+                MessageType::INFO,
+                format!("workspace/willCreateFiles: {} file(s)", params.files.len()),
+            )
+            .await;
+        self.client
+            .log_message(
+                MessageType::INFO,
+                "willCreateFiles: skipping pre-create edits; scaffolding via didCreateFiles",
+            )
+            .await;
+        Ok(None)
+    }
+
+    async fn did_create_files(&self, params: CreateFilesParams) {
+        self.client
+            .log_message(
+                MessageType::INFO,
+                format!("workspace/didCreateFiles: {} file(s)", params.files.len()),
+            )
+            .await;
+
+        let config = self.foundry_config.read().await;
+        let solc_version = config.solc_version.clone();
+        drop(config);
+
+        // Generate scaffold and push via workspace/applyEdit for files that
+        // are empty in both cache and on disk. This avoids prepending content
+        // to already-populated files while keeping a fallback for clients that
+        // don't apply willCreateFiles edits.
+        let mut apply_edits: HashMap<Url, Vec<TextEdit>> = HashMap::new();
+        let mut staged_content: HashMap<String, String> = HashMap::new();
+        let mut created_uris: Vec<String> = Vec::new();
+        {
+            let tc = self.text_cache.read().await;
+            for file_create in &params.files {
+                let uri = match Url::parse(&file_create.uri) {
+                    Ok(u) => u,
+                    Err(_) => continue,
+                };
+                let uri_str = uri.to_string();
+
+                let open_has_content = tc
+                    .get(&uri_str)
+                    .map_or(false, |(_, c)| c.chars().any(|ch| !ch.is_whitespace()));
+                let path = match uri.to_file_path() {
+                    Ok(p) => p,
+                    Err(_) => continue,
+                };
+                let disk_has_content = std::fs::read_to_string(&path)
+                    .map_or(false, |c| c.chars().any(|ch| !ch.is_whitespace()));
+
+                // If an open buffer already has content, skip. If buffer is
+                // open but empty, still apply scaffold to that buffer.
+                if open_has_content {
+                    self.client
+                        .log_message(
+                            MessageType::INFO,
+                            format!(
+                                "didCreateFiles: skip {} (open buffer already has content)",
+                                uri_str
+                            ),
+                        )
+                        .await;
+                    continue;
+                }
+
+                // Also skip when the file already has content on disk.
+                if disk_has_content {
+                    self.client
+                        .log_message(
+                            MessageType::INFO,
+                            format!(
+                                "didCreateFiles: skip {} (disk file already has content)",
+                                uri_str
+                            ),
+                        )
+                        .await;
+                    continue;
+                }
+
+                let content =
+                    match file_operations::generate_scaffold(&uri, solc_version.as_deref()) {
+                        Some(s) => s,
+                        None => continue,
+                    };
+
+                staged_content.insert(uri_str, content.clone());
+                created_uris.push(uri.to_string());
+
+                apply_edits.entry(uri).or_default().push(TextEdit {
+                    range: Range {
+                        start: Position {
+                            line: 0,
+                            character: 0,
+                        },
+                        end: Position {
+                            line: 0,
+                            character: 0,
+                        },
+                    },
+                    new_text: content,
+                });
+            }
+        }
+
+        if !apply_edits.is_empty() {
+            {
+                let mut pending = self.pending_create_scaffold.write().await;
+                for uri in &created_uris {
+                    pending.insert(uri.clone());
+                }
+            }
+
+            let edit = WorkspaceEdit {
+                changes: Some(apply_edits.clone()),
+                document_changes: None,
+                change_annotations: None,
+            };
+            self.client
+                .log_message(
+                    MessageType::INFO,
+                    format!(
+                        "didCreateFiles: scaffolding {} empty file(s) via workspace/applyEdit",
+                        apply_edits.len()
+                    ),
+                )
+                .await;
+            let apply_result = self.client.apply_edit(edit).await;
+            let applied = apply_result.as_ref().is_ok_and(|r| r.applied);
+
+            if applied {
+                let mut tc = self.text_cache.write().await;
+                for (uri_str, content) in staged_content {
+                    tc.insert(uri_str, (0, content));
+                }
+            } else {
+                if let Ok(resp) = &apply_result {
+                    self.client
+                        .log_message(
+                            MessageType::WARNING,
+                            format!(
+                                "didCreateFiles: applyEdit rejected (no disk fallback): {:?}",
+                                resp.failure_reason
+                            ),
+                        )
+                        .await;
+                } else if let Err(e) = &apply_result {
+                    self.client
+                        .log_message(
+                            MessageType::WARNING,
+                            format!("didCreateFiles: applyEdit failed (no disk fallback): {e}"),
+                        )
+                        .await;
+                }
+            }
+        }
+
+        // Refresh diagnostics for newly created files that now have in-memory
+        // content (e.g. scaffold applied via willCreateFiles/didChange). This
+        // clears stale diagnostics produced from the transient empty didOpen.
+        for file_create in &params.files {
+            let Ok(uri) = Url::parse(&file_create.uri) else {
+                continue;
+            };
+            let (version, content) = {
+                let tc = self.text_cache.read().await;
+                match tc.get(&uri.to_string()) {
+                    Some((v, c)) => (*v, c.clone()),
+                    None => continue,
+                }
+            };
+            if !content.chars().any(|ch| !ch.is_whitespace()) {
+                continue;
+            }
+            self.on_change(TextDocumentItem {
+                uri,
+                version,
+                text: content,
+                language_id: "solidity".to_string(),
+            })
+            .await;
+        }
+
+        // Trigger background re-index so new symbols become discoverable.
+        let root_key = self.root_uri.read().await.as_ref().map(|u| u.to_string());
+        if let Some(ref key) = root_key {
+            self.ast_cache.write().await.remove(key);
+        }
+
+        let foundry_config = self.foundry_config.read().await.clone();
+        let ast_cache = self.ast_cache.clone();
+        let client = self.client.clone();
+        let text_cache_snapshot = self.text_cache.read().await.clone();
+
+        tokio::spawn(async move {
+            let Some(cache_key) = root_key else {
+                return;
+            };
+            match crate::solc::solc_project_index(
+                &foundry_config,
+                Some(&client),
+                Some(&text_cache_snapshot),
+            )
+            .await
+            {
+                Ok(ast_data) => {
+                    let cached_build = Arc::new(crate::goto::CachedBuild::new(ast_data, 0));
+                    let source_count = cached_build.nodes.len();
+                    ast_cache.write().await.insert(cache_key, cached_build);
+                    client
+                        .log_message(
+                            MessageType::INFO,
+                            format!("didCreateFiles: re-indexed {} source files", source_count),
+                        )
+                        .await;
+                }
+                Err(e) => {
+                    client
+                        .log_message(
+                            MessageType::WARNING,
+                            format!("didCreateFiles: re-index failed: {e}"),
                         )
                         .await;
                 }

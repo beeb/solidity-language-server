@@ -978,3 +978,108 @@ fn test_expand_folder_deletes_from_paths_uses_component_prefix() {
     assert_eq!(expanded.len(), 1, "should not match sibling src2 path");
     assert!(expanded[0].ends_with("/tmp/project/src/A.sol"));
 }
+
+// =============================================================================
+// Scaffold generation tests
+// =============================================================================
+
+#[test]
+fn test_scaffold_basic_contract() {
+    let uri = Url::from_file_path("/tmp/project/src/MyToken.sol").unwrap();
+    let scaffold = file_operations::generate_scaffold(&uri, None).unwrap();
+    assert!(scaffold.contains("pragma solidity ^0.8.0;"));
+    assert!(scaffold.contains("contract MyToken {"));
+    assert!(scaffold.contains("// SPDX-License-Identifier: MIT"));
+}
+
+#[test]
+fn test_scaffold_with_solc_version() {
+    let uri = Url::from_file_path("/tmp/project/src/Vault.sol").unwrap();
+    let scaffold = file_operations::generate_scaffold(&uri, Some("0.8.26")).unwrap();
+    assert!(scaffold.contains("pragma solidity ^0.8.26;"));
+    assert!(scaffold.contains("contract Vault {"));
+}
+
+#[test]
+fn test_scaffold_with_prefixed_version() {
+    let uri = Url::from_file_path("/tmp/project/src/Vault.sol").unwrap();
+    let scaffold = file_operations::generate_scaffold(&uri, Some(">=0.8.0 <0.9.0")).unwrap();
+    assert!(scaffold.contains("pragma solidity >=0.8.0 <0.9.0;"));
+}
+
+#[test]
+fn test_scaffold_interface() {
+    let uri = Url::from_file_path("/tmp/project/src/IPoolManager.sol").unwrap();
+    let scaffold = file_operations::generate_scaffold(&uri, None).unwrap();
+    assert!(scaffold.contains("interface IPoolManager {"));
+}
+
+#[test]
+fn test_scaffold_library() {
+    let uri = Url::from_file_path("/tmp/project/src/LibMath.sol").unwrap();
+    let scaffold = file_operations::generate_scaffold(&uri, None).unwrap();
+    assert!(scaffold.contains("library LibMath {"));
+}
+
+#[test]
+fn test_scaffold_test_file() {
+    // Foo.t.sol → contract Foo is Test (strips .t suffix, adds forge-std import)
+    let uri = Url::from_file_path("/tmp/project/test/Foo.t.sol").unwrap();
+    let scaffold = file_operations::generate_scaffold(&uri, None).unwrap();
+    assert!(scaffold.contains("import {Test} from \"forge-std/Test.sol\""));
+    assert!(scaffold.contains("contract Foo is Test {"));
+}
+
+#[test]
+fn test_scaffold_script_file() {
+    // Deploy.s.sol → contract Deploy is Script (strips .s suffix, adds forge-std import)
+    let uri = Url::from_file_path("/tmp/project/script/Deploy.s.sol").unwrap();
+    let scaffold = file_operations::generate_scaffold(&uri, None).unwrap();
+    assert!(scaffold.contains("import {Script} from \"forge-std/Script.sol\""));
+    assert!(scaffold.contains("contract Deploy is Script {"));
+}
+
+#[test]
+fn test_scaffold_test_file_forces_contract_kind() {
+    let uri = Url::from_file_path("/tmp/project/test/IFoo.t.sol").unwrap();
+    let scaffold = file_operations::generate_scaffold(&uri, None).unwrap();
+    assert!(scaffold.contains("contract IFoo is Test {"));
+    assert!(!scaffold.contains("interface IFoo is Test {"));
+}
+
+#[test]
+fn test_scaffold_script_file_forces_contract_kind() {
+    let uri = Url::from_file_path("/tmp/project/script/LibDeploy.s.sol").unwrap();
+    let scaffold = file_operations::generate_scaffold(&uri, None).unwrap();
+    assert!(scaffold.contains("contract LibDeploy is Script {"));
+    assert!(!scaffold.contains("library LibDeploy is Script {"));
+}
+
+#[test]
+fn test_scaffold_non_sol_returns_none() {
+    let uri = Url::from_file_path("/tmp/project/README.md").unwrap();
+    assert!(file_operations::generate_scaffold(&uri, None).is_none());
+}
+
+#[test]
+fn test_scaffold_sanitizes_identifier() {
+    // Filename with hyphens: "my-token.sol" → contract mytoken
+    let uri = Url::from_file_path("/tmp/project/src/my-token.sol").unwrap();
+    let scaffold = file_operations::generate_scaffold(&uri, None).unwrap();
+    assert!(scaffold.contains("contract mytoken {"));
+}
+
+#[test]
+fn test_scaffold_digit_prefix() {
+    // Filename starting with digit: "1inch.sol" → contract _1inch
+    let uri = Url::from_file_path("/tmp/project/src/1inch.sol").unwrap();
+    let scaffold = file_operations::generate_scaffold(&uri, None).unwrap();
+    assert!(scaffold.contains("contract _1inch {"));
+}
+
+#[test]
+fn test_scaffold_keyword_identifier_prefixed() {
+    let uri = Url::from_file_path("/tmp/project/src/contract.sol").unwrap();
+    let scaffold = file_operations::generate_scaffold(&uri, None).unwrap();
+    assert!(scaffold.contains("contract _contract {"));
+}
