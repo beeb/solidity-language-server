@@ -1,5 +1,0 @@
-# v4-core / test/PoolManager.t.sol
-
-── textDocument/diagnostic (2.0s, 255.0 MB) ──
-
-← mmsaki v0.1.25 [content] { diagnostics: Array(15) [{ code: "mixed-case-variable", message: "mutable variables should use mixedCase", range: { end: { character: 40, line: 354 }, start: { character: 16, line: 354 } }, severi...

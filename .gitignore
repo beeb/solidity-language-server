@@ -14,3 +14,6 @@ poolmanager-t-full.json
 
 # VS Code extension build artifacts
 editors/vscode/*.vsix
+# Benchmark session artifacts
+benchmarks/**/session.md
+benchmarks/**/session.txt
