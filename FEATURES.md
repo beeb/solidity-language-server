@@ -73,7 +73,7 @@ See [FEATURES.md](FEATURES.md) for the full LSP feature set and roadmap.
 - [x] `workspace/didChangeConfiguration` - Updates editor settings (inlay hints, lint options)
 - [x] `workspace/didChangeWatchedFiles` - Acknowledges watched file changes (logs only)
 - [x] `workspace/didChangeWorkspaceFolders` - Acknowledges workspace folder changes (logs only)
-- [ ] `workspace/applyEdit` - Apply workspace edits
+- [ ] `workspace/applyEdit` - Inbound handler not implemented (server uses outbound `workspace/applyEdit` to scaffold created files)
 - [ ] `workspace/executeCommand` - Execute workspace commands (stub implementation)
 - [x] `workspace/willCreateFiles` - File creation preview (scaffolding for `.sol`, `.t.sol`, `.s.sol`)
 - [x] `workspace/didCreateFiles` - Post-create scaffold fallback + cache/index refresh
