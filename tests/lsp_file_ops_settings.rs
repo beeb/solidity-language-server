@@ -1,15 +1,20 @@
 use serde_json::{Value, json};
+use std::collections::VecDeque;
 use std::fs;
 use std::io::{BufRead, BufReader, Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Child, ChildStdin, ChildStdout, Command, Stdio};
+use std::sync::mpsc::{self, Receiver, RecvTimeoutError};
+use std::thread;
 use std::time::{Duration, Instant};
 use tempfile::TempDir;
+use tower_lsp::lsp_types::Url;
 
 struct LspProc {
     child: Child,
     stdin: ChildStdin,
-    stdout: BufReader<ChildStdout>,
+    rx: Receiver<Value>,
+    stash: VecDeque<Value>,
     next_id: u64,
 }
 
@@ -34,11 +39,13 @@ impl LspProc {
             .expect("spawn solidity-language-server");
 
         let stdin = child.stdin.take().expect("stdin");
-        let stdout = BufReader::new(child.stdout.take().expect("stdout"));
+        let stdout = child.stdout.take().expect("stdout");
+        let rx = spawn_reader(stdout);
         Self {
             child,
             stdin,
-            stdout,
+            rx,
+            stash: VecDeque::new(),
             next_id: 1,
         }
     }
@@ -73,34 +80,31 @@ impl LspProc {
         self.stdin.flush().expect("flush");
     }
 
-    fn read_msg(&mut self) -> Value {
-        let mut content_length: usize = 0;
-        let mut line = String::new();
-        loop {
-            line.clear();
-            let n = self.stdout.read_line(&mut line).expect("read header line");
-            assert!(n > 0, "LSP stream closed while reading headers");
-            if line == "\r\n" {
-                break;
-            }
-            if let Some(v) = line.strip_prefix("Content-Length:") {
-                content_length = v.trim().parse::<usize>().expect("parse content length");
-            }
-        }
-
-        assert!(content_length > 0, "missing Content-Length");
-        let mut body = vec![0u8; content_length];
-        self.stdout.read_exact(&mut body).expect("read body");
-        serde_json::from_slice::<Value>(&body).expect("parse jsonrpc message")
-    }
-
     fn wait_response(&mut self, id: u64, timeout: Duration) -> Value {
         let deadline = Instant::now() + timeout;
         loop {
             assert!(Instant::now() < deadline, "timed out waiting response id={id}");
-            let msg = self.read_msg();
-            if msg.get("id").and_then(|v| v.as_u64()) == Some(id) {
-                return msg;
+            if let Some(msg) = self.stash.pop_front() {
+                if msg.get("id").and_then(|v| v.as_u64()) == Some(id) {
+                    return msg;
+                }
+                continue;
+            }
+
+            let remaining = deadline.saturating_duration_since(Instant::now());
+            match self.rx.recv_timeout(remaining) {
+                Ok(msg) => {
+                    if msg.get("id").and_then(|v| v.as_u64()) == Some(id) {
+                        return msg;
+                    }
+                    self.stash.push_back(msg);
+                }
+                Err(RecvTimeoutError::Timeout) => {
+                    panic!("timed out waiting response id={id}");
+                }
+                Err(RecvTimeoutError::Disconnected) => {
+                    panic!("LSP reader disconnected while waiting response id={id}");
+                }
             }
         }
     }
@@ -109,8 +113,68 @@ impl LspProc {
         let shutdown_id = self.send_request("shutdown", Value::Null);
         let _ = self.wait_response(shutdown_id, Duration::from_secs(5));
         self.send_notification("exit", Value::Null);
-        let _ = self.child.wait();
+        let deadline = Instant::now() + Duration::from_secs(2);
+        loop {
+            match self.child.try_wait() {
+                Ok(Some(_)) => break,
+                Ok(None) if Instant::now() < deadline => {
+                    std::thread::sleep(Duration::from_millis(20));
+                }
+                Ok(None) | Err(_) => {
+                    let _ = self.child.kill();
+                    let _ = self.child.wait();
+                    break;
+                }
+            }
+        }
     }
+}
+
+fn spawn_reader(stdout: ChildStdout) -> Receiver<Value> {
+    let (tx, rx) = mpsc::channel();
+    thread::spawn(move || {
+        let mut reader = BufReader::new(stdout);
+        let mut line = String::new();
+        loop {
+            let mut content_length: usize = 0;
+            line.clear();
+            let n = match reader.read_line(&mut line) {
+                Ok(n) => n,
+                Err(_) => return,
+            };
+            if n == 0 {
+                return;
+            }
+            loop {
+                if line == "\r\n" {
+                    break;
+                }
+                if let Some(v) = line.strip_prefix("Content-Length:") {
+                    content_length = v.trim().parse::<usize>().unwrap_or(0);
+                }
+                line.clear();
+                let n = match reader.read_line(&mut line) {
+                    Ok(n) => n,
+                    Err(_) => return,
+                };
+                if n == 0 {
+                    return;
+                }
+            }
+            if content_length == 0 {
+                continue;
+            }
+            let mut body = vec![0u8; content_length];
+            if reader.read_exact(&mut body).is_err() {
+                return;
+            }
+            let Ok(msg) = serde_json::from_slice::<Value>(&body) else {
+                continue;
+            };
+            let _ = tx.send(msg);
+        }
+    });
+    rx
 }
 
 fn write_foundry_project(dir: &Path) -> (String, String, String) {
@@ -137,9 +201,11 @@ src = "src"
     )
     .expect("write B.sol");
 
-    let root_uri = format!("file://{}", dir.display());
-    let a_uri = format!("file://{}", a.display());
-    let b_uri = format!("file://{}", b.display());
+    let root_uri = Url::from_file_path(dir)
+        .expect("root uri")
+        .to_string();
+    let a_uri = Url::from_file_path(&a).expect("a uri").to_string();
+    let b_uri = Url::from_file_path(&b).expect("b uri").to_string();
     (root_uri, a_uri, b_uri)
 }
 
@@ -164,7 +230,6 @@ fn initialize_server(lsp: &mut LspProc, root_uri: &str) {
 }
 
 #[test]
-#[ignore = "E2E stdio test; run manually when validating LSP file-op settings"]
 fn will_delete_files_returns_edits_when_enabled() {
     let tmp = TempDir::new().expect("tmp dir");
     let (root_uri, a_uri, b_uri) = write_foundry_project(tmp.path());
@@ -192,7 +257,6 @@ fn will_delete_files_returns_edits_when_enabled() {
 }
 
 #[test]
-#[ignore = "E2E stdio test; run manually when validating LSP file-op settings"]
 fn will_delete_files_returns_null_when_update_imports_on_delete_disabled() {
     let tmp = TempDir::new().expect("tmp dir");
     let (root_uri, a_uri, _b_uri) = write_foundry_project(tmp.path());
