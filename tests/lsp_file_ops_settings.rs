@@ -80,6 +80,43 @@ impl LspProc {
         self.stdin.flush().expect("flush");
     }
 
+    fn send_result(&mut self, id: u64, result: Value) {
+        let msg = json!({
+            "jsonrpc": "2.0",
+            "id": id,
+            "result": result,
+        });
+        self.write_msg(&msg);
+    }
+
+    fn wait_for_method(&mut self, method: &str, timeout: Duration) -> Option<Value> {
+        if let Some(idx) = self
+            .stash
+            .iter()
+            .position(|msg| msg.get("method").and_then(Value::as_str) == Some(method))
+        {
+            return self.stash.remove(idx);
+        }
+
+        let deadline = Instant::now() + timeout;
+        loop {
+            let remaining = deadline.saturating_duration_since(Instant::now());
+            if remaining.is_zero() {
+                return None;
+            }
+            match self.rx.recv_timeout(remaining) {
+                Ok(msg) => {
+                    if msg.get("method").and_then(Value::as_str) == Some(method) {
+                        return Some(msg);
+                    }
+                    self.stash.push_back(msg);
+                }
+                Err(RecvTimeoutError::Timeout) => return None,
+                Err(RecvTimeoutError::Disconnected) => return None,
+            }
+        }
+    }
+
     fn wait_response(&mut self, id: u64, timeout: Duration) -> Value {
         let deadline = Instant::now() + timeout;
         loop {
@@ -229,6 +266,28 @@ fn initialize_server(lsp: &mut LspProc, root_uri: &str) {
     lsp.send_notification("initialized", json!({}));
 }
 
+fn set_file_op_settings(
+    lsp: &mut LspProc,
+    template_on_create: bool,
+    update_imports_on_rename: bool,
+    update_imports_on_delete: bool,
+) {
+    lsp.send_notification(
+        "workspace/didChangeConfiguration",
+        json!({
+            "settings": {
+                "solidity-language-server": {
+                    "fileOperations": {
+                        "templateOnCreate": template_on_create,
+                        "updateImportsOnRename": update_imports_on_rename,
+                        "updateImportsOnDelete": update_imports_on_delete
+                    }
+                }
+            }
+        }),
+    );
+}
+
 #[test]
 fn will_delete_files_returns_edits_when_enabled() {
     let tmp = TempDir::new().expect("tmp dir");
@@ -286,6 +345,142 @@ fn will_delete_files_returns_null_when_update_imports_on_delete_disabled() {
     assert!(
         resp.get("result").is_some_and(Value::is_null),
         "expected null result when disabled: {resp}"
+    );
+
+    lsp.shutdown();
+}
+
+#[test]
+fn did_create_files_requests_apply_edit_when_template_enabled() {
+    let tmp = TempDir::new().expect("tmp dir");
+    let (root_uri, _a_uri, _b_uri) = write_foundry_project(tmp.path());
+    let mut lsp = LspProc::spawn(tmp.path());
+    initialize_server(&mut lsp, &root_uri);
+
+    // didCreateFiles: server should request workspace/applyEdit scaffolding.
+    let c_path = tmp.path().join("src").join("C.sol");
+    fs::write(&c_path, "").expect("create C.sol");
+    let c_uri = Url::from_file_path(&c_path).expect("c uri").to_string();
+    lsp.send_notification(
+        "workspace/didCreateFiles",
+        json!({
+            "files": [{ "uri": c_uri }]
+        }),
+    );
+
+    let apply_req = lsp
+        .wait_for_method("workspace/applyEdit", Duration::from_secs(10))
+        .expect("expected workspace/applyEdit request for didCreateFiles");
+    let apply_id = apply_req
+        .get("id")
+        .and_then(Value::as_u64)
+        .expect("applyEdit request id");
+    let apply_changes = apply_req
+        .pointer("/params/edit/changes")
+        .and_then(Value::as_object)
+        .expect("applyEdit edit.changes");
+    let c_edits = apply_changes
+        .get(&c_uri)
+        .and_then(Value::as_array)
+        .expect("expected C.sol edit");
+    let new_text = c_edits
+        .first()
+        .and_then(|v| v.get("newText"))
+        .and_then(Value::as_str)
+        .unwrap_or("");
+    assert!(
+        new_text.contains("contract C"),
+        "expected scaffold contract in applyEdit: {new_text}"
+    );
+    lsp.send_result(apply_id, json!({ "applied": true }));
+
+    lsp.shutdown();
+}
+
+#[test]
+fn did_create_files_skips_apply_edit_when_template_disabled() {
+    let tmp = TempDir::new().expect("tmp dir");
+    let (root_uri, _a_uri, _b_uri) = write_foundry_project(tmp.path());
+    let mut lsp = LspProc::spawn(tmp.path());
+    initialize_server(&mut lsp, &root_uri);
+    set_file_op_settings(&mut lsp, false, true, true);
+
+    let c_path = tmp.path().join("src").join("C.sol");
+    fs::write(&c_path, "").expect("create C.sol");
+    let c_uri = Url::from_file_path(&c_path).expect("c uri").to_string();
+    lsp.send_notification(
+        "workspace/didCreateFiles",
+        json!({
+            "files": [{ "uri": c_uri }]
+        }),
+    );
+
+    let apply_req = lsp.wait_for_method("workspace/applyEdit", Duration::from_secs(2));
+    assert!(
+        apply_req.is_none(),
+        "expected no workspace/applyEdit when templateOnCreate=false: {apply_req:?}"
+    );
+
+    lsp.shutdown();
+}
+
+#[test]
+fn will_rename_files_returns_edits_when_enabled() {
+    let tmp = TempDir::new().expect("tmp dir");
+    let (root_uri, a_uri, b_uri) = write_foundry_project(tmp.path());
+    let mut lsp = LspProc::spawn(tmp.path());
+    initialize_server(&mut lsp, &root_uri);
+
+    // willRenameFiles: should preview import rewrite in B.sol.
+    let req_rename = lsp.send_request(
+        "workspace/willRenameFiles",
+        json!({
+            "files": [{
+                "oldUri": a_uri,
+                "newUri": Url::from_file_path(tmp.path().join("src").join("AA.sol"))
+                    .expect("aa uri")
+                    .to_string()
+            }]
+        }),
+    );
+    let resp_rename = lsp.wait_response(req_rename, Duration::from_secs(15));
+    let rename_changes = resp_rename
+        .get("result")
+        .and_then(|v| v.get("changes"))
+        .and_then(Value::as_object)
+        .expect("expected willRenameFiles workspace edit changes");
+    assert!(
+        rename_changes.contains_key(&b_uri),
+        "expected B.sol rename import edit: {resp_rename}"
+    );
+
+    lsp.shutdown();
+}
+
+#[test]
+fn will_rename_files_returns_null_when_disabled() {
+    let tmp = TempDir::new().expect("tmp dir");
+    let (root_uri, a_uri, _b_uri) = write_foundry_project(tmp.path());
+    let mut lsp = LspProc::spawn(tmp.path());
+    initialize_server(&mut lsp, &root_uri);
+    set_file_op_settings(&mut lsp, true, false, true);
+
+    // willRenameFiles: should return null when disabled.
+    let req_rename = lsp.send_request(
+        "workspace/willRenameFiles",
+        json!({
+            "files": [{
+                "oldUri": a_uri,
+                "newUri": Url::from_file_path(tmp.path().join("src").join("AA.sol"))
+                    .expect("aa uri")
+                    .to_string()
+            }]
+        }),
+    );
+    let resp_rename = lsp.wait_response(req_rename, Duration::from_secs(15));
+    assert!(
+        resp_rename.get("result").is_some_and(Value::is_null),
+        "expected null willRenameFiles result when disabled: {resp_rename}"
     );
 
     lsp.shutdown();

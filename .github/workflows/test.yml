@@ -23,3 +23,36 @@ jobs:
 
       - name: Run tests
         run: timeout 20m cargo test
+
+  release-preflight:
+    name: Release Preflight
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Build release binary
+        run: cargo build --release
+
+      - name: Run debug tests
+        run: timeout 20m cargo test
+
+      - name: Run release tests
+        run: timeout 25m cargo test --release
+
+      - name: Install lsp-bench
+        run: cargo install lsp-bench --version 0.2.7 --locked
+
+      - name: Run lsp-bench verify
+        run: |
+          lsp-bench \
+            -c benchmarks/ci-verify.yaml \
+            -s benchmarks/servers.ci.yaml \
+            --verify

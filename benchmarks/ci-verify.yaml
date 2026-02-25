@@ -1,0 +1,41 @@
+# CI verification benchmark.
+# Run from repo root:
+#   lsp-bench -c benchmarks/ci-verify.yaml -s benchmarks/servers.ci.yaml --verify
+
+project: example
+file: B.sol
+line: 6
+col: 6
+iterations: 1
+warmup: 0
+timeout: 10
+index_timeout: 15
+output: target/benchmarks/ci-verify
+report: README.md
+response: full
+
+servers:
+  - mmsaki@latest
+
+benchmarks:
+  - textDocument/definition
+  - textDocument/references
+  - textDocument/documentSymbol
+
+methods:
+  textDocument/definition:
+    line: 6
+    col: 6
+    expect:
+      file: A.sol
+      line: 3
+
+  textDocument/references:
+    line: 3
+    col: 9
+    expect:
+      minCount: 3
+
+  textDocument/documentSymbol:
+    expect:
+      minCount: 2
