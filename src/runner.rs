@@ -91,7 +91,7 @@ impl Runner for ForgeRunner {
             .await?;
 
         let stdout_str = String::from_utf8_lossy(&output.stdout);
-        let parsed: serde_json::Value = serde_json::from_str(&stdout_str)?;
+        let parsed = parse_json_from_mixed_stdout(&stdout_str)?;
 
         Ok(parsed)
     }
@@ -111,7 +111,7 @@ impl Runner for ForgeRunner {
             .await?;
 
         let stdout_str = String::from_utf8_lossy(&output.stdout);
-        let parsed: serde_json::Value = serde_json::from_str(&stdout_str)?;
+        let parsed = parse_json_from_mixed_stdout(&stdout_str)?;
 
         Ok(normalize_forge_output(parsed))
     }
@@ -173,6 +173,53 @@ impl Runner for ForgeRunner {
         let build_output = self.build(path_str).await?;
         let diagnostics = build_output_to_diagnostics(&build_output, &path, &content, &[]);
         Ok(diagnostics)
+    }
+}
+
+/// Parse JSON from forge stdout, tolerating non-JSON log lines before payload.
+fn parse_json_from_mixed_stdout(stdout: &str) -> Result<serde_json::Value, RunnerError> {
+    let trimmed = stdout.trim();
+    if trimmed.is_empty() {
+        return Err(RunnerError::EmptyOutput);
+    }
+
+    if let Ok(v) = serde_json::from_str::<serde_json::Value>(trimmed) {
+        return Ok(v);
+    }
+
+    // Some forge/log integrations can print warnings to stdout before JSON.
+    // Try parsing from each `{` onward and take the first valid JSON object.
+    for (idx, ch) in trimmed.char_indices() {
+        if ch != '{' {
+            continue;
+        }
+        if let Ok(v) = serde_json::from_str::<serde_json::Value>(&trimmed[idx..]) {
+            return Ok(v);
+        }
+    }
+
+    Err(RunnerError::JsonError(serde_json::Error::io(io::Error::other(
+        "failed to parse forge JSON from mixed stdout",
+    ))))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::parse_json_from_mixed_stdout;
+
+    #[test]
+    fn parse_json_from_mixed_stdout_accepts_plain_json() {
+        let out = r#"{ "errors": [], "sources": {}, "contracts": {}, "build_infos": [] }"#;
+        let parsed = parse_json_from_mixed_stdout(out).expect("valid JSON");
+        assert!(parsed.get("errors").is_some());
+    }
+
+    #[test]
+    fn parse_json_from_mixed_stdout_skips_leading_logs() {
+        let out = r#"WARN cache write failed
+{ "errors": [], "sources": {}, "contracts": {}, "build_infos": [] }"#;
+        let parsed = parse_json_from_mixed_stdout(out).expect("mixed output should parse");
+        assert!(parsed.get("sources").is_some());
     }
 }
 
