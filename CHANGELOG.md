@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.1.26
+
+### Features
+
+- File operation behaviors are configurable via:
+  - `fileOperations.templateOnCreate`
+  - `fileOperations.updateImportsOnRename`
+  - `fileOperations.updateImportsOnDelete`
+- Default file-operation settings are enabled.
+- Template/scaffolding naming standardized to `templateOnCreate`.
+
+### Fixes
+
+- Improve file creation scaffolding flow to avoid missing scaffold content on new files.
+- Fix duplicate/incorrect scaffold insertion timing during create-file lifecycle.
+- Improve auto-import completion behavior for top-level symbols and import edit attachment.
+
+### Benchmarks
+
+- Added/updated benchmark coverage for file-operation lifecycle flows (`willCreateFiles`,
+  `willRenameFiles`, `willDeleteFiles`) and auto-import scenarios.
+
 ## v0.1.25
 
 ### Performance
