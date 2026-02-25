@@ -9,17 +9,18 @@
 
 project: example
 file: Shop.sol
-line: 136
+line: 137
 col: 32
 output: benchmarks/shop
 report: README.md
 
 servers:
-  - mmsaki@v0.1.25
-  - solc
-  - qiuxiang
-  - juanfranblanco
-  - nomicfoundation
+  - mmsaki@latest
+  # - mmsaki@v0.1.25
+  # - solc
+  # - qiuxiang
+  # - juanfranblanco
+  # - nomicfoundation
 
 exclude:
   - textDocument/typeDefinition
@@ -29,7 +30,7 @@ exclude:
 
 methods:
   textDocument/definition:
-    line: 136
+    line: 137
     col: 32
     # PRICE — immutable declared at line 68, resolved through `using Transaction for uint256`
     didChange:
@@ -47,7 +48,7 @@ methods:
         # PRICE shifted (both edits)
 
   textDocument/references:
-    line: 69
+    line: 70
     col: 27
     # owner — 14+ usages across the contract
     didChange:
@@ -65,7 +66,7 @@ methods:
         # owner — both edits applied
 
   textDocument/completion:
-    line: 159
+    line: 160
     col: 18
     trigger: "."
     # order. — member completion on Transaction.Order (buyer, nonce, amount, date, confirmed)
@@ -84,7 +85,7 @@ methods:
         # order. shifted (both edits)
 
   textDocument/hover:
-    line: 41
+    line: 42
     col: 13
     # addTax — function with full NatSpec (@notice, @param, @return)
     didChange:
@@ -102,7 +103,7 @@ methods:
         # addTax — same position
 
   textDocument/rename:
-    line: 69
+    line: 70
     col: 27
     # owner — 14+ occurrences across contract
     didChange:
@@ -134,6 +135,24 @@ methods:
         # 10 extra blank lines at end — formatter should strip them
 
   textDocument/signatureHelp:
-    line: 136
+    line: 137
     col: 45
     # Inside addTax(TAX, TAX_BASE) — first argument position
+
+  workspace/willRenameFiles:
+    renameSteps:
+      - file: A.sol
+        newName: AA.sol
+      - file: AA.sol
+        newName: A.sol
+    # Rename A.sol -> AA.sol, then back. Should update Shop.sol import path.
+
+  workspace/willCreateFiles:
+    createSteps:
+      - file: ShopBenchCreate.s.sol
+    # Create lifecycle benchmark in example project (script template scaffold).
+
+  workspace/willDeleteFiles:
+    deleteSteps:
+      - file: A.sol
+    # Delete lifecycle benchmark for imported file A.sol.

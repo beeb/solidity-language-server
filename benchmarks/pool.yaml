@@ -15,8 +15,8 @@ exclude:
   - textDocument/documentColor
 
 servers:
-  - mmsaki@v0.1.25
-  - mmsaki@v0.1.24
+  - mmsaki@latest
+  # - mmsaki@v0.1.25
   # - solc
   # - qiuxiang
   # - juanfranblanco
@@ -69,5 +69,19 @@ methods:
     # Inside TickMath.getTickAtSqrtPrice(sqrtPriceX96)
 
   workspace/willRenameFiles:
-    newName: Pools.sol
-    # Rename Pool.sol → Pools.sol — imported by PoolManager.sol, ProtocolFees.sol, PoolManager.t.sol
+    renameSteps:
+      - file: src/libraries/Pool.sol
+        newName: Pools.sol
+      - file: src/libraries/Pools.sol
+        newName: Pool.sol
+    # Rename Pool.sol -> Pools.sol, then rename back to original path.
+
+  workspace/willCreateFiles:
+    createSteps:
+      - file: src/libraries/PoolBenchCreate.s.sol
+    # Create lifecycle benchmark in v4-core/src/libraries (script template scaffold).
+
+  workspace/willDeleteFiles:
+    deleteSteps:
+      - file: src/libraries/Pool.sol
+    # Delete lifecycle benchmark for Pool.sol (restored after run).
