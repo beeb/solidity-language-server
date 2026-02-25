@@ -7,7 +7,7 @@ Benchmarked against `example` — `Shop.sol`.
 | Setting | Value |
 |---------|-------|
 | File | `Shop.sol` |
-| Position | line 136, col 32 |
+| Position | line 137, col 32 |
 | Iterations | 10 (2 warmup) |
 | Timeout | 10s |
 
@@ -23,36 +23,36 @@ Benchmarked against `example` — `Shop.sol`.
 
 | Method | mmsaki |
 |--------|--------|
-| [initialize](#initialize) | 15.1ms ⚡ |
-| [textDocument/diagnostic](#textdocumentdiagnostic) | 53.0ms ⚡ |
+| [initialize](#initialize) | 18.7ms ⚡ |
+| [textDocument/diagnostic](#textdocumentdiagnostic) | 64.2ms ⚡ |
 | [textDocument/semanticTokens/full/delta](#textdocumentsemantictokensfulldelta) | 1.5ms ⚡ |
-| [textDocument/definition](#textdocumentdefinition) | 3.1ms ⚡ |
-| [textDocument/declaration](#textdocumentdeclaration) | 0.2ms ⚡ |
+| [textDocument/definition](#textdocumentdefinition) | 2.9ms ⚡ |
+| [textDocument/declaration](#textdocumentdeclaration) | 0.3ms ⚡ |
 | [textDocument/hover](#textdocumenthover) | 1.2ms ⚡ |
-| [textDocument/references](#textdocumentreferences) | 0.9ms ⚡ |
-| [textDocument/completion](#textdocumentcompletion) | 0.2ms ⚡ |
+| [textDocument/references](#textdocumentreferences) | 0.5ms ⚡ |
+| [textDocument/completion](#textdocumentcompletion) | 0.3ms ⚡ |
 | [textDocument/signatureHelp](#textdocumentsignaturehelp) | 0.9ms ⚡ |
-| [textDocument/rename](#textdocumentrename) | 1.3ms ⚡ |
+| [textDocument/rename](#textdocumentrename) | 0.6ms |
 | [textDocument/prepareRename](#textdocumentpreparerename) | 0.1ms ⚡ |
 | [textDocument/documentSymbol](#textdocumentdocumentsymbol) | 1.2ms ⚡ |
-| [textDocument/documentHighlight](#textdocumentdocumenthighlight) | 1.3ms ⚡ |
-| [textDocument/documentLink](#textdocumentdocumentlink) | empty |
-| [textDocument/formatting](#textdocumentformatting) | 11.6ms ⚡ |
-| [textDocument/foldingRange](#textdocumentfoldingrange) | 1.1ms ⚡ |
-| [textDocument/selectionRange](#textdocumentselectionrange) | 1.0ms ⚡ |
-| [textDocument/inlayHint](#textdocumentinlayhint) | 1.6ms ⚡ |
+| [textDocument/documentHighlight](#textdocumentdocumenthighlight) | 1.2ms ⚡ |
+| [textDocument/documentLink](#textdocumentdocumentlink) | 0.1ms ⚡ |
+| [textDocument/formatting](#textdocumentformatting) | 11.3ms ⚡ |
+| [textDocument/foldingRange](#textdocumentfoldingrange) | 1.2ms ⚡ |
+| [textDocument/selectionRange](#textdocumentselectionrange) | 0.9ms ⚡ |
+| [textDocument/inlayHint](#textdocumentinlayhint) | 1.5ms ⚡ |
 | [textDocument/semanticTokens/full](#textdocumentsemantictokensfull) | 1.6ms ⚡ |
 | [textDocument/semanticTokens/range](#textdocumentsemantictokensrange) | 1.0ms ⚡ |
-| [workspace/symbol](#workspacesymbol) | 1.2ms ⚡ |
-| [workspace/willRenameFiles](#workspacewillrenamefiles) | 1.3ms |
-| [workspace/willCreateFiles](#workspacewillcreatefiles) | 0.1ms |
-| [workspace/willDeleteFiles](#workspacewilldeletefiles) | 1.4ms |
+| [workspace/symbol](#workspacesymbol) | 0.9ms ⚡ |
+| [workspace/willRenameFiles](#workspacewillrenamefiles) | 4.1ms ⚡ |
+| [workspace/willCreateFiles](#workspacewillcreatefiles) | 0.2ms ⚡ |
+| [workspace/willDeleteFiles](#workspacewilldeletefiles) | 1.6ms ⚡ |
 
 ### Scorecard
 
 | Server | Wins | Out of |
 |--------|------|--------|
-| **mmsaki** | **20** | **24** |
+| **mmsaki** | **23** | **24** |
 
 ---
 
@@ -62,146 +62,146 @@ Benchmarked against `example` — `Shop.sol`.
 
 | Server | p95 | RSS | Result |
 |--------|-----|-----|--------|
-| **mmsaki** | 15.1ms ⚡ | **8.9 MB** | ok |
+| **mmsaki** | 18.7ms ⚡ | **8.9 MB** | ok |
 
 ### textDocument/diagnostic
 
 | Server | p95 | RSS | Result |
 |--------|-----|-----|--------|
-| **mmsaki** | 53.0ms ⚡ | **13.8 MB** | 1 diagnostics |
+| **mmsaki** | 64.2ms ⚡ | **14.4 MB** | 2 diagnostics |
 
 ### textDocument/semanticTokens/full/delta
 
 | Server | p95 | RSS | Result |
 |--------|-----|-----|--------|
-| **mmsaki** | 1.5ms ⚡ | **13.9 MB** | delta |
+| **mmsaki** | 1.5ms ⚡ | **14.4 MB** | delta |
 
 ### textDocument/definition
 
 | Server | p95 | RSS | Result |
 |--------|-----|-----|--------|
-| **mmsaki** | 3.1ms ⚡ | **13.9 MB** | `Shop.sol:68` |
+| **mmsaki** | 2.9ms ⚡ | **14.1 MB** | `Shop.sol:68` |
 
 ### textDocument/declaration
 
 | Server | p95 | RSS | Result |
 |--------|-----|-----|--------|
-| **mmsaki** | 0.2ms ⚡ | **13.8 MB** | `Shop.sol:68` |
+| **mmsaki** | 0.3ms ⚡ | **14.3 MB** | `Shop.sol:69` |
 
 ### textDocument/hover
 
 | Server | p95 | RSS | Result |
 |--------|-----|-----|--------|
-| **mmsaki** | 1.2ms ⚡ | **13.6 MB** | function addTax(uint256 amount, uint16 tax, uint16... |
+| **mmsaki** | 1.2ms ⚡ | **14.3 MB** | library Transaction |
 
 ### textDocument/references
 
 | Server | p95 | RSS | Result |
 |--------|-----|-----|--------|
-| **mmsaki** | 0.9ms ⚡ | **13.9 MB** | 11 references |
+| **mmsaki** | 0.5ms ⚡ | **14.4 MB** | 1 references |
 
 ### textDocument/completion
 
 | Server | p95 | RSS | Result |
 |--------|-----|-----|--------|
-| **mmsaki** | 0.2ms ⚡ | **13.8 MB** | 5 items (buyer, nonce, amount) |
+| **mmsaki** | 0.3ms ⚡ | **14.1 MB** | 5 items (buyer, nonce, amount) |
 
 ### textDocument/signatureHelp
 
 | Server | p95 | RSS | Result |
 |--------|-----|-----|--------|
-| **mmsaki** | 0.9ms ⚡ | **13.8 MB** | function addTax(uint256 amount, uint16 tax, uint16... |
+| **mmsaki** | 0.9ms ⚡ | **14.1 MB** | function addTax(uint256 amount, uint16 tax, uint16... |
 
 ### textDocument/rename
 
 | Server | p95 | RSS | Result |
 |--------|-----|-----|--------|
-| **mmsaki** | 1.3ms ⚡ | **13.6 MB** | 4 edits in 1 files |
+| **mmsaki** | 0.6ms | 14.1 MB | 0 edits in 0 files |
 
 ### textDocument/prepareRename
 
 | Server | p95 | RSS | Result |
 |--------|-----|-----|--------|
-| **mmsaki** | 0.1ms ⚡ | **13.9 MB** | ready (line 136) |
+| **mmsaki** | 0.1ms ⚡ | **14.1 MB** | ready (line 137) |
 
 ### textDocument/documentSymbol
 
 | Server | p95 | RSS | Result |
 |--------|-----|-----|--------|
-| **mmsaki** | 1.2ms ⚡ | **13.7 MB** | 3 symbols |
+| **mmsaki** | 1.2ms ⚡ | **14.1 MB** | 4 symbols |
 
 ### textDocument/documentHighlight
 
 | Server | p95 | RSS | Result |
 |--------|-----|-----|--------|
-| **mmsaki** | 1.3ms ⚡ | **13.8 MB** | [{"kind":3,"range":{"end":{"character":2... |
+| **mmsaki** | 1.2ms ⚡ | **14.4 MB** | [{"kind":3,"range":{"end":{"character":2... |
 
 ### textDocument/documentLink
 
 | Server | p95 | RSS | Result |
 |--------|-----|-----|--------|
-| **mmsaki** | - | 13.8 MB | empty |
+| **mmsaki** | 0.1ms ⚡ | **14.2 MB** | 1 links |
 
 ### textDocument/formatting
 
 | Server | p95 | RSS | Result |
 |--------|-----|-----|--------|
-| **mmsaki** | 11.6ms ⚡ | **13.8 MB** | 1 edits |
+| **mmsaki** | 11.3ms ⚡ | **14.2 MB** | 1 edits |
 
 ### textDocument/foldingRange
 
 | Server | p95 | RSS | Result |
 |--------|-----|-----|--------|
-| **mmsaki** | 1.1ms ⚡ | **13.8 MB** | [{"endCharacter":1,"endLine":53,"startCh... |
+| **mmsaki** | 1.2ms ⚡ | **14.3 MB** | [{"endCharacter":1,"endLine":54,"startCh... |
 
 ### textDocument/selectionRange
 
 | Server | p95 | RSS | Result |
 |--------|-----|-----|--------|
-| **mmsaki** | 1.0ms ⚡ | **13.8 MB** | [{"parent":{"parent":{"parent":{"parent"... |
+| **mmsaki** | 0.9ms ⚡ | **14.0 MB** | [{"parent":{"parent":{"parent":{"parent"... |
 
 ### textDocument/inlayHint
 
 | Server | p95 | RSS | Result |
 |--------|-----|-----|--------|
-| **mmsaki** | 1.6ms ⚡ | **13.9 MB** | 24 hints (tax:, base:, buyer:) |
+| **mmsaki** | 1.5ms ⚡ | **14.2 MB** | 24 hints (tax:, base:, buyer:) |
 
 ### textDocument/semanticTokens/full
 
 | Server | p95 | RSS | Result |
 |--------|-----|-----|--------|
-| **mmsaki** | 1.6ms ⚡ | **13.9 MB** | 451 tokens |
+| **mmsaki** | 1.6ms ⚡ | **14.2 MB** | 455 tokens |
 
 ### textDocument/semanticTokens/range
 
 | Server | p95 | RSS | Result |
 |--------|-----|-----|--------|
-| **mmsaki** | 1.0ms ⚡ | **13.6 MB** | 160 tokens |
+| **mmsaki** | 1.0ms ⚡ | **14.1 MB** | 162 tokens |
 
 ### workspace/symbol
 
 | Server | p95 | RSS | Result |
 |--------|-----|-----|--------|
-| **mmsaki** | 1.2ms ⚡ | **13.8 MB** | 61 symbols |
+| **mmsaki** | 0.9ms ⚡ | **14.1 MB** | 61 symbols |
 
 ### workspace/willRenameFiles
 
 | Server | p95 | RSS | Result |
 |--------|-----|-----|--------|
-| **mmsaki** | 1.3ms | 13.7 MB | empty |
+| **mmsaki** | 4.1ms ⚡ | **14.4 MB** | 1 edits in 1 files |
 
 ### workspace/willCreateFiles
 
 | Server | p95 | RSS | Result |
 |--------|-----|-----|--------|
-| **mmsaki** | 0.1ms | 13.8 MB | null |
+| **mmsaki** | 0.2ms ⚡ | **14.1 MB** | null (valid) |
 
 ### workspace/willDeleteFiles
 
 | Server | p95 | RSS | Result |
 |--------|-----|-----|--------|
-| **mmsaki** | 1.4ms | 13.8 MB | null |
+| **mmsaki** | 1.6ms ⚡ | **14.4 MB** | {"changes":{"file:///Users/meek/develope... |
 
 ---
 
-*Benchmark run: 2026-02-25T01:16:13Z*
+*Benchmark run: 2026-02-25T02:41:05Z*
