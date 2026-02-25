@@ -50,6 +50,13 @@ pub struct ForgeLsp {
     root_uri: Arc<RwLock<Option<Url>>>,
     /// Whether background project indexing has already been triggered.
     project_indexed: Arc<std::sync::atomic::AtomicBool>,
+    /// Whether workspace file operations changed project structure and
+    /// the persisted reference cache should be refreshed from disk.
+    project_cache_dirty: Arc<std::sync::atomic::AtomicBool>,
+    /// Whether a didSave cache-sync worker is currently running.
+    project_cache_sync_running: Arc<std::sync::atomic::AtomicBool>,
+    /// Whether a didSave cache-sync pass is pending (set by save bursts).
+    project_cache_sync_pending: Arc<std::sync::atomic::AtomicBool>,
     /// URIs recently scaffolded in willCreateFiles (used to avoid re-applying
     /// edits again in didCreateFiles for the same create operation).
     pending_create_scaffold: Arc<RwLock<HashSet<String>>>,
@@ -84,6 +91,9 @@ impl ForgeLsp {
             semantic_token_id: Arc::new(AtomicU64::new(0)),
             root_uri: Arc::new(RwLock::new(None)),
             project_indexed: Arc::new(std::sync::atomic::AtomicBool::new(false)),
+            project_cache_dirty: Arc::new(std::sync::atomic::AtomicBool::new(false)),
+            project_cache_sync_running: Arc::new(std::sync::atomic::AtomicBool::new(false)),
+            project_cache_sync_pending: Arc::new(std::sync::atomic::AtomicBool::new(false)),
             pending_create_scaffold: Arc::new(RwLock::new(HashSet::new())),
         }
     }
@@ -425,17 +435,130 @@ impl ForgeLsp {
                     })
                     .await;
 
+                // Try persisted reference index first (fast warm start).
+                let cfg_for_load = foundry_config.clone();
+                let load_res = tokio::task::spawn_blocking(move || {
+                    crate::project_cache::load_reference_cache_with_report(&cfg_for_load)
+                })
+                .await;
+                match load_res {
+                    Ok(report) => {
+                        if let Some(cached_build) = report.build {
+                            let source_count = cached_build.nodes.len();
+                            ast_cache
+                                .write()
+                                .await
+                                .insert(cache_key, Arc::new(cached_build));
+                            client
+                                .log_message(
+                                    MessageType::INFO,
+                                    format!(
+                                        "project index: cache load hit (sources={}, hashed_files={}, duration={}ms)",
+                                        source_count, report.file_count_hashed, report.duration_ms
+                                    ),
+                                )
+                                .await;
+
+                            client
+                                .send_notification::<notification::Progress>(ProgressParams {
+                                    token: token.clone(),
+                                    value: ProgressParamsValue::WorkDone(WorkDoneProgress::End(
+                                        WorkDoneProgressEnd {
+                                            message: Some(format!(
+                                                "Loaded {} source files from cache",
+                                                source_count
+                                            )),
+                                        },
+                                    )),
+                                })
+                                .await;
+                            return;
+                        }
+
+                        client
+                            .log_message(
+                                MessageType::INFO,
+                                format!(
+                                    "project index: cache load miss (reason={}, hashed_files={}, duration={}ms)",
+                                    report
+                                        .miss_reason
+                                        .unwrap_or_else(|| "unknown".to_string()),
+                                    report.file_count_hashed,
+                                    report.duration_ms
+                                ),
+                            )
+                            .await;
+                    }
+                    Err(e) => {
+                        client
+                            .log_message(
+                                MessageType::WARNING,
+                                format!("project index: cache load task failed: {e}"),
+                            )
+                            .await;
+                    }
+                }
+
                 match crate::solc::solc_project_index(&foundry_config, Some(&client), None).await {
                     Ok(ast_data) => {
                         let cached_build = Arc::new(crate::goto::CachedBuild::new(ast_data, 0));
                         let source_count = cached_build.nodes.len();
-                        ast_cache.write().await.insert(cache_key, cached_build);
+                        let build_for_save = (*cached_build).clone();
+                        ast_cache
+                            .write()
+                            .await
+                            .insert(cache_key.clone(), cached_build);
                         client
                             .log_message(
                                 MessageType::INFO,
                                 format!("project index: cached {} source files", source_count),
                             )
                             .await;
+
+                        let cfg_for_save = foundry_config.clone();
+                        let client_for_save = client.clone();
+                        tokio::spawn(async move {
+                            let res = tokio::task::spawn_blocking(move || {
+                                crate::project_cache::save_reference_cache_with_report(
+                                    &cfg_for_save,
+                                    &build_for_save,
+                                )
+                            })
+                            .await;
+                            match res {
+                                Ok(Ok(report)) => {
+                                    client_for_save
+                                        .log_message(
+                                            MessageType::INFO,
+                                            format!(
+                                                "project index: cache save complete (hashed_files={}, duration={}ms)",
+                                                report.file_count_hashed, report.duration_ms
+                                            ),
+                                        )
+                                        .await;
+                                }
+                                Ok(Err(e)) => {
+                                    client_for_save
+                                        .log_message(
+                                            MessageType::WARNING,
+                                            format!(
+                                                "project index: failed to persist cache: {e}"
+                                            ),
+                                        )
+                                        .await;
+                                }
+                                Err(e) => {
+                                    client_for_save
+                                        .log_message(
+                                            MessageType::WARNING,
+                                            format!(
+                                                "project index: cache save task failed: {e}"
+                                            ),
+                                        )
+                                        .await;
+                                }
+                            }
+                        });
 
                         // End progress: indexing complete.
                         client
@@ -569,6 +692,37 @@ impl ForgeLsp {
 
 fn update_imports_on_delete_enabled(settings: &crate::config::Settings) -> bool {
     settings.file_operations.update_imports_on_delete
+}
+
+fn start_or_mark_project_cache_sync_pending(
+    pending: &std::sync::atomic::AtomicBool,
+    running: &std::sync::atomic::AtomicBool,
+) -> bool {
+    pending.store(true, Ordering::Release);
+    running
+        .compare_exchange(false, true, Ordering::AcqRel, Ordering::Acquire)
+        .is_ok()
+}
+
+fn take_project_cache_sync_pending(pending: &std::sync::atomic::AtomicBool) -> bool {
+    pending.swap(false, Ordering::AcqRel)
+}
+
+fn stop_project_cache_sync_worker_or_reclaim(
+    pending: &std::sync::atomic::AtomicBool,
+    running: &std::sync::atomic::AtomicBool,
+) -> bool {
+    running.store(false, Ordering::Release);
+    pending.load(Ordering::Acquire)
+        && running
+            .compare_exchange(false, true, Ordering::AcqRel, Ordering::Acquire)
+            .is_ok()
+}
+
+fn try_claim_project_cache_dirty(dirty: &std::sync::atomic::AtomicBool) -> bool {
+    dirty
+        .compare_exchange(true, false, Ordering::AcqRel, Ordering::Acquire)
+        .is_ok()
 }
 
 #[tower_lsp::async_trait]
@@ -948,11 +1102,79 @@ impl LanguageServer for ForgeLsp {
                     })
                     .await;
 
+                // Try persisted reference index first (fast warm start).
+                let cfg_for_load = foundry_config.clone();
+                let load_res = tokio::task::spawn_blocking(move || {
+                    crate::project_cache::load_reference_cache_with_report(&cfg_for_load)
+                })
+                .await;
+                match load_res {
+                    Ok(report) => {
+                        if let Some(cached_build) = report.build {
+                            let source_count = cached_build.nodes.len();
+                            ast_cache
+                                .write()
+                                .await
+                                .insert(cache_key, Arc::new(cached_build));
+                            client
+                                .log_message(
+                                    MessageType::INFO,
+                                    format!(
+                                        "project index (eager): cache load hit (sources={}, hashed_files={}, duration={}ms)",
+                                        source_count, report.file_count_hashed, report.duration_ms
+                                    ),
+                                )
+                                .await;
+
+                            client
+                                .send_notification::<notification::Progress>(ProgressParams {
+                                    token: token.clone(),
+                                    value: ProgressParamsValue::WorkDone(WorkDoneProgress::End(
+                                        WorkDoneProgressEnd {
+                                            message: Some(format!(
+                                                "Loaded {} source files from cache",
+                                                source_count
+                                            )),
+                                        },
+                                    )),
+                                })
+                                .await;
+                            return;
+                        }
+
+                        client
+                            .log_message(
+                                MessageType::INFO,
+                                format!(
+                                    "project index (eager): cache load miss (reason={}, hashed_files={}, duration={}ms)",
+                                    report
+                                        .miss_reason
+                                        .unwrap_or_else(|| "unknown".to_string()),
+                                    report.file_count_hashed,
+                                    report.duration_ms
+                                ),
+                            )
+                            .await;
+                    }
+                    Err(e) => {
+                        client
+                            .log_message(
+                                MessageType::WARNING,
+                                format!("project index (eager): cache load task failed: {e}"),
+                            )
+                            .await;
+                    }
+                }
+
                 match crate::solc::solc_project_index(&foundry_config, Some(&client), None).await {
                     Ok(ast_data) => {
                         let cached_build = Arc::new(crate::goto::CachedBuild::new(ast_data, 0));
                         let source_count = cached_build.nodes.len();
-                        ast_cache.write().await.insert(cache_key, cached_build);
+                        let build_for_save = (*cached_build).clone();
+                        ast_cache
+                            .write()
+                            .await
+                            .insert(cache_key.clone(), cached_build);
                         client
                             .log_message(
                                 MessageType::INFO,
@@ -962,6 +1184,51 @@ impl LanguageServer for ForgeLsp {
                                 ),
                             )
                             .await;
+
+                        let cfg_for_save = foundry_config.clone();
+                        let client_for_save = client.clone();
+                        tokio::spawn(async move {
+                            let res = tokio::task::spawn_blocking(move || {
+                                crate::project_cache::save_reference_cache_with_report(
+                                    &cfg_for_save,
+                                    &build_for_save,
+                                )
+                            })
+                            .await;
+                            match res {
+                                Ok(Ok(report)) => {
+                                    client_for_save
+                                        .log_message(
+                                            MessageType::INFO,
+                                            format!(
+                                                "project index (eager): cache save complete (hashed_files={}, duration={}ms)",
+                                                report.file_count_hashed, report.duration_ms
+                                            ),
+                                        )
+                                        .await;
+                                }
+                                Ok(Err(e)) => {
+                                    client_for_save
+                                        .log_message(
+                                            MessageType::WARNING,
+                                            format!(
+                                                "project index (eager): failed to persist cache: {e}"
+                                            ),
+                                        )
+                                        .await;
+                                }
+                                Err(e) => {
+                                    client_for_save
+                                        .log_message(
+                                            MessageType::WARNING,
+                                            format!(
+                                                "project index (eager): cache save task failed: {e}"
+                                            ),
+                                        )
+                                        .await;
+                                }
+                            }
+                        });
 
                         client
                             .send_notification::<notification::Progress>(ProgressParams {
@@ -1245,6 +1512,147 @@ impl LanguageServer for ForgeLsp {
             language_id: "".to_string(),
         })
         .await;
+
+        // If workspace file-ops changed project structure, schedule a
+        // debounced latest-wins sync of on-disk reference cache.
+        if self.use_solc
+            && self.settings.read().await.project_index.full_project_scan
+            && self.project_cache_dirty.load(Ordering::Acquire)
+        {
+            if start_or_mark_project_cache_sync_pending(
+                &self.project_cache_sync_pending,
+                &self.project_cache_sync_running,
+            ) {
+                let foundry_config = self.foundry_config.read().await.clone();
+                let root_key = self.root_uri.read().await.as_ref().map(|u| u.to_string());
+                let ast_cache = self.ast_cache.clone();
+                let client = self.client.clone();
+                let dirty_flag = self.project_cache_dirty.clone();
+                let running_flag = self.project_cache_sync_running.clone();
+                let pending_flag = self.project_cache_sync_pending.clone();
+
+                tokio::spawn(async move {
+                    loop {
+                        // Debounce save bursts into one trailing sync.
+                        tokio::time::sleep(std::time::Duration::from_millis(700)).await;
+
+                        if !take_project_cache_sync_pending(&pending_flag) {
+                            // No pending work right now; try to stop worker.
+                            // If new work arrived concurrently after stop,
+                            // reclaim leadership and keep running.
+                            if stop_project_cache_sync_worker_or_reclaim(
+                                &pending_flag,
+                                &running_flag,
+                            ) {
+                                continue;
+                            }
+                            break;
+                        }
+
+                        if !try_claim_project_cache_dirty(&dirty_flag) {
+                            continue;
+                        }
+
+                        let Some(cache_key) = &root_key else {
+                            dirty_flag.store(true, Ordering::Release);
+                            continue;
+                        };
+                        if !foundry_config.root.is_dir() {
+                            dirty_flag.store(true, Ordering::Release);
+                            client
+                                .log_message(
+                                    MessageType::WARNING,
+                                    format!(
+                                        "didSave cache sync: invalid project root {}, deferring",
+                                        foundry_config.root.display()
+                                    ),
+                                )
+                                .await;
+                            continue;
+                        }
+
+                        client
+                            .log_message(
+                                MessageType::INFO,
+                                "didSave cache sync: rebuilding project index from disk",
+                            )
+                            .await;
+
+                        match crate::solc::solc_project_index(
+                            &foundry_config,
+                            Some(&client),
+                            None,
+                        )
+                        .await
+                        {
+                            Ok(ast_data) => {
+                                let cached_build =
+                                    Arc::new(crate::goto::CachedBuild::new(ast_data, 0));
+                                let source_count = cached_build.nodes.len();
+                                let build_for_save = (*cached_build).clone();
+                                ast_cache.write().await.insert(cache_key.clone(), cached_build);
+
+                                let cfg_for_save = foundry_config.clone();
+                                let save_res = tokio::task::spawn_blocking(move || {
+                                    crate::project_cache::save_reference_cache_with_report(
+                                        &cfg_for_save,
+                                        &build_for_save,
+                                    )
+                                })
+                                .await;
+
+                                match save_res {
+                                    Ok(Ok(report)) => {
+                                        client
+                                            .log_message(
+                                                MessageType::INFO,
+                                                format!(
+                                                    "didSave cache sync: persisted cache (sources={}, hashed_files={}, duration={}ms)",
+                                                    source_count, report.file_count_hashed, report.duration_ms
+                                                ),
+                                            )
+                                            .await;
+                                    }
+                                    Ok(Err(e)) => {
+                                        dirty_flag.store(true, Ordering::Release);
+                                        client
+                                            .log_message(
+                                                MessageType::WARNING,
+                                                format!(
+                                                    "didSave cache sync: persist failed, will retry: {e}"
+                                                ),
+                                            )
+                                            .await;
+                                    }
+                                    Err(e) => {
+                                        dirty_flag.store(true, Ordering::Release);
+                                        client
+                                            .log_message(
+                                                MessageType::WARNING,
+                                                format!(
+                                                    "didSave cache sync: save task failed, will retry: {e}"
+                                                ),
+                                            )
+                                            .await;
+                                    }
+                                }
+                            }
+                            Err(e) => {
+                                dirty_flag.store(true, Ordering::Release);
+                                client
+                                    .log_message(
+                                        MessageType::WARNING,
+                                        format!(
+                                            "didSave cache sync: re-index failed, will retry: {e}"
+                                        ),
+                                    )
+                                    .await;
+                            }
+                        }
+                    }
+                });
+            }
+        }
     }
 
     async fn will_save(&self, params: WillSaveTextDocumentParams) {
@@ -2830,6 +3238,7 @@ impl LanguageServer for ForgeLsp {
                 format!("workspace/didRenameFiles: {} file(s)", params.files.len()),
             )
             .await;
+        self.project_cache_dirty.store(true, Ordering::Release);
 
         // ── Phase 1: parse params & expand folder renames ──────────────
         let raw_uri_pairs: Vec<(Url, Url)> = params
@@ -3132,6 +3541,7 @@ impl LanguageServer for ForgeLsp {
                 format!("workspace/didDeleteFiles: {} file(s)", params.files.len()),
             )
             .await;
+        self.project_cache_dirty.store(true, Ordering::Release);
 
         let raw_delete_uris: Vec<Url> = params
             .files
@@ -3333,6 +3743,7 @@ impl LanguageServer for ForgeLsp {
                 format!("workspace/didCreateFiles: {} file(s)", params.files.len()),
             )
             .await;
+        self.project_cache_dirty.store(true, Ordering::Release);
         if !self
             .settings
             .read()
@@ -3559,7 +3970,12 @@ impl LanguageServer for ForgeLsp {
 
 #[cfg(test)]
 mod tests {
-    use super::update_imports_on_delete_enabled;
+    use super::{
+        start_or_mark_project_cache_sync_pending, stop_project_cache_sync_worker_or_reclaim,
+        take_project_cache_sync_pending, try_claim_project_cache_dirty,
+        update_imports_on_delete_enabled,
+    };
+    use std::sync::atomic::{AtomicBool, Ordering};
 
     #[test]
     fn update_imports_on_delete_enabled_defaults_true() {
@@ -3572,5 +3988,64 @@ mod tests {
         let mut s = crate::config::Settings::default();
         s.file_operations.update_imports_on_delete = false;
         assert!(!update_imports_on_delete_enabled(&s));
+    }
+
+    #[test]
+    fn project_cache_sync_burst_only_first_starts_worker() {
+        let pending = AtomicBool::new(false);
+        let running = AtomicBool::new(false);
+
+        assert!(start_or_mark_project_cache_sync_pending(&pending, &running));
+        assert!(pending.load(Ordering::Acquire));
+        assert!(running.load(Ordering::Acquire));
+
+        // Subsequent save while running should only mark pending, not spawn.
+        assert!(!start_or_mark_project_cache_sync_pending(&pending, &running));
+        assert!(pending.load(Ordering::Acquire));
+        assert!(running.load(Ordering::Acquire));
+    }
+
+    #[test]
+    fn project_cache_sync_take_pending_is_one_shot() {
+        let pending = AtomicBool::new(true);
+        assert!(take_project_cache_sync_pending(&pending));
+        assert!(!pending.load(Ordering::Acquire));
+        assert!(!take_project_cache_sync_pending(&pending));
+    }
+
+    #[test]
+    fn project_cache_sync_worker_stop_or_reclaim_handles_race() {
+        let pending = AtomicBool::new(false);
+        let running = AtomicBool::new(true);
+
+        // No new pending work: worker stops.
+        assert!(!stop_project_cache_sync_worker_or_reclaim(
+            &pending, &running
+        ));
+        assert!(!running.load(Ordering::Acquire));
+
+        // Simulate a new save arriving right as worker tries to stop.
+        pending.store(true, Ordering::Release);
+        running.store(true, Ordering::Release);
+        assert!(stop_project_cache_sync_worker_or_reclaim(
+            &pending, &running
+        ));
+        assert!(running.load(Ordering::Acquire));
+    }
+
+    #[test]
+    fn project_cache_dirty_claim_and_retry_cycle() {
+        let dirty = AtomicBool::new(true);
+
+        assert!(try_claim_project_cache_dirty(&dirty));
+        assert!(!dirty.load(Ordering::Acquire));
+
+        // Second claim without retry mark should fail.
+        assert!(!try_claim_project_cache_dirty(&dirty));
+
+        // Retry path marks dirty again.
+        dirty.store(true, Ordering::Release);
+        assert!(try_claim_project_cache_dirty(&dirty));
+        assert!(!dirty.load(Ordering::Acquire));
     }
 }
