@@ -152,6 +152,20 @@ Add to `~/.config/opencode/config.json`:
 }
 ```
 
+## CI and Release Gates
+
+- [`test.yml`](.github/workflows/test.yml)
+  - `test` job: runs `cargo test` on PRs and `main`.
+  - `release-preflight` job (depends on `test`): runs:
+    - `cargo build --release`
+    - `cargo test --release`
+    - `lsp-bench -c benchmarks/ci-verify.yaml -s benchmarks/servers.ci.yaml --verify`
+    - `lsp-bench -c benchmarks/ci-file-ops-verify.yaml -s benchmarks/servers.ci.yaml --verify`
+- [`release.yml`](.github/workflows/release.yml)
+  - runs on `v*` tags
+  - builds and publishes signed release artifacts
+  - does not re-run the full test suite (already covered by preflight)
+
 ## Verify Release Binaries
 
 Release binaries are GPG-signed. Download `checksums-sha256.txt`, `checksums-sha256.txt.asc`, and [`public-key.asc`](public-key.asc) from the [release](https://github.com/mmsaki/solidity-language-server/releases/latest):
