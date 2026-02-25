@@ -302,3 +302,14 @@ tail -f ~/.local/state/nvim/lsp.log
 ```
 
 You should see `workspace/willRenameFiles` followed by `willRenameFiles: N edit(s) across M file(s)`. If you see `willRenameFiles: no import edits needed`, the server couldn't find matching imports — the project index may not have finished building yet (wait for the "Indexing project" spinner to complete before renaming).
+
+**4. Save all modified buffers after rename**
+
+`workspace/willRenameFiles` applies import updates to open buffers. Your editor may not auto-save those buffers to disk.
+After a rename, run:
+
+```vim
+:wa
+```
+
+This writes all modified files, so external tools (e.g. Foundry) read the updated imports from disk.
